@@ -51,3 +51,22 @@
 - Creato commit locale con messaggio `Initialize project governance and scaffold`.
 - Push remoto non completato: il push non interattivo e' fallito per assenza
   credenziali e il tentativo di push interattivo non e' stato autorizzato.
+
+## 2026-05-26 18:20 +02:00 - Verifica commit/push prima cambio ambiente
+
+### Messaggio utente
+- L'utente chiede se commit e push di tutto sono stati completati per poter
+  continuare dall'ambiente di casa.
+
+### Verifica assistente
+- Eseguito controllo Git: branch `main` risulta `ahead 1` rispetto a
+  `origin/main`.
+- Ultimo commit locale verificato: `80cf88e Initialize project governance and scaffold`.
+- Verificata autenticazione GitHub CLI: assente (`gh auth status` segnala
+  utente non loggato).
+
+### Stato comunicato
+- Commit locale completato.
+- Push remoto non completato.
+- Per continuare da casa serve completare il push da questa macchina oppure
+  portare manualmente i file/commit locali.
