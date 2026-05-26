@@ -1,0 +1,186 @@
+SPECIFICA TECNICA COMPLETA - MVP OTTIMIZZATO
+
+AI Swimming Motion Analyzer (Proof of Concept a Secco)
+
+1. Introduzione e Visione del Progetto
+
+AI Swimming Motion Analyzer e' un sistema di analisi biomeccanica basato su
+Computer Vision e Intelligenza Artificiale, progettato per monitorare,
+tracciare e valutare i movimenti del nuotatore senza l'utilizzo obbligatorio di
+dispositivi indossabili (smartwatch, fasce cardio o sensori inerziali).
+
+L'obiettivo fondamentale di questa versione Minimum Viable Product (MVP),
+strutturata come Proof of Concept (PoC), e' validare l'intera logica
+algoritmica, l'architettura software e i moduli di Computer Vision in un
+ambiente controllato, eliminando i costi hardware e le complessita' fisiche
+legate all'ambiente acquatico. Il sistema e' progettato per funzionare in
+modalita' standalone 100% offline, garantendo l'elaborazione locale dei flussi
+video tramite hardware di livello consumer.
+
+2. Obiettivi dell'MVP
+
+- Tracciare la fisionomia e la postura del corpo umano senza marcatori fisici
+  utilizzando flussi video standard (webcam o file video MP4).
+- Calcolare gli angoli delle articolazioni principali coinvolte nella
+  cinematica del nuoto in tempo reale.
+- Sviluppare algoritmi matematici robusti per l'estrazione di metriche
+  biomeccaniche essenziali (conteggio cicli, costanza del ritmo, simmetria
+  bilaterale).
+- Fornire una dashboard visiva interattiva e locale per consentire all'utente
+  di caricare video, analizzare i flussi live e visualizzare i grafici
+  prestazionali immediati.
+- Raggiungere l'obiettivo a costo zero per lo sviluppo software, sfruttando
+  esclusivamente framework open source maturi.
+
+3. Scenario di Test e Vincoli Geometrici
+
+Validazione a Secco: al fine di azzerare i tempi di installazione hardware in
+vasca e aggirare i problemi fisici della rifrazione della luce e degli schizzi
+d'acqua, il sistema viene validato esclusivamente a secco attraverso due
+modalita':
+
+1. Dryland Swimming (Nuoto a Secco): l'utente simula i movimenti tecnici degli
+   stili del nuoto davanti alla webcam del PC, rimanendo in piedi o sdraiato
+   longitudinalmente su una panca da allenamento.
+2. Video Dataset Analysis: il sistema elabora file video in formato MP4 di
+   nuotatori reali estratti da dataset open source o scaricati da riprese
+   tecniche presenti su YouTube.
+
+Vincolo Geometrico Fondamentale (Inquadratura Laterale): tutto il materiale di
+test deve presentare una vista rigorosamente laterale (profilo a 90 gradi).
+L'asse ottico della telecamera deve essere perpendicolare al piano sagittale del
+soggetto. Questa inquadratura consente alla pipeline software di mappare la
+cinematica articolare nello spazio cartesiano X-Y del frame video senza subire
+distorsioni significative dovute ad accorciamenti prospettici sull'asse Z.
+
+4. Stack Tecnologico Open Source
+
+- Python 3.10+: linguaggio core per l'intero ecosistema.
+- OpenCV (opencv-python): ingestione flussi video, manipolazione frame,
+  ridimensionamento e rendering overlay.
+- MediaPipe Pose: framework di percezione per tracciare 33 landmark corporei in
+  tempo reale su CPU.
+- Streamlit: framework per interfaccia utente locale e grafici interattivi.
+- NumPy, Pandas e Matplotlib: organizzazione dati, analisi statistica ed export.
+- SQLite / CSV: persistenza locale serverless, con alternativa minimale CSV.
+
+5. Moduli Software e Architettura del Sistema
+
+1. Video Acquisition Module (vision_tracker.py): inizializza sorgente video
+   tramite webcam o file MP4, estrae i frame e sincronizza il frame rate.
+2. Pose Detection Module (vision_tracker.py): converte frame in RGB, passa il
+   frame a MediaPipe Pose, estrae landmark e coordinate cartesiane normalizzate.
+3. Motion Analysis & Metrics Engine (metrics_engine.py): isola vettori di
+   interesse ed esegue calcoli trigonometrici e statistici.
+4. Dashboard Module (app.py): gestisce UI Streamlit, rendering video con
+   scheletro in overlay e visualizzazione grafici.
+5. Storage Module (data/): persiste dati aggregati a fine sessione.
+
+6. Algoritmi e Metriche Biomeccaniche
+
+6.1 Conteggio Automatico delle Bracciate (Stroke Counter)
+
+L'algoritmo sfrutta un approccio cinematico basato sul tracciamento della
+coordinata Y del polso (landmark 15 per sinistro, landmark 16 per destro). Nel
+nuoto di profilo il polso compie una traiettoria ciclica sinusoidale.
+L'algoritmo monitora l'inversione del vettore di movimento della coordinata Y e
+registra un ciclo completo quando l'escursione d'onda viene completata. Un
+filtro di debounce temporale, ad esempio minimo 0.6 secondi tra i picchi,
+previene falsi positivi generati dal tremolio del tracking.
+
+6.2 Analisi dell'Angolo del Gomito (Elbow Angle Analysis)
+
+La metrica valuta la presenza del gomito alto durante trazione o recupero.
+L'algoritmo isola tre punti nello spazio 2D: spalla (A), gomito (B) e polso
+(C). Utilizzando funzioni arcotangente bidimensionali viene calcolato l'angolo
+interno espresso in gradi tra 0 e 180.
+
+Funzione richiesta in metrics_engine.py:
+
+```python
+import numpy as np
+
+def calculate_elbow_angle(shoulder, elbow, wrist):
+    """
+    shoulder, elbow, wrist sono tuple o liste (x, y).
+    Calcola l'angolo in gradi formato dal gomito.
+    """
+    a = np.array(shoulder)
+    b = np.array(elbow)
+    c = np.array(wrist)
+
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(
+        a[1] - b[1],
+        a[0] - b[0],
+    )
+    angle = np.abs(radians * 180.0 / np.pi)
+
+    if angle > 180.0:
+        angle = 360.0 - angle
+
+    return angle
+```
+
+6.3 Indice di Fluidita' e Costanza (Fluidity Score)
+
+Il Fluidity Score viene calcolato sulla regolarita' temporale dei cicli motori.
+Il sistema registra il timestamp di ogni picco d'onda rilevato dallo Stroke
+Counter e calcola la deviazione standard degli intervalli di tempo tra i cicli.
+
+Formula:
+
+```text
+Fluidity Score = max(0, 100 - (Standard_Deviation(Delta_Tempi) * 50))
+```
+
+6.4 Punteggio di Simmetria Bilaterale (Symmetry Score)
+
+Lo score viene espresso come rapporto percentuale tra la media degli angoli
+massimi destro e sinistro:
+
+```text
+Symmetry Score = (Min(Media_Angoli_Dx, Media_Angoli_Sx) /
+                  Max(Media_Angoli_Dx, Media_Angoli_Sx)) * 100
+```
+
+7. Interfaccia Utente (UI/UX Dashboard)
+
+La GUI viene sviluppata in `app.py` usando Streamlit con layout minimale a due
+macro-colonne:
+
+- Colonna sinistra: selettore input, caricamento MP4 o webcam live, rendering
+  video frame per frame con scheletro MediaPipe in overlay e angolo gomito
+  istantaneo.
+- Colonna destra: KPI aggregati tramite blocchi numerici (Total Strokes,
+  Fluidity Index, Symmetry %) e grafici a linee aggiornati dinamicamente.
+- Barra funzioni: pulsanti per iniziare sessione, interrompere e salvare,
+  esportare in CSV.
+
+8. Struttura del Progetto
+
+```text
+swim_ai_poc/
+├── app.py
+├── vision_tracker.py
+├── metrics_engine.py
+├── requirements.txt
+├── data/
+│   └── sessions.csv
+└── test_videos/
+    └── profilo_test.mp4
+```
+
+9. Roadmap di Sviluppo
+
+- Settimana 1: ingestione video e pose tracking corporeo.
+- Settimana 2: sviluppo algoritmi e calcolo metriche.
+- Settimana 3: UI frontend e integrazione dashboard.
+- Settimana 4: debugging generale, ottimizzazione e demo pitch.
+
+10. Mitigazione delle Criticita' e Sviluppi Futuri
+
+L'inquadratura laterale 2D puo' soffrire di occlusioni temporanee. In questa
+fase MVP l'algoritmo ignora landmark con visibility score inferiore a 0.5 e
+mantiene l'ultimo angolo valido fino al ritorno del punto nel campo visivo,
+prevenendo picchi anomali o crash del software.
+
