@@ -64,11 +64,13 @@
 - Evidenza: `gh auth status` restituisce "You are not logged into any GitHub hosts".
 - Impatto: il push potrebbe non riuscire finche' non viene completato il login
   GitHub o configurato un credential helper valido.
-- Stato: aperto.
+- Stato: risolto per Git HTTPS.
 - Azione eseguita: creato commit locale; push non interattivo fallito
   per assenza credenziali; tentativo di push interattivo non autorizzato.
-- Azione proposta: eseguire login GitHub CLI o completare autenticazione via
-  Git Credential Manager, poi ripetere `git push origin main`.
+- Aggiornamento 2026-05-28: `git push origin main` e' riuscito tramite
+  credenziali Git HTTPS disponibili. GitHub CLI resta non autenticato, ma non
+  blocca il push Git.
+- Azione residua: autenticare GitHub CLI solo se serviranno comandi `gh`.
 
 ## 2026-05-28
 

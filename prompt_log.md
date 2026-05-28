@@ -100,3 +100,5 @@
 - FASE 1 implementata, test reale webcam/MP4 ancora da fare.
 - FASE 2 implementata con test sintetici.
 - Prossima task: FASE 3, dashboard Streamlit in `app.py`.
+- Creato e pushato su `origin/main` il commit
+  `Implement vision tracking and metrics engine`.
