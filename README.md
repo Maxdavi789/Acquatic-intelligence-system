@@ -37,12 +37,13 @@ la specifica tecnica e il breakdown operativo forniti nei PDF di progetto.
 
 ## Stato
 
-Aggiornato al 2026-05-26.
+Aggiornato al 2026-05-28.
 
-- FASE 0: in corso.
-- FASE 0.1: completata con scaffold iniziale.
-- FASE 0.2: bloccata finche' l'ambiente Python locale non viene sistemato.
-- FASI 1-4: non iniziate.
+- FASE 0: completata.
+- FASE 1: implementata in `vision_tracker.py`; test reale webcam/MP4 ancora da fare.
+- FASE 2: implementata in `metrics_engine.py` con test sintetici.
+- FASE 3: prossima, dashboard Streamlit in `app.py`.
+- FASE 4: non iniziata.
 
 ## Governance Operativa
 

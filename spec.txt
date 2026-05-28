@@ -160,14 +160,14 @@ macro-colonne:
 
 ```text
 swim_ai_poc/
-├── app.py
-├── vision_tracker.py
-├── metrics_engine.py
-├── requirements.txt
-├── data/
-│   └── sessions.csv
-└── test_videos/
-    └── profilo_test.mp4
++-- app.py
++-- vision_tracker.py
++-- metrics_engine.py
++-- requirements.txt
++-- data/
+|   +-- sessions.csv
++-- test_videos/
+    +-- profilo_test.mp4
 ```
 
 9. Roadmap di Sviluppo
@@ -183,4 +183,3 @@ L'inquadratura laterale 2D puo' soffrire di occlusioni temporanee. In questa
 fase MVP l'algoritmo ignora landmark con visibility score inferiore a 0.5 e
 mantiene l'ultimo angolo valido fino al ritorno del punto nel campo visivo,
 prevenendo picchi anomali o crash del software.
-

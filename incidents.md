@@ -69,3 +69,33 @@
   per assenza credenziali; tentativo di push interattivo non autorizzato.
 - Azione proposta: eseguire login GitHub CLI o completare autenticazione via
   Git Credential Manager, poi ripetere `git push origin main`.
+
+## 2026-05-28
+
+### INC-2026-05-28-001 - Python command ancora puntato allo stub WindowsApps
+- Tipo: ambiente Python.
+- Evidenza: `python --version` continua a fallire nella shell corrente anche
+  dopo installazione Python 3.11.
+- Impatto: i comandi devono usare `.\venv\Scripts\python.exe` oppure il path
+  esplicito di Python finche' il PATH non viene aggiornato.
+- Stato: mitigato.
+- Azione eseguita: installato Python 3.11, creato `venv/` e verificati import
+  delle dipendenze dal virtual environment.
+
+### INC-2026-05-28-002 - Pip bloccato dalla sandbox di rete
+- Tipo: ambiente rete.
+- Evidenza: `pip install -r requirements.txt` falliva con errore WinError 10013
+  senza permessi elevati.
+- Impatto: impossibile installare dipendenze nel sandbox standard.
+- Stato: risolto.
+- Azione eseguita: rilanciata installazione con permesso rete e completata con
+  successo.
+
+### INC-2026-05-28-003 - Cache Matplotlib non scrivibile nel profilo utente
+- Tipo: ambiente runtime.
+- Evidenza: import MediaPipe/Matplotlib tentava di creare
+  `C:\Users\user\.matplotlib` e riceveva accesso negato.
+- Impatto: warning ripetuti e import piu' lento.
+- Stato: mitigato.
+- Azione eseguita: configurato `MPLCONFIGDIR` su cache locale di progetto in
+  `vision_tracker.py` e ignorata `.cache/` in Git.

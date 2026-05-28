@@ -70,3 +70,33 @@
 - Push remoto non completato.
 - Per continuare da casa serve completare il push da questa macchina oppure
   portare manualmente i file/commit locali.
+
+## 2026-05-28 - Continuazione progetto
+
+### Messaggio utente
+- L'utente ha chiesto: "continua con il progetto".
+
+### Messaggi/azioni assistente
+- Verificato che la repo locale e `origin/main` sono allineati al commit
+  `321804d`.
+- Letti `breakdown_status.md`, `prompt_log.md`, `incidents.md`,
+  `requirements.txt` e `spec.txt`.
+- Verificato che GitHub CLI non e' autenticato.
+- Installato Python 3.11 tramite `winget`.
+- Creato virtual environment `venv/`.
+- Compilato `requirements.txt` con stack previsto dalla specifica.
+- Installate dipendenze nel `venv` dopo autorizzazione rete per pip.
+- Verificati import di OpenCV, MediaPipe, Streamlit, NumPy, Pandas e Matplotlib.
+- Aggiunto `.gitignore` per `venv/`, cache, output locali e file editor.
+- Corretto il blocco struttura in `spec.txt` usando ASCII.
+- Implementata FASE 1 in `vision_tracker.py`: webcam/MP4, resize, MediaPipe
+  Pose, overlay landmark e chiusura pulita con `q`.
+- Implementata FASE 2 in `metrics_engine.py`: angolo gomito, StrokeCounter,
+  Fluidity Score e Symmetry Score.
+- Eseguiti test di compilazione, CLI help e casi numerici sintetici.
+
+### Stato iterazione
+- FASE 0 completata.
+- FASE 1 implementata, test reale webcam/MP4 ancora da fare.
+- FASE 2 implementata con test sintetici.
+- Prossima task: FASE 3, dashboard Streamlit in `app.py`.
