@@ -580,3 +580,10 @@
   ed escluso dal commit/push per la possibile licenza di terzi.
 - Azione autorizzata: push dei commit locali su `origin/main`, seguito da
   verifica ahead/behind. Nessun altro file locale viene pubblicato.
+
+### Esito
+- Push riuscito: `origin/main` aggiornato da `f32f661` a `e52a264`.
+- Verifica successiva al push: locale 0 commit avanti e 0 indietro rispetto a
+  `origin/main`.
+- Unico file residuo: `test_videos/profilo_provvisorio.mp4`, untracked e non
+  pubblicato intenzionalmente.
