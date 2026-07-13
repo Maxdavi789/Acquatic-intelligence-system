@@ -143,9 +143,10 @@
 - Evidenza: `python --version` sul PATH restituisce 3.12.10; la spec v1.1
   indica Python 3.11.
 - Impatto: possibile incompatibilita' di MediaPipe legacy con Python 3.12.
-- Stato: aperto.
-- Azione pianificata: creare `venv` con 3.12 e installare le dipendenze; se
-  MediaPipe legacy fallisce, ripiegare su Python 3.11 (approvato dall'utente).
+- Stato: risolto.
+- Azione eseguita: creato `venv` con Python 3.12 e installate le dipendenze;
+  mediapipe 0.10.35 e le altre librerie importano correttamente su 3.12.
+  Nessun fallback a Python 3.11 necessario.
 
 ### INC-2026-07-13-005 - requirements.txt non pinnato, matplotlib da valutare
 - Tipo: dipendenze.
@@ -154,6 +155,7 @@
   grafici (i grafici useranno `st.line_chart`).
 - Impatto: rischio di rotture da upgrade (in particolare MediaPipe) e
   dipendenza potenzialmente inutile.
-- Stato: aperto.
-- Azione pianificata: pinnare la versione di MediaPipe (task T02) e decidere su
-  matplotlib (task T04) dopo aver visto se e' dipendenza transitiva di MediaPipe.
+- Stato: risolto.
+- Azione eseguita: pinnato `mediapipe==0.10.35` (T02). Verificato che matplotlib
+  e' dipendenza transitiva di mediapipe (mediapipe Requires: ...matplotlib...);
+  rimosso da requirements.txt, resta installato via mediapipe (T04).

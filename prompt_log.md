@@ -151,3 +151,27 @@
 - Avviato Step 0 (scaffolding governance): creato SPEC_ERRATA.md, aggiornati
   prompt_log.md e incidents.md, riallineato breakdown_status.md al modello
   T01-T41. A seguire: M0 (T01 spec v1.1, T05 airbag simmetria, T02/T04 con venv).
+
+### Azioni eseguite in questa iterazione (M0)
+- Impostata identita' Git locale (Massimo davide fedrigo, noreply Maxdavi789).
+- Commit 05f13d7 (governance scaffolding): SPEC_ERRATA.md creato; prompt_log,
+  incidents e breakdown_status aggiornati e riallineati a T01-T41.
+- T01 (commit ca30745): spec.txt sostituito con la spec v1.1 in ASCII puro,
+  stato portato a CONGELATA (2026-07-13). Vecchia spec recuperabile da Git.
+- T05 (commit a7d399a): calculate_symmetry_score marcata airbag FUORI MVP v1;
+  verificate 0 chiamate attive; syntax check OK.
+- Creato venv con Python 3.12 e installate le dipendenze: mediapipe 0.10.35,
+  opencv-python 5.0.0.93, streamlit 1.59.1, numpy 2.5.1, pandas 3.0.3. Import
+  OK, nessun fallback a Python 3.11 necessario.
+- T02 (commit 4c9e0bf): pinnato mediapipe==0.10.35 in requirements.txt.
+- T04 (commit 61a96ea): rimosso matplotlib da requirements.txt; verificato che
+  e' dipendenza transitiva di mediapipe (mediapipe Requires matplotlib), quindi
+  resta installato automaticamente. Cache gestita via MPLCONFIGDIR.
+- T06 (questo commit): finalizzata la baseline nei file di governance.
+
+### Stato iterazione (fine)
+- M0 completata tranne T03 (test reale su MP4/webcam): bloccata in attesa di un
+  MP4 laterale provvisorio da mettere in test_videos/. Prossima task attivabile:
+  M1/T07 (selezione arto lato-camera).
+- Dopo il commit T06: 6 commit locali ahead di origin/main; push NON eseguito
+  (in attesa di OK esplicito dell'utente, come da politica concordata).
