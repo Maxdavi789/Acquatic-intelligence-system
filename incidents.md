@@ -331,6 +331,24 @@
   formale del test di occlusione T31 (M6): scenario controllato eseguito,
   nessun picco spurio, nessun crash, esito registrato.
 
+### 2026-07-14 - Video ufficiale adottato in deroga (T35 via DA-05)
+- Tipo: decisione di progetto / input di validazione.
+- Contesto: la registrazione in proprio (sandbox T34/T35) non e'
+  realizzabile. Su richiesta dell'utente e' stata cercata e validata una
+  clip stock con licenza libera (opzione gia' prevista da DA-05).
+- Selezione: valutati 4 candidati Pexels; 3 scartati (stretching statico,
+  vista posteriore, seduta). Adottato Pexels 37264420, HD 720x1280 25fps,
+  7,0 s, `test_videos/profilo_test.mp4`, SHA256
+  `2102C40B880F6BF5EC3AA04EBC22F769F1A628A4942E042D7AEAD4E1BBF5CD83`,
+  VERSIONATO nella repo (licenza Pexels, watermark assenti).
+- Validazione pipeline: 175/175 frame con posa, arto destro selezionato,
+  10 bracciate con cadenza regolare ~0,7 s, Fluidity 93,1, angoli
+  [58,49; 179,92]. Primo KPI Fluidity vivo su footage reale.
+- Limiti onesti: 7 secondi; vista laterale non perfetta nei primi istanti
+  (3/4); gesto = mulinello in piedi (dorso a secco), non stile libero
+  prono; primo picco a t=0,16 s perche' la clip inizia a braccio alzato.
+- Dettagli formali in SPEC_ERRATA.md (deroga T34/T35).
+
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
 - Evidenza: `cv2.VideoCapture(0)` restituisce `isOpened() == False` e OpenCV

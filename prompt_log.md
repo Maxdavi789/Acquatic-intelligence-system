@@ -951,3 +951,59 @@
   T35 (registrare profilo_test.mp4 con bracciate ritmiche continue).
 - Dopo il video ufficiale: T36, ripetizione T30/T33, poi M8 (README
   finale, screenshot, slide pitch, rehearsal, chiusura governance).
+
+## 2026-07-14 00:45 +02:00 - Consultazione: fattibilita' del video ufficiale T35
+
+### Messaggio utente
+- "questo video forse non puo' essere realizzato, se fosse cosi come
+  facciamo? proposte?". Nessuna richiesta di build: iterazione consultiva.
+
+### Analisi e proposte esposte (in attesa di scelta dell'utente)
+- Premessa: la spec (sez. 14.2) prevede gia' la simulazione a secco IN
+  PIEDI; il sandbox sez. 3.4 e' minimale per progetto. Non serve la panca
+  del video provvisorio.
+- Impatto del non avere un video nuovo: Fluidity mai esercitato con >= 3
+  picchi su footage reale (in demo resterebbe 0), T30 passato solo al
+  limite della tolleranza, pitch con footage di terzi watermarked e con
+  diritti non chiariti.
+- Proposta A (raccomandata con B): sandbox minimo in piedi, profilo,
+  mulinelli ritmici 4-5 cicli, telefono su appoggio fisso, parete neutra.
+- Proposta B (raccomandata): registrare con la webcam della macchina di
+  casa (gia' validata) tramite script di cattura dedicato che salva
+  direttamente test_videos/profilo_test.mp4; il PC funge da camera fissa
+  del sandbox. Serve anche per ripetere T30/T33 (richiedono un file).
+- Proposta C: clip open-license (Pexels/Pixabay/dataset) come consentito
+  da DA-05; rischio di non trovare inquadratura idonea.
+- Proposta D (ultima spiaggia): promuovere il provvisorio a riferimento
+  con deroga documentata in SPEC_ERRATA (resta fuori Git per licenza);
+  opzione tecnicamente funzionante ma debole per il pitch.
+- Esclusa esplicitamente la manipolazione del footage (loop/montaggio per
+  simulare il ritmo): contraria all'onesta' di validazione (DA-03).
+
+### Stato iterazione
+- Nessuna modifica a codice o scope; in attesa della scelta dell'utente
+  tra A/B/C/D. Preparazione script di cattura (B) o ricerca clip (C)
+  pronte a partire su approvazione.
+
+### Follow-up utente (stessa iterazione)
+- Commit dell'entry rifiutato dall'utente con due domande: perche' non si
+  puo' usare il video in Downloads? e il tutto necessita di una demo il
+  giorno della presentazione.
+- Risposta data: il video di Downloads E' gia' in uso come provvisorio
+  (stesso SHA256); il problema e' promuoverlo a video UFFICIALE di
+  demo/validazione per tre ragioni: (1) diritti - e' contenuto di terzi
+  con watermark/sovraimpressioni, non pubblicabile nella repo ne'
+  presentabile come pezzo centrale di un pitch di finanziamento (INC-009);
+  (2) contenuto - una sola bracciata lenta: il Fluidity Score resterebbe
+  0 in demo (servono >= 3 picchi), il counter e' al limite di tolleranza
+  (T30), formato verticale a bassa risoluzione con testo/frecce; (3)
+  coerenza con la spec - la narrativa del sandbox controllato (sez. 3.4)
+  e la ripetibilita' della demo (sez. 1.2) presuppongono footage proprio
+  in condizioni controllate.
+- Chiarimento demo: il giorno della presentazione NON serve produrre il
+  video dal vivo. Il flusso demo (T40) e': dashboard -> carica il video
+  ufficiale registrato una volta nel sandbox -> elaborazione LIVE davanti
+  al pubblico -> KPI/grafico -> export CSV. Con la riproducibilita'
+  bit-identica dimostrata (T33) la demo da' sempre gli stessi numeri:
+  e' il motivo per cui DA-02 ha reso l'MP4 percorso primario. La webcam
+  live resta un momento bonus opzionale gia' implementato (T28).

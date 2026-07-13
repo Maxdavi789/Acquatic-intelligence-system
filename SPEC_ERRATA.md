@@ -45,6 +45,38 @@ Qui si annotano baseline, delta e correzioni successive, con data e task ID.
 
 ## Errata successivi
 
+### 2026-07-14 - Deroga T34/T35 (DA-05, DA-08): video ufficiale da footage con licenza libera
+
+- Contesto: la registrazione in proprio del video di riferimento nel sandbox
+  fisico (T34/T35) non e' realizzabile per l'MVP. La spec prevede gia'
+  l'alternativa in DA-05 ("dataset open ... con licenza chiara").
+- Decisione (approvata dall'utente): il video ufficiale di riferimento e'
+  la clip stock Pexels 37264420 ("Workout warm up arm stretch routine
+  outdoors"), variante HD 720x1280 25fps, adottata come
+  `test_videos/profilo_test.mp4` e VERSIONATA nella repo (1,9 MB).
+  - Fonte: https://www.pexels.com/video/workout-warm-up-arm-stretch-routine-outdoors-37264420/
+  - File: https://videos.pexels.com/video-files/37264420/15786510_720_1280_25fps.mp4
+  - SHA256: 2102C40B880F6BF5EC3AA04EBC22F769F1A628A4942E042D7AEAD4E1BBF5CD83
+  - Licenza: Pexels License (uso libero anche commerciale, attribuzione non
+    richiesta). Watermark assenti.
+- Motivazione tecnica: soggetto singolo in piedi, prevalentemente di
+  profilo, camera fissa, luce uniforme, mulinelli RITMICI del braccio
+  (10 cicli in 7 s): esercita tutti i KPI, incluso il Fluidity Score che
+  con il provvisorio restava 0 (<3 picchi). Validazione: 175/175 frame con
+  posa, 10 bracciate, Fluidity 93,1, angoli [58,49; 179,92].
+- Conseguenze sulla spec congelata:
+  - Il "sandbox di validazione controllato" (sez. 3.4) per l'MVP e'
+    soddisfatto dalle condizioni controllate della clip (camera fissa,
+    sfondo uniforme, luce costante), non da un allestimento proprio.
+    L'allestimento fisico resta nella roadmap della fase finanziata.
+  - La simulazione e' in piedi (mulinello tipo dorso), opzione gia'
+    prevista dalla spec (sez. 14.2), non prona su panca.
+  - La demo (sez. 1.2) resta: elaborazione LIVE del video ufficiale nella
+    dashboard, ripetibile con KPI identici (riproducibilita' T33), con
+    eventuale momento webcam live best-effort (RF-014) da decidere.
+- Il precedente `profilo_provvisorio.mp4` (terzi, non licenziato) resta
+  NON tracciato e viene declassato a materiale di sviluppo storico.
+
 ### 2026-07-13 - Correzione DA-06 / T02: runtime MediaPipe legacy
 
 - `mediapipe==0.10.35` importa su Python 3.12 ma non distribuisce l'API legacy
