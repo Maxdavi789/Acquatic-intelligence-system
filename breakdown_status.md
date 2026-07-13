@@ -5,9 +5,8 @@ Data aggiornamento: 2026-07-13
 ## Stato Generale
 
 Repository: `https://github.com/Maxdavi789/Acquatic-intelligence-system.git`,
-branch `main`. Il locale e' AVANTI di diversi commit rispetto a `origin/main`:
-il push e' attualmente bloccato (vedi `incidents.md` INC-2026-07-13-006, la
-macchina e' autenticata come MrChuck118 senza permesso di scrittura).
+branch `main`. Locale allineato a `origin/main` (push eseguito il 2026-07-13
+dopo aver aggiunto MrChuck118 come collaboratore; vedi INC-2026-07-13-006).
 
 Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 
@@ -79,6 +78,6 @@ un dict senza campo simmetria. Non richiede video reale.
 
 - T03 (test reale FASE 1) e T14 (validazione CLI): servono un MP4 laterale
   provvisorio in `test_videos/`.
-- Push su `origin` bloccato: INC-2026-07-13-006 (credenziali GitHub di un altro
-  account). I commit restano al sicuro in locale.
+- Push su `origin`: risolto (MrChuck118 aggiunto come collaboratore); locale e
+  origin allineati.
 - `data/sessions.csv` non creato: generato dal modulo di export (M4).

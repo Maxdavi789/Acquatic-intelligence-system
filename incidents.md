@@ -168,7 +168,7 @@
   memorizzate su questa macchina appartengono all'account GitHub MrChuck118, che
   NON ha permesso di scrittura sul repo di Maxdavi789. (MrChuck118 e' anche il
   proprietario del repo live-draft-companion, non collegato a questo progetto.)
-- Stato: aperto, richiede azione dell'utente.
+- Stato: risolto (2026-07-13).
 - Azione residua: autenticarsi come Maxdavi789 (proprietario del repo) tramite
   credential manager / personal access token, oppure aggiungere MrChuck118 come
   collaboratore con permesso di scrittura sul repo di Maxdavi789. I commit
@@ -179,3 +179,7 @@
   serve un Personal Access Token oppure l'aggiunta di MrChuck118 come
   collaboratore. La credenziale NON e' stata salvata su disco. In quel momento
   i commit locali in attesa di push erano 14.
+- Aggiornamento 2026-07-13 (risoluzione): l'utente ha aggiunto MrChuck118 come
+  collaboratore con permesso Write sul repo di Maxdavi789. `git push origin main`
+  riuscito (ff016b8..9718657) usando le credenziali gia' presenti; locale e
+  `origin/main` allineati (0/0).
