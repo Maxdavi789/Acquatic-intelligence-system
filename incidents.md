@@ -146,8 +146,8 @@
 - Impatto: possibile incompatibilita' di MediaPipe legacy con Python 3.12.
 - Stato: risolto.
 - Azione eseguita: creato `venv` con Python 3.12 e installate le dipendenze;
-  mediapipe 0.10.35 e le altre librerie importano correttamente su 3.12.
-  Nessun fallback a Python 3.11 necessario.
+  il set corretto MediaPipe 0.10.21 / OpenCV contrib 4.11.0.86 / NumPy 1.26.4 /
+  protobuf 4.25.9 funziona su 3.12. Nessun fallback a Python 3.11 necessario.
 
 ### INC-2026-07-13-005 - requirements.txt non pinnato, matplotlib da valutare
 - Tipo: dipendenze.
@@ -157,8 +157,9 @@
 - Impatto: rischio di rotture da upgrade (in particolare MediaPipe) e
   dipendenza potenzialmente inutile.
 - Stato: risolto.
-- Azione eseguita: pinnato `mediapipe==0.10.35` (T02). Verificato che matplotlib
-  e' dipendenza transitiva di mediapipe (mediapipe Requires: ...matplotlib...);
+- Azione eseguita: il primo pin `mediapipe==0.10.35` e' stato corretto dopo
+  INC-008 a `mediapipe==0.10.21`, con pin compatibili di OpenCV contrib, NumPy e
+  protobuf. Verificato che matplotlib e' dipendenza transitiva di mediapipe;
   rimosso da requirements.txt, resta installato via mediapipe (T04).
 
 ### INC-2026-07-13-006 - Push negato: credenziali GitHub di un altro account
@@ -207,13 +208,15 @@
   possono eseguire il pose tracking con l'ambiente attuale, indipendentemente
   dalla qualita' del video. I precedenti import check non esercitavano questa
   API runtime.
-- Stato: aperto.
-- Azione prevista: prima di T03 verificare una versione MediaPipe realmente
-  compatibile con l'API legacy richiesta dalla spec, oppure formalizzare una
-  diversa decisione tecnica. Nessun downgrade/migrazione eseguito durante la
-  sola valutazione del video.
+- Stato: risolto (2026-07-13).
+- Azione eseguita: sostituito il runtime con `mediapipe==0.10.21`,
+  `opencv-contrib-python==4.11.0.86`, `numpy==1.26.4` e
+  `protobuf==4.25.9`; rimosso il pacchetto parallelo `opencv-python` per evitare
+  conflitti sul namespace `cv2`. `pip check` e inizializzazione Pose riusciti
+  nel venv corrente; installazione da `requirements.txt` riuscita anche in un
+  venv temporaneo pulito. Registrata la correzione in `SPEC_ERRATA.md`.
 
-### INC-2026-07-13-009 - Video candidato non adatto a T03/T14
+### INC-2026-07-13-009 - Selezione video candidato per T03/T14
 - Tipo: input di validazione / protocollo di ripresa.
 - Evidenza: `videoplayback.mp4` e' un H.264 640x360 a 30 fps, durata 255,3 s,
   tecnicamente integro (7.660/7.660 frame decodificati). Visivamente e' pero'
@@ -223,8 +226,40 @@
 - Impatto: non consente una misura riproducibile ne' il confronto manuale del
   conteggio; viola il protocollo dryland controllato della spec e non puo'
   soddisfare il DoD T03/T14.
-- Stato: mitigato; candidato rifiutato come video di riferimento/provvisorio.
+- Stato: risolto per T03; restano limiti noti per la validazione finale.
 - Azione prevista: richiedere una clip propria, continua e fissa, a secco, con
   una sola persona interamente visibile di profilo e ripetizioni chiare del
   movimento. Il file rifiutato puo' essere conservato solo come futuro stress
   test fuori distribuzione, non come validazione ufficiale.
+- Aggiornamento 2026-07-13: valutato anche `videoplayback (1).mp4` (H.264,
+  360x640 verticale, 30 fps, 277 frame, 9,23 s; 277/277 frame decodificati).
+  E' nettamente migliore del primo candidato per continuita', singolo soggetto
+  e vista prevalentemente laterale, ma mostra nuoto reale in vasca: acqua,
+  riflessi e immersione occludono parti del corpo; il formato verticale e la
+  bassa risoluzione utile limitano il tracking. Rifiutato come riferimento
+  T03/T14; idoneo soltanto come futuro stress test fuori distribuzione.
+- Aggiornamento 2026-07-13: valutato `videoplayback (2).mp4` (H.264, 360x640
+  verticale, 30 fps, 448 frame, 14,93 s; 448/448 frame decodificati). Mostra un
+  singolo soggetto a secco su supporto, camera fissa, vista sufficientemente
+  laterale e un ciclo completo di bracciata con spalla/gomito/polso visibili.
+  Accettato come MP4 PROVVISORIO per T03/T14. Limiti: bassa risoluzione, formato
+  verticale, testo/frecce sovrapposti e possibile licenza di terzi. L'idoneita'
+  effettiva del tracking resta da misurare dopo la risoluzione di INC-008. Non
+  sostituisce il video ufficiale dryland del sandbox T35.
+- Aggiornamento 2026-07-13 (test reale): copiato localmente come
+  `test_videos/profilo_provvisorio.mp4`, hash SHA256 invariato. MediaPipe Pose ha
+  rilevato la posa in 448/448 frame e l'arto lato-camera affidabile in 448/448
+  frame (visibilita' minima 0,9341); overlay ispezionato su 12 campioni. Il file
+  resta intenzionalmente non tracciato da Git finche' la licenza non e'
+  chiarita.
+
+### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
+- Tipo: hardware / input secondario best-effort.
+- Evidenza: `cv2.VideoCapture(0)` restituisce `isOpened() == False` e OpenCV
+  segnala `Camera index out of range`; nessun frame acquisito.
+- Impatto: non e' possibile verificare visivamente la modalita' webcam su questo
+  hardware. Il percorso MP4 primario e il pose tracking non sono coinvolti.
+- Stato: aperto non bloccante.
+- Azione eseguita: tentata l'apertura non interattiva e rilasciato il capture.
+  T03 considera soddisfatto il requisito webcam come best-effort; ripetere la
+  prova quando sara' collegata una webcam reale.

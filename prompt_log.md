@@ -447,3 +447,120 @@
 - Screenshot visivo non disponibile per assenza del browser integrato; la
   struttura e' stata verificata con AppTest e server reale.
 - Prossima task in ordine: T14 bloccata. Prossima eseguibile: M3/T16.
+
+## 2026-07-13 12:31 +02:00 - Valutazione secondo video candidato
+
+### Messaggio utente
+- Fornito `C:\Users\user\Downloads\videoplayback (1).mp4` e chiesto se questo
+  secondo video e' idoneo.
+
+### Messaggi/azioni assistente
+- Comunicato che sarebbero stati applicati gli stessi criteri del primo video e
+  che il file non sarebbe stato copiato nella repo prima dell'approvazione.
+- Verificato il file: 788.954 byte, SHA256
+  `EA5A67AF8B8A0BB504AA7FF5E9F07DFF5E7D038632D0C56811B4E82C9D4BC8B7`.
+- Estratti metadati: H.264, 360x640 verticale, 30 fps, 277 frame, durata 9,23 s.
+- Decodifica completa riuscita: 277/277 frame; file tecnicamente integro.
+- Creata e ispezionata una contact sheet di 12 frame distribuiti nella clip.
+- Riscontro: video molto migliore del precedente per durata, continuita',
+  singolo soggetto e ripresa prevalentemente laterale. Resta pero' una clip di
+  nuoto reale in vasca, non una simulazione dryland controllata.
+- Acqua, riflessi e immersione occludono parti del corpo; la risoluzione utile e'
+  bassa e il formato verticale riduce l'inquadratura. Presente anche un
+  watermark, con licenza/consenso da verificare.
+- Decisione: non approvato come riferimento T03/T14 e non copiato in
+  `test_videos/`; puo' essere usato in futuro come stress test fuori
+  distribuzione dopo la risoluzione di INC-008.
+- Aggiornati INC-009 e breakdown status. Nessun codice, dipendenza, commit o
+  push modificato/eseguito.
+
+### Stato iterazione
+- T03/T14 restano bloccate: serve ancora una clip propria a secco, laterale e
+  controllata; resta inoltre aperto INC-008 sull'API MediaPipe legacy.
+
+## 2026-07-13 12:36 +02:00 - Valutazione terzo video candidato
+
+### Messaggio utente
+- Fornito `C:\Users\user\Downloads\videoplayback (2).mp4`, indicandolo come
+  candidato potenzialmente migliore.
+
+### Messaggi/azioni assistente
+- Ribadita la distinzione tra file utilizzabile per upload/decodifica e video
+  valido per chiudere T03/T14; nessuna copia preventiva nella repo.
+- Verificato il file: 1.182.093 byte, SHA256
+  `49702466FF32DA10D633A2FCF41BA2BB594F7A57C979BAF9BAA95D6FCCE906A3`.
+- Metadati: H.264, 360x640 verticale, 30 fps, 448 frame, durata 14,93 s.
+- Decodifica completa riuscita: 448/448 frame; file tecnicamente integro.
+- Creata e ispezionata una contact sheet con 12 campioni temporali.
+- Riscontro: un solo soggetto, movimento simulato a secco su supporto, camera
+  fissa, vista sufficientemente laterale e ciclo completo con spalla, gomito e
+  polso visibili. E' il primo candidato coerente col protocollo dryland.
+- Limiti rilevati: 360x640 verticale, sovraimpressioni con testo/frecce,
+  possibile contenuto di terzi e un solo ciclo lento; non e' il video ufficiale
+  T35 e non e' ideale per validazione finale/Fluidity.
+- Decisione comunicata: accettato come MP4 PROVVISORIO per T03/T14, con
+  idoneita' effettiva del pose tracking da verificare dopo INC-008.
+- Aggiornati INC-009, breakdown status e HANDOFF. Nessuna copia del video,
+  modifica al codice/dipendenze, commit o push eseguita.
+
+### Stato iterazione
+- Il blocco "manca un candidato MP4" e' mitigato.
+- T03/T14 restano formalmente bloccate da INC-008; T03 richiede anche il test
+  webcam. Il video ufficiale del sandbox T35 resta futuro.
+
+## 2026-07-13 13:05 +02:00 - Correzione runtime MediaPipe e chiusura T03
+
+### Messaggio utente
+- L'utente ha approvato il passo successivo con: "bene procediamo vai con il
+  prossimo passo".
+
+### Messaggi/azioni assistente
+- Confermato il perimetro: rendere riproducibile MediaPipe legacy, copiare il
+  terzo video come campione locale provvisorio, validare il tracking completo e
+  tentare la webcam; il video non sarebbe stato pubblicato senza licenza.
+- Copiato `videoplayback (2).mp4` in
+  `test_videos/profilo_provvisorio.mp4`; verificato SHA256
+  `49702466FF32DA10D633A2FCF41BA2BB594F7A57C979BAF9BAA95D6FCCE906A3`.
+- Il primo avvio del launcher `venv` nel sandbox ha segnalato l'interprete base
+  come non disponibile; rieseguito con il permesso richiesto. Non era una
+  rottura del venv: fuori dal sandbox `pip check` e gli import sono riusciti.
+- Verificato il runtime di lavoro: OpenCV 4.11.0, MediaPipe 0.10.21, NumPy
+  1.26.4, protobuf 4.25.9; `mp.solutions.pose` presente e inizializzabile.
+- Processato l'intero video con `process_pose_frame` e `analyze_frame`: 448/448
+  frame decodificati, posa 100%, arto selezionato affidabile 100%, arto sinistro
+  selezionato 448 volte, visibilita' minima 0,9341 e media 0,9814.
+- Angolo gomito osservato tra 4,40 e 179,92 gradi; conteggio finale 2. Fluidity
+  Score 0 coerente con la regola che richiede almeno tre picchi.
+- Creata in `C:\tmp` e ispezionata una contact sheet di 12 frame con overlay:
+  scheletro coerente nelle fasi catch, pull, push e recovery.
+- Tentata la webcam con `VideoCapture(0)`: nessuna camera disponibile,
+  `Camera index out of range`. Registrato INC-010 come limite hardware
+  best-effort non bloccante.
+- Testato il ramo di chiusura con `q` sul video reale mediante sostituzione delle
+  sole funzioni GUI: un frame mostrato, un `waitKey`, una chiamata a
+  `destroyAllWindows`, exit 0. Il primo validatore temporaneo aveva passato un
+  `Path` invece della stringa prevista; corretto e rilanciato, senza modifiche al
+  progetto e senza aprire un incidente applicativo.
+- Regressione: 23/23 test metrici, `py_compile` riuscito, Streamlit AppTest con
+  0 eccezioni e 2 colonne.
+- Corretto `requirements.txt` al set compatibile e registrata l'errata DA-06 in
+  `SPEC_ERRATA.md`. Installazione completa da requirements riuscita anche in un
+  venv temporaneo pulito: `pip check` verde e `legacy_pose=True`.
+- Creato il commit locale `3c89374` (`T02: restore compatible MediaPipe legacy
+  runtime`). Nessun push eseguito.
+- Aggiornati README, HANDOFF, breakdown status e incidents: M0 6/6, INC-008
+  risolto, T03 completata con webcam best-effort non disponibile, T14 sbloccata
+  e prossima.
+- Eseguito `git fetch origin` in sola lettura: remoto 0 commit avanti, branch
+  locale 6 commit avanti prima del commit T03. Nessun pull o push eseguito.
+- Preparato un commit locale dedicato alla chiusura T03; il video provvisorio
+  resta escluso dallo staging.
+
+### Stato iterazione
+- T02 corretta e validata in ambiente pulito; INC-008 risolto.
+- T03 completata sul percorso MP4 primario; INC-010 resta aperto ma non
+  bloccante per assenza di hardware webcam.
+- T14 e' la prossima task in ordine. La prova temporanea ha gia' mostrato valori
+  plausibili; resta da creare e validare lo script CLI previsto dal breakdown.
+- Il video provvisorio resta solo locale e fuori da Git per possibile licenza
+  di terzi. Nessun push eseguito.

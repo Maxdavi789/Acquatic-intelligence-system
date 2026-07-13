@@ -25,10 +25,10 @@ La specifica di riferimento e' [`spec.txt`](spec.txt), versione 1.1 congelata.
 
 - Python 3.11 come riferimento di specifica; ambiente locale validato anche con
   Python 3.12.10.
-- OpenCV.
-- MediaPipe Pose legacy, pinnato a `mediapipe==0.10.35`.
+- OpenCV contrib `4.11.0.86` (include il namespace `cv2` completo).
+- MediaPipe Pose legacy, pinnato a `mediapipe==0.10.21`.
 - Streamlit.
-- NumPy e Pandas.
+- NumPy `1.26.4`, protobuf `4.25.9` e Pandas.
 - CSV locale per l'export delle sessioni.
 
 `matplotlib` non e' una dipendenza diretta del progetto: viene installato
@@ -39,18 +39,21 @@ transitivamente da MediaPipe. I grafici della dashboard useranno
 
 Aggiornato al 2026-07-13.
 
-- M0/T01-T06: 5 task su 6 completate; T03 resta bloccata finche' non e'
-  disponibile un MP4 laterale provvisorio per il test reale.
-- M1/T07-T12: completata; suite sintetica corrente 19/19 verde, inclusa la
+- M0/T01-T06: completata. T03 e' stata validata sul video dryland provvisorio:
+  448/448 frame con posa, arto selezionato affidabile nel 100% dei frame e
+  chiusura `q` pulita. La webcam best-effort e' stata tentata ma su questa
+  macchina non e' presente alcuna camera (INC-010).
+- M1/T07-T12: completata; suite sintetica corrente 23/23 verde, inclusa la
   regressione sul gate spalla stretto di T10.
-- M2: T13 completata (`FrameAnalysisState` + `analyze_frame`); T14 dipende dal
-  video di T03 ed e' bloccata.
+- M2: T13 completata (`FrameAnalysisState` + `analyze_frame`); T14 e' ora la
+  prossima task ed e' sbloccata dal completamento di T03.
 - M3: T15 completata; la dashboard Streamlit ha lo scaffold a due colonne.
   Prossima task eseguibile T16 (selettore input).
 - M4-M8: non iniziate.
 
-La prossima task in ordine e' T14 (bloccata); la prossima eseguibile senza video
-e' T16, selettore File MP4 / Webcam sperimentale.
+La prossima task in ordine e' T14: collegare formalmente `analyze_frame` ai
+landmark reali in uno script CLI e stampare angolo/conteggio. T16 resta la task
+successiva gia' eseguibile sul ramo dashboard.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -68,6 +71,10 @@ Lo scaffold della dashboard e' avviabile con:
 ```
 
 Le funzioni di input, rendering e KPI verranno aggiunte nelle task T16-T22.
+
+Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
+non viene versionato o pubblicato finche' non e' chiarita la licenza del video.
+Il riferimento ufficiale verra' registrato nel sandbox T35.
 
 ## Struttura principale
 
