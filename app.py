@@ -31,6 +31,7 @@ SESSION_CSV_COLUMNS = (
 PROJECT_ROOT = Path(__file__).resolve().parent
 UPLOAD_CACHE_DIR = PROJECT_ROOT / ".cache"
 UPLOADED_VIDEO_PATH = UPLOAD_CACHE_DIR / "uploaded_session.mp4"
+SESSIONS_CSV_PATH = PROJECT_ROOT / "data" / "sessions.csv"
 
 INPUT_MP4 = "File MP4 (primario)"
 INPUT_WEBCAM = "Webcam (sperimentale)"
@@ -241,14 +242,32 @@ def build_session_dataframe(summary: dict[str, Any]) -> pd.DataFrame:
     return pd.DataFrame([row], columns=list(SESSION_CSV_COLUMNS))
 
 
+def append_session_to_csv(
+    session_df: pd.DataFrame,
+    csv_path: Path = SESSIONS_CSV_PATH,
+) -> Path:
+    """Accoda la sessione a `data/sessions.csv` (T24, RF-011).
+
+    Crea cartella e header alla prima scrittura; le righe precedenti non
+    vengono mai sovrascritte (append). Nel CSV finiscono solo metriche
+    aggregate anonime con timestamp (spec sez. 8.3).
+    """
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    write_header = not csv_path.exists()
+    session_df.to_csv(csv_path, mode="a", header=write_header, index=False)
+    return csv_path
+
+
 def render_export_section() -> None:
-    """Fine sessione (T23): aggrega le metriche e mostra la preview."""
+    """Fine sessione: aggrega le metriche (T23) ed esporta su CSV (T24)."""
     if "last_summary" not in st.session_state:
         return
 
     if st.button("Termina Sessione ed Esporta Dati"):
         session_df = build_session_dataframe(st.session_state["last_summary"])
-        st.dataframe(session_df, hide_index=True, use_container_width=True)
+        st.dataframe(session_df, hide_index=True)
+        csv_path = append_session_to_csv(session_df)
+        st.success(f"Sessione esportata in data/{csv_path.name} (append).")
 
 
 def render_kpis(
