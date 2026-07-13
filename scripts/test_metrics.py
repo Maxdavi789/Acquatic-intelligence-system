@@ -219,31 +219,23 @@ def test_fluidity_never_negative() -> None:
     assert score >= 0.0, score
 
 
-TESTS = [
-    test_select_camera_side_arm_picks_more_visible_side,
-    test_select_camera_side_arm_left_side,
-    test_select_camera_side_arm_empty_returns_none,
-    test_elbow_smoother_forward_fill_on_occlusion,
-    test_elbow_smoother_none_before_first_valid,
-    test_elbow_smoother_no_exception_on_repeated_occlusion,
-    test_elbow_angle_straight_arm,
-    test_elbow_angle_right_angle,
-    test_elbow_angle_acute_45,
-    test_elbow_angle_within_bounds,
-    test_stroke_counter_counts_regular_rhythm,
-    test_stroke_counter_deadband_ignores_jitter,
-    test_stroke_counter_debounce_blocks_fast_second_peak,
-    test_stroke_counter_shoulder_gate_blocks_low_wrist,
-    test_fluidity_regular_intervals_high,
-    test_fluidity_irregular_intervals_low,
-    test_fluidity_fewer_than_three_peaks_zero,
-    test_fluidity_never_negative,
-]
+def _collect_tests() -> list:
+    """Raccoglie tutte le funzioni test_* del modulo, in ordine di definizione."""
+    module = sys.modules[__name__]
+    tests = [
+        obj
+        for name, obj in vars(module).items()
+        if name.startswith("test_") and callable(obj)
+    ]
+    tests.sort(key=lambda fn: fn.__code__.co_firstlineno)
+    return tests
 
 
 def main() -> int:
+    print("=== Validazione motore metriche (metrics_engine) ===")
+    tests = _collect_tests()
     failures = 0
-    for test in TESTS:
+    for test in tests:
         try:
             test()
         except AssertionError as exc:
@@ -255,8 +247,8 @@ def main() -> int:
         else:
             print(f"[PASS] {test.__name__}")
 
-    passed = len(TESTS) - failures
-    print(f"\n{passed}/{len(TESTS)} test passati")
+    passed = len(tests) - failures
+    print(f"\nRiepilogo: {passed}/{len(tests)} test passati, {failures} falliti")
     return 1 if failures else 0
 
 
