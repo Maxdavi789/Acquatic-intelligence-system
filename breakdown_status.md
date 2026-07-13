@@ -43,7 +43,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M2 | Step di analisi per-frame (glue) | T13-T14 | Completata: 2/2 |
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Completata: 8/8 |
 | M4 | Persistenza CSV | T23-T25 | Completata: 3/3 |
-| M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
+| M5 | Robustezza e gestione errori | T26-T29 | Completata: 4/4 |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
 | M7 | Sandbox demo controllato | T34-T36 | Da iniziare |
 | M8 | Demo, pitch e chiusura governance | T37-T41 | Da iniziare |
@@ -111,16 +111,25 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | T24 | Completata | `append_session_to_csv`: header alla prima scrittura, append mai distruttivo (8031b20). 9/9 check: doppio append su path temporaneo e via click AppTest reali su `data/sessions.csv`. |
 | T25 | Completata | Ispezione: `data/` contiene solo `sessions.csv` + `.gitkeep`; nessun media persistito nel progetto; CSV gitignored. Nota di design sul file transitorio `.cache/uploaded_session.mp4` registrata in incidents.md. |
 
+## Dettaglio M5
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T26 | Completata | Verifica doppia sul loop app (b4df5f2): MP4 con box nero sul braccio per 100 frame -> nessun crash, nessun picco spurio, dati inaffidabili scartati; iniezione visibility<0.5 -> forward-fill esatto, counter congelato, ripresa corretta. Trovato e documentato INC-011 (falso negativo post-occlusione, limite MediaPipe). |
+| T27 | Completata | `_execute_processing` (cd704e0): sorgente non apribile -> `st.error` leggibile; fine stream -> "Elaborazione terminata"; clip sintetica senza persona -> skip pulito, KPI a 0, nessun errore. 11/11 check. |
+| T28 | Completata | Anteprima webcam sperimentale a frame limitati (c4dc9a3, `WEBCAM_PREVIEW_FRAMES=300`): termina da sola e rilascia le risorse; su errore degrado documentato con rimando a MP4 primario. Validata con webcam REALE: 13/13 check inclusi click end-to-end via AppTest. |
+| T29 | Completata | Verifica senza modifiche al codice: stop simulato a meta' elaborazione (MP4 e webcam) -> `capture.release()` chiamata esattamente una volta dal `finally`, interruzione propagata a Streamlit, webcam subito riapribile. 6/6 check. |
+
 ## Prossima Task
 
-- Prossima task in ordine: M5/T26, occlusion smoothing verificato nel loop
-  dell'app. Nota: `analyze_frame` usa gia' `ElbowAngleSmoother` (T08/T13),
-  quindi il collegamento c'e'; resta da verificare formalmente su un video
-  con arto occluso che non compaiano picchi spuri o crash nella dashboard.
-- A seguire: T27 (sorgente non valida / fine stream / nessuna persona in UI:
-  oggi un sorgente non apribile solleva RuntimeError non catturato dal
-  bottone), T28 (webcam best-effort, ora testabile: hardware presente),
-  T29 (cleanup risorse su stop/switch).
+- Prossima task in ordine: M6/T30, test caso normale: conteggio manuale
+  documentato vs `stroke_count` (tolleranza +-1). Utilizzabile l'MP4
+  provvisorio in attesa del video ufficiale del sandbox (T35). Nota: il
+  provvisorio mostra un ciclo lento (INC-009) e il counter rileva 2 picchi;
+  il confronto manuale va documentato con attenzione.
+- A seguire: T31 (occlusione formale: evidenza T26/INC-011 gia' registrata,
+  da formalizzare), T32 (input non valido + fine stream + stop: evidenze
+  T27/T29), T33 (riproducibilita': due run stesso MP4 -> KPI identici).
 
 ## Task Arretrate o Bloccate
 
