@@ -21,7 +21,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | FASE 0 - scaffold e ambiente | Completata | Struttura presente; venv 3.12 ricreato in questo percorso. |
 | FASE 1 - `vision_tracker.py` | Implementata, runtime bloccato | Webcam/MP4, resize, MediaPipe Pose, overlay. T03 bloccata da video non idoneo e da `mp.solutions` assente nell'ambiente (INC-008/009). |
 | FASE 2 - `metrics_engine.py` | Implementata + hardening M1 + T13 | Angolo gomito, StrokeCounter, Fluidity (K documentata), selezione arto, smoothing e `analyze_frame`. Symmetry resta airbag fuori pipeline. |
-| FASE 3 - `app.py` | Non iniziata | File vuoto (M3). |
+| FASE 3 - `app.py` | Iniziata | T15 completata: scaffold Streamlit e layout asimmetrico a due colonne. |
 | FASE 4 - persistenza/robustezza/demo | Non iniziata | Dipende da M2-M3. |
 
 ## Avanzamento per modulo (nuovo breakdown)
@@ -31,7 +31,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Parziale: 5/6, T03 bloccata |
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
 | M2 | Step di analisi per-frame (glue) | T13-T14 | T13 completata; T14 bloccata dal video |
-| M3 | Dashboard Streamlit `app.py` | T15-T22 | Da iniziare |
+| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15 completata, T16 prossima |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
@@ -69,6 +69,14 @@ Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
 | T13 | Completata | `FrameAnalysisState` + `analyze_frame`; contratto a sei chiavi, persistenza, occlusione e frame senza landmark coperti da test sintetici. |
 | T14 | Bloccata | Serve il test reale T03, un MP4 laterale idoneo e la risoluzione di INC-008. |
 
+## Dettaglio M3
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T15 | Completata | `app.py` con page config, intestazione e colonne Video/Metriche 2:1. Server health 200; Streamlit AppTest: 0 eccezioni, 2 colonne. |
+| T16 | Prossima eseguibile | Selettore File MP4 / Webcam sperimentale; MP4 default. |
+| T17-T22 | Da iniziare | T17 resta bloccata da T03/INC-008; le altre dipendono dal relativo ordine del breakdown. |
+
 ## Governance
 
 - Step 0 (05f13d7): SPEC_ERRATA.md + riallineamento a T01-T41.
@@ -82,8 +90,9 @@ Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
 
 - Prossima task in ordine: M2/T14, attualmente bloccata dalla mancanza di un
   video idoneo e dall'assenza dell'API legacy MediaPipe (INC-008/009).
-- Prossima task eseguibile senza video: M3/T15, scaffold Streamlit e layout a
-  due colonne. T17 restera' comunque bloccata finche' T03 non viene validata.
+- Prossima task eseguibile senza video: M3/T16, selettore input con MP4 primario
+  e webcam sperimentale. T17 restera' bloccata finche' T03/INC-008 non vengono
+  risolti.
 
 ## Task Arretrate o Bloccate
 

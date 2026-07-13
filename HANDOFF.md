@@ -18,13 +18,15 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
     corretto anche il bordo T10 `peak_y == shoulder_y` con test di regressione.
   - M2/T13: `FrameAnalysisState` e `analyze_frame` implementati e validati su
     input sintetici; T14 resta bloccata dal video.
+  - M3/T15: scaffold Streamlit con layout Video/Metriche a due colonne
+    completato; T16 e' la prossima task eseguibile.
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T14 bloccata; T15 eseguibile
+## 2. PUNTO DI RIPRESA -> T14 bloccata; T16 eseguibile
 
 - T13 e' completata. `analyze_frame` restituisce le sei chiavi richieste, usa
   stato persistente e non contiene simmetria.
@@ -32,8 +34,10 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   `wrist_y=None`; frame senza persona: stato invariato.
 - Validazione sintetica: 23/23 test passati, compilazione Python OK.
 - T14 e' la prossima task in ordine, ma richiede un MP4 laterale e il test T03.
-- In attesa del video, la prossima task eseguibile e' M3/T15: scaffold Streamlit
-  e layout a due colonne. `app.py` e' ancora vuoto.
+- T15 e' completata: `app.py` espone una pagina wide con colonne Video/Metriche
+  2:1. Verifica: server health 200, AppTest senza eccezioni e due colonne.
+- In attesa del video e della risoluzione INC-008, la prossima task eseguibile
+  e' M3/T16: radio File MP4/Webcam sperimentale e uploader `.mp4` con MP4 default.
 
 ## 3. Ambiente
 
@@ -83,7 +87,7 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 - `metrics_engine.py` - motore metriche (angolo, stroke, fluidity, selezione
   arto, smoother e `analyze_frame`; simmetria airbag fuori pipeline).
 - `vision_tracker.py` - ingestione video + MediaPipe Pose + overlay (FASE 1).
-- `app.py` - VUOTO: qui va la dashboard Streamlit (M3).
+- `app.py` - scaffold Streamlit T15; qui proseguono T16-T22.
 - `scripts/test_metrics.py` - runner di validazione del motore (auto-discovery,
   18 test).
 - `breakdown_status.md` - avanzamento per modulo/task (T01-T41).

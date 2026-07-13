@@ -45,10 +45,12 @@ Aggiornato al 2026-07-13.
   regressione sul gate spalla stretto di T10.
 - M2: T13 completata (`FrameAnalysisState` + `analyze_frame`); T14 dipende dal
   video di T03 ed e' bloccata.
-- M3-M8: non iniziate.
+- M3: T15 completata; la dashboard Streamlit ha lo scaffold a due colonne.
+  Prossima task eseguibile T16 (selettore input).
+- M4-M8: non iniziate.
 
 La prossima task in ordine e' T14 (bloccata); la prossima eseguibile senza video
-e' T15, scaffold della dashboard Streamlit.
+e' T16, selettore File MP4 / Webcam sperimentale.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -59,8 +61,13 @@ Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 .\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4
 ```
 
-La dashboard sara' avviabile con `streamlit run app.py` dopo il completamento
-del modulo M3.
+Lo scaffold della dashboard e' avviabile con:
+
+```powershell
+.\venv\Scripts\python.exe -m streamlit run app.py
+```
+
+Le funzioni di input, rendering e KPI verranno aggiunte nelle task T16-T22.
 
 ## Struttura principale
 

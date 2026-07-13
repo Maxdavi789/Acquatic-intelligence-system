@@ -408,3 +408,42 @@
   ripetizioni chiare del gesto.
 - Prima di eseguire T03 va inoltre risolto separatamente INC-008 sull'API
   MediaPipe legacy.
+
+## 2026-07-13 12:29 +02:00 - Prosecuzione senza video: completamento M3/T15
+
+### Messaggio utente
+- L'utente ha chiesto di procedere con le altre task mentre cerca un video
+  laterale idoneo.
+
+### Messaggi/azioni assistente
+- Selezionata M3/T15 come prossima task eseguibile senza video; T03/T14 e
+  INC-008 restano bloccati e separati.
+- Annunciato l'uso della skill browser per verificare la pagina locale richiesta
+  dal DoD T15. Letta integralmente la relativa procedura prima dei test UI.
+- Salvata la precedente valutazione video nel commit locale `adc161b`
+  (`governance: assess candidate video and log MediaPipe blocker`). Nessun push.
+- Implementato `app.py` senza anticipare T16-T22: `st.set_page_config` wide,
+  titolo, caption, due colonne asimmetriche 2:1, intestazioni Video/Metriche,
+  placeholder informativi e disclaimer.
+- Evitato intenzionalmente l'import MediaPipe nello scaffold: INC-008 non blocca
+  l'avvio della pagina T15.
+- Validazione statica: `py_compile` e import `app` riusciti; `git diff --check`
+  verde. Il warning Streamlit in bare mode e' atteso e non e' un incidente.
+- Avviato Streamlit in locale su `127.0.0.1:8501`: health endpoint HTTP 200,
+  corpo `ok`.
+- La skill browser non ha trovato alcuna scheda/browser integrato disponibile;
+  seguita la procedura di troubleshooting prevista, che ha confermato lista
+  browser vuota. Nessun fallback verso strumenti browser non autorizzati.
+- Eseguito il validatore nativo `streamlit.testing.v1.AppTest`: 0 eccezioni,
+  titolo corretto, subheader Video/Metriche, esattamente 2 colonne con pesi
+  0,6667 / 0,3333 e i due placeholder attesi.
+- Arrestato il server locale dopo la verifica. Nessun processo lasciato in
+  ascolto sulla porta 8501.
+- Aggiornati README, HANDOFF e breakdown status: T15 completata; T14 bloccata;
+  T16 prossima task eseguibile. Preparato commit locale T15; nessun push.
+
+### Stato iterazione
+- M3/T15 completata secondo il DoD strutturale/runtime.
+- Screenshot visivo non disponibile per assenza del browser integrato; la
+  struttura e' stata verificata con AppTest e server reale.
+- Prossima task in ordine: T14 bloccata. Prossima eseguibile: M3/T16.
