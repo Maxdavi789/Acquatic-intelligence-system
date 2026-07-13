@@ -54,10 +54,15 @@ Aggiornato al 2026-07-13.
   dell'onda Y del polso popolato durante l'elaborazione e risultati che
   sopravvivono ai rerun dell'interfaccia. Sul video provvisorio: conteggio
   finale 2, coerente con le bracciate visibili.
-- M4-M8: non iniziate.
+- M4/T23-T25: completata. Il pulsante "Termina Sessione ed Esporta Dati"
+  aggrega timestamp, bracciate totali, Fluidity Score e angolo medio/max in
+  un DataFrame con preview e lo accoda a `data/sessions.csv` (header alla
+  prima scrittura, append mai distruttivo). Verifica privacy passata: in
+  `data/` restano solo metriche aggregate anonime, nessun frame o video.
+- M5-M8: non iniziate.
 
-La prossima task in ordine e' T23 (modulo M4): pulsante di fine sessione con
-aggregazione delle metriche ed export CSV.
+La prossima task in ordine e' T26 (modulo M5, robustezza): verifica formale
+dell'occlusion smoothing nel loop della dashboard.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -75,7 +80,8 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-L'export CSV della sessione verra' aggiunto nelle task T23-T25 (modulo M4).
+La gestione formale degli errori in UI e la modalita' webcam verranno
+rifinite nelle task T26-T29 (modulo M5).
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.

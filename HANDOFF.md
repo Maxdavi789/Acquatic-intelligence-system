@@ -31,14 +31,19 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - M3 (T15-T22): COMPLETATA. Dashboard con selettore input (MP4 primario,
     webcam sperimentale), video annotato con scheletro e angolo gomito live,
     KPI reali (bracciate, fluidity), grafico onda Y del polso e persistenza
-    dei risultati tra i rerun. Prossimo modulo: M4 (persistenza CSV).
+    dei risultati tra i rerun.
+  - M4 (T23-T25): COMPLETATA. Bottone "Termina Sessione ed Esporta Dati":
+    aggrega timestamp ISO, bracciate, fluidity, angolo medio/max in un
+    DataFrame con preview e lo accoda a `data/sessions.csv` (header alla
+    prima scrittura, append mai distruttivo). Verifica privacy T25 passata.
+    Prossimo modulo: M5 (robustezza).
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T23 pronta (inizio M4)
+## 2. PUNTO DI RIPRESA -> T26 pronta (inizio M5)
 
 - M2 e' completata (T13-T14: `analyze_frame` + script CLI
   `scripts/analyze_video.py`, validati sul video provvisorio).
@@ -57,13 +62,22 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
     `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
     valori persistiti.
-- T23 e' la prossima task (M4): pulsante "Termina Sessione ed Esporta Dati"
-  che aggrega le metriche finali in un DataFrame Pandas (bracciate totali,
-  fluidity finale, angolo medio/max). ATTENZIONE: il riepilogo del loop non
-  traccia ancora angolo medio/max -> estendere `render_video_stream` (o lo
-  stato persistito) per accumularli. Poi T24 (append `data/sessions.csv`
-  con timestamp, header se assente) e T25 (verifica che in `data/` ci sia
-  solo il CSV, RF-011 e privacy sez. 8.3/10).
+- M4 e' completata (T23 8e877ad, T24 8031b20, T25 f4f86e6): il riepilogo del
+  loop include ora `elbow_angle_mean`/`elbow_angle_max` e finisce in
+  `st.session_state["last_summary"]`; `build_session_dataframe` +
+  `append_session_to_csv` gestiscono l'export in `data/sessions.csv`.
+- T26 e' la prossima task (M5): occlusion smoothing nel loop app. Il
+  collegamento esiste gia' (`analyze_frame` usa `ElbowAngleSmoother`);
+  serve la verifica formale su un video con arto occluso: nessun picco
+  spurio nel grafico angoli, nessun crash (RF-008, spec sez. 12).
+- T27 dopo: gestione in UI di sorgente non valida (oggi `open_video_capture`
+  solleva RuntimeError NON catturato dal bottone -> st.error leggibile),
+  fine stream ("Elaborazione terminata." gia' presente come caption) e frame
+  senza persona (gia' skip senza errore in analyze_frame, da verificare).
+- T28: webcam best-effort in UI, ORA TESTABILE (la macchina di casa ha una
+  webcam funzionante); rimuovere il rimando "T28" nella colonna video e
+  gestire il degrado documentato. T29: cleanup risorse su stop/switch
+  (capture.release() gia' nel finally; verificare stop a meta').
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.

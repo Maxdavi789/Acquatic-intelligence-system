@@ -809,3 +809,43 @@
 - Suite 23/23; dashboard end-to-end funzionante sul video provvisorio.
 - Restano aperti: video ufficiale sandbox (T35), webcam UI (T28), export CSV
   (M4), robustezza formale (M5), test finali (M6).
+
+## 2026-07-13 23:05 +02:00 - Prosecuzione approvata: modulo M4 completato (T23-T25)
+
+### Messaggio utente
+- "procediamo". Autorizzazione push di sessione ancora attiva.
+
+### T23 - Aggregazione metriche di fine sessione (commit 8e877ad)
+- Esteso il riepilogo di `render_video_stream` con `elbow_angle_mean` e
+  `elbow_angle_max` (nota lasciata in HANDOFF); il riepilogo completo viene
+  persistito in `st.session_state["last_summary"]`.
+- `build_session_dataframe`: una riga con timestamp ISO, bracciate_totali,
+  fluidity_score, angolo_medio, angolo_max. Bottone "Termina Sessione ed
+  Esporta Dati" visibile solo dopo un'elaborazione; click -> preview.
+- Validazione 14/14 sul video reale: angolo medio 146,25, max 179,92,
+  bracciate 2; AppTest conferma gating del bottone e preview DataFrame.
+
+### T24 - Append su data/sessions.csv (commit 8031b20)
+- `append_session_to_csv`: crea cartella e header alla prima scrittura,
+  append mai distruttivo (RF-011). Messaggio di conferma in UI.
+- Validazione 9/9: doppio append su path temporaneo (header unico, righe
+  preservate) + due click AppTest reali -> `data/sessions.csv` con due righe
+  identiche al riferimento. Rimosso `use_container_width` deprecato dalla
+  preview.
+
+### T25 - Verifica privacy (commit f4f86e6)
+- Ispezione: `data/` contiene SOLO `sessions.csv` + `.gitkeep`; nessun
+  frame/media persistito nel progetto; CSV gitignored (riga 8).
+- Nota di design in incidents.md sul file transitorio gitignored
+  `.cache/uploaded_session.mp4` (upload T16, non e' persistenza di sessione).
+
+### Governance e chiusura
+- breakdown_status: M4 completata 3/3 con dettaglio task; prossima M5/T26
+  con note operative (T27: RuntimeError non catturato dal bottone; T28:
+  webcam ora testabile sulla macchina di casa).
+- HANDOFF: punto di ripresa T26 con stato M4 e indicazioni per T26-T29.
+- README: stato M4, export CSV documentato.
+- Suite finale 23/23; py_compile OK. Push di chiusura eseguito.
+
+### Stato iterazione
+- M0-M4 COMPLETATI (T01-T25, 25/41 task). Prossima task: M5/T26.
