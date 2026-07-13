@@ -1,0 +1,48 @@
+# Spec Errata
+
+Registro delle modifiche e aggiunte alla specifica DOPO il congelamento, come
+richiesto dalla spec v1.1 (sezione 16 - Registro versioni) e dalla nota di
+processo: "Dopo il congelamento ogni modifica va tracciata in SPEC_ERRATA.md".
+
+Questo file NON e' la specifica: la specifica congelata vive in `spec.txt`.
+Qui si annotano baseline, delta e correzioni successive, con data e task ID.
+
+## 2026-07-13 - Baseline: congelamento spec v1.1
+
+- Stato: la specifica di riferimento passa alla versione v1.1 (datata
+  02/07/2026), che sostituisce il vecchio `spec.txt` (generazione v0).
+- La sostituzione fisica del contenuto di `spec.txt` con la v1.1 e' eseguita
+  nel task T01 di questa sessione (vedi breakdown_tasks_v1).
+- Il vecchio `spec.txt` resta recuperabile dalla history Git (commit precedenti
+  a T01).
+
+### Delta principali v0 (vecchio spec.txt) -> v1.1
+
+1. Symmetry Score bilaterale: RIMOSSO dal perimetro MVP (decisione DA-01 = A).
+   Contraddice il vincolo di vista laterale (arto lontano occluso). La funzione
+   `calculate_symmetry_score` resta nel codice come airbag NON collegato
+   (vedi task T05), riattivabile in v2 con cambio protocollo di ripresa.
+2. Obiettivo riformulato in modo onesto (DA-03): il PoC valida la logica
+   software e algoritmica, NON la validita' biomeccanica sportiva in acqua.
+   Rimosso ogni claim di "equivalenza a laboratorio professionale".
+3. Input MP4 dichiarato percorso PRIMARIO; webcam declassata a best-effort
+   sperimentale (DA-02), per i limiti di Streamlit sul rendering real-time.
+4. Fluidity Score: costante K=50 dichiarata euristica; il punteggio e' un
+   indice relativo, non una misura assoluta (DA-04).
+5. Contesto strategico aggiunto: il PoC e' la leva per un pitch di
+   finanziamento; formalizzato il sandbox di validazione controllato
+   (spec v1.1 sezione 3.4) e il criterio di ripetibilita' demo (sezione 1.2).
+6. Stack precisato: MediaPipe API legacy con versione PINNATA (DA-06);
+   Python 3.11; matplotlib solo se necessario (DA-07); niente SQLite, solo CSV.
+7. Contraddizioni interne del vecchio testo (Symmetry "max" vs "media",
+   overclaiming): rese irrilevanti perche' la metrica e' fuori scope MVP.
+
+### Delta ambientali rispetto alla spec
+
+- Python di riferimento: la spec fissa 3.11; l'ambiente locale attuale ha sul
+  PATH Python 3.12.10. Scelta operativa: venv su 3.12 con fallback a 3.11 se
+  MediaPipe legacy risulta incompatibile (vedi incidents.md 2026-07-13).
+
+## Errata successivi
+
+(nessuno al momento)

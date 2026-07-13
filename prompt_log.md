@@ -102,3 +102,52 @@
 - Prossima task: FASE 3, dashboard Streamlit in `app.py`.
 - Creato e pushato su `origin/main` il commit
   `Implement vision tracking and metrics engine`.
+
+## 2026-07-13 - Ripresa progetto: riallineamento a spec v1.1 e avvio M0
+
+### Messaggio utente
+- Fornite due nuove versioni dei documenti guida: spec tecnica v1.1 e
+  breakdown_tasks_v1 (task T01-T41), entrambi datati 02/07/2026.
+- Richiesto: continuare a seguire il breakdown progredendo con lo status (data
+  odierna), leggendo integralmente tutti i file allegati, prompt_log e
+  breakdown_status; analizzare discordanze tra progetto e documenti; individuare
+  prossima task e arretrati; verificare allineamento Git locale vs origin;
+  controllare se il README va aggiornato; validare il piano e attendere
+  approvazione prima di costruire.
+- Vincoli ribaditi: non inventare, non iniziare a costruire, mostrare prima il
+  piano. Subtask: aggiornare/creare prompt_log, breakdown_status, incidents e
+  creare SPEC_ERRATA.
+- Nota: il link repo incollato dall'utente puntava a
+  `MrChuck118/live-draft-companion` (progetto diverso, Draft Whisperer).
+
+### Messaggi/azioni assistente (analisi in sola lettura)
+- Rilevato che il workspace `c:\AcquaticIntelligenceSystem` conteneva solo un
+  file `readme` vuoto e nessun repo Git: la base non era ancora clonata qui.
+- Segnalata la discordanza sul link repo; l'utente ha confermato che la repo
+  corretta e' `Maxdavi789/Acquatic-intelligence-system`.
+- Inizializzato Git nel workspace, collegato origin e fetchato `origin/main`
+  (commit ff016b8). Branch locale `main` allineato: 0 ahead / 0 behind.
+- Letti integralmente: breakdown_status.md, prompt_log.md, incidents.md,
+  spec.txt, README.md, metrics_engine.py, vision_tracker.py, app.py,
+  requirements.txt, .gitignore.
+- Riscontro chiave: la repo e' allo stato PRE-M0. Il `spec.txt` in repo e'
+  ancora la spec VECCHIA (con Symmetry Score), `metrics_engine.py` implementa
+  `calculate_symmetry_score`, `app.py` e' vuoto. Il `breakdown_status.md`
+  indicava come prossima task "FASE 3 dashboard con KPI Simmetria": indicazione
+  OBSOLETA e in contrasto con la spec v1.1 (trappola di scope creep).
+- Conclusione: la vera prossima task e' M0/T01 del nuovo breakdown, non FASE 3.
+- Verificato ambiente: Python 3.12.10 sul PATH (spec chiede 3.11), nessun venv,
+  `gh` assente, nessuna identita' Git configurata.
+
+### Decisioni approvate dall'utente
+- Repo corretta confermata: `Maxdavi789/Acquatic-intelligence-system`.
+- Scope sessione: governance + task M0 non bloccate, un passo alla volta, fin
+  dove si arriva con i token.
+- Ambiente: venv con Python 3.12, fallback 3.11 se MediaPipe legacy si rompe.
+- Commit/push: commit locali per task; push su origin solo dopo OK esplicito;
+  identita' Git = quella dei commit precedenti (Maxdavi789 noreply).
+
+### Stato iterazione
+- Avviato Step 0 (scaffolding governance): creato SPEC_ERRATA.md, aggiornati
+  prompt_log.md e incidents.md, riallineato breakdown_status.md al modello
+  T01-T41. A seguire: M0 (T01 spec v1.1, T05 airbag simmetria, T02/T04 con venv).

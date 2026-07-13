@@ -101,3 +101,59 @@
 - Stato: mitigato.
 - Azione eseguita: configurato `MPLCONFIGDIR` su cache locale di progetto in
   `vision_tracker.py` e ignorata `.cache/` in Git.
+
+## 2026-07-13
+
+### INC-2026-07-13-001 - Link repo errato fornito nella consegna
+- Tipo: governance/documentazione.
+- Evidenza: nel messaggio utente il link repo indicato era
+  `https://github.com/MrChuck118/live-draft-companion`, che corrisponde a un
+  progetto diverso (Draft Whisperer / Live Draft Companion, fantasy football).
+- Impatto: rischio di clonare o pushare sul repository sbagliato.
+- Stato: risolto.
+- Azione eseguita: segnalata la discordanza; l'utente ha confermato che la repo
+  corretta e' `Maxdavi789/Acquatic-intelligence-system`, coerente con spec e
+  breakdown.
+
+### INC-2026-07-13-002 - Workspace locale vuoto, base non clonata qui
+- Tipo: repository locale.
+- Evidenza: `c:\AcquaticIntelligenceSystem` conteneva solo un file `readme`
+  vuoto e nessun `.git`. Il percorso usato in passato aveva spazi
+  (`C:\Acquatic intelligence system`), diverso da quello attuale.
+- Impatto: nessuna base versionata locale su cui lavorare; il `venv` precedente
+  non e' presente in questo percorso.
+- Stato: risolto (per la base Git).
+- Azione eseguita: `git init`, collegato `origin`, `fetch` e checkout di `main`.
+  Branch locale allineato a `origin/main` (0 ahead / 0 behind, commit ff016b8).
+
+### INC-2026-07-13-003 - spec.txt e breakdown_status obsoleti rispetto a v1.1
+- Tipo: allineamento specifica.
+- Evidenza: il `spec.txt` in repo e' la spec vecchia (contiene Symmetry Score,
+  overclaiming, Python 3.10+, SQLite). Il `breakdown_status.md` indicava come
+  prossima task "FASE 3 dashboard con KPI Simmetria".
+- Impatto: seguendo lo status obsoleto si costruirebbe la simmetria, fuori
+  scope MVP per la v1.1 (trappola di scope creep documentata nel breakdown).
+- Stato: in risoluzione.
+- Azione eseguita: riallineato `breakdown_status.md` al modello T01-T41; la
+  sostituzione di `spec.txt` con la v1.1 e' pianificata nel task T01; la
+  demossione della simmetria nel task T05.
+
+### INC-2026-07-13-004 - Python 3.12 sul PATH, la spec fissa 3.11
+- Tipo: ambiente Python.
+- Evidenza: `python --version` sul PATH restituisce 3.12.10; la spec v1.1
+  indica Python 3.11.
+- Impatto: possibile incompatibilita' di MediaPipe legacy con Python 3.12.
+- Stato: aperto.
+- Azione pianificata: creare `venv` con 3.12 e installare le dipendenze; se
+  MediaPipe legacy fallisce, ripiegare su Python 3.11 (approvato dall'utente).
+
+### INC-2026-07-13-005 - requirements.txt non pinnato, matplotlib da valutare
+- Tipo: dipendenze.
+- Evidenza: `requirements.txt` elenca pacchetti senza versione; `matplotlib` e'
+  presente ma nel codice serve solo a impostare `MPLCONFIGDIR` (cache), non per
+  grafici (i grafici useranno `st.line_chart`).
+- Impatto: rischio di rotture da upgrade (in particolare MediaPipe) e
+  dipendenza potenzialmente inutile.
+- Stato: aperto.
+- Azione pianificata: pinnare la versione di MediaPipe (task T02) e decidere su
+  matplotlib (task T04) dopo aver visto se e' dipendenza transitiva di MediaPipe.
