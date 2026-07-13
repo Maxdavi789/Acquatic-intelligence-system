@@ -1,185 +1,620 @@
-SPECIFICA TECNICA COMPLETA - MVP OTTIMIZZATO
+# AI Swimming Motion Analyzer - Specifica Tecnica
 
-AI Swimming Motion Analyzer (Proof of Concept a Secco)
+Versione: 1.1
+Data: 02/07/2026
+Stato: CONGELATA (congelata il 2026-07-13, task T01)
+Autore: studente proprietario del progetto
+Repository: https://github.com/Maxdavi789/Acquatic-intelligence-system
+Supporto metodologico: Filippo Moruzzi
 
-1. Introduzione e Visione del Progetto
+Nota di processo: ogni versione va salvata come file distinto (v1, v2, ...).
+La specifica e' stata congelata prima di ricominciare a costruire (FASE 3+).
+Dopo il congelamento ogni modifica va tracciata in SPEC_ERRATA.md o nel registro
+versioni (sez. 16). Questa versione nasce dal brainstorming di validazione del
+02/07/2026 e sostituisce lo spec.txt precedente, che conteneva contraddizioni
+interne (vedi sez. 14.4).
+v1.1 (02/07/2026): aggiunto il contesto strategico (il PoC e' la leva per un
+pitch di finanziamento) e formalizzato il sandbox di validazione controllato
+(sez. 3.4).
 
-AI Swimming Motion Analyzer e' un sistema di analisi biomeccanica basato su
-Computer Vision e Intelligenza Artificiale, progettato per monitorare,
-tracciare e valutare i movimenti del nuotatore senza l'utilizzo obbligatorio di
-dispositivi indossabili (smartwatch, fasce cardio o sensori inerziali).
+---
 
-L'obiettivo fondamentale di questa versione Minimum Viable Product (MVP),
-strutturata come Proof of Concept (PoC), e' validare l'intera logica
-algoritmica, l'architettura software e i moduli di Computer Vision in un
-ambiente controllato, eliminando i costi hardware e le complessita' fisiche
-legate all'ambiente acquatico. Il sistema e' progettato per funzionare in
-modalita' standalone 100% offline, garantendo l'elaborazione locale dei flussi
-video tramite hardware di livello consumer.
+## 0. Sintesi del progetto
 
-2. Obiettivi dell'MVP
+Nome del progetto:
+AI Swimming Motion Analyzer (PoC a secco) - repo "Acquatic Intelligence System".
 
-- Tracciare la fisionomia e la postura del corpo umano senza marcatori fisici
-  utilizzando flussi video standard (webcam o file video MP4).
-- Calcolare gli angoli delle articolazioni principali coinvolte nella
-  cinematica del nuoto in tempo reale.
-- Sviluppare algoritmi matematici robusti per l'estrazione di metriche
-  biomeccaniche essenziali (conteggio cicli, costanza del ritmo, simmetria
-  bilaterale).
-- Fornire una dashboard visiva interattiva e locale per consentire all'utente
-  di caricare video, analizzare i flussi live e visualizzare i grafici
-  prestazionali immediati.
-- Raggiungere l'obiettivo a costo zero per lo sviluppo software, sfruttando
-  esclusivamente framework open source maturi.
+Descrizione in una frase:
+Il sistema analizza un video laterale di movimenti natatori simulati a secco e ne
+estrae metriche cinematiche 2D (conteggio bracciate, angolo del gomito,
+regolarita' del ritmo) tramite pose estimation locale, per validare la pipeline
+software e gli algoritmi di calcolo a costo zero, prima di qualsiasi
+investimento hardware.
 
-3. Scenario di Test e Vincoli Geometrici
+Tipo di sistema:
+Pipeline di Computer Vision + dashboard locale di analisi. NON e' un sistema
+generativo/LLM: usa un modello ML pre-addestrato (MediaPipe BlazePose) eseguito
+interamente in locale.
 
-Validazione a Secco: al fine di azzerare i tempi di installazione hardware in
-vasca e aggirare i problemi fisici della rifrazione della luce e degli schizzi
-d'acqua, il sistema viene validato esclusivamente a secco attraverso due
-modalita':
+Obiettivo del MVP:
+Dimostrare che l'architettura a tre moduli (ingestione video -> pose tracking ->
+motore metriche -> dashboard) funziona end-to-end su un file MP4 di riferimento,
+producendo metriche stabili e riproducibili e un export CSV, senza crash e senza
+costi.
 
-1. Dryland Swimming (Nuoto a Secco): l'utente simula i movimenti tecnici degli
-   stili del nuoto davanti alla webcam del PC, rimanendo in piedi o sdraiato
-   longitudinalmente su una panca da allenamento.
-2. Video Dataset Analysis: il sistema elabora file video in formato MP4 di
-   nuotatori reali estratti da dataset open source o scaricati da riprese
-   tecniche presenti su YouTube.
+Output principale:
+Una dashboard Streamlit locale con video annotato (scheletro + angolo gomito
+live), KPI aggregati (bracciate totali, Fluidity Score), grafico dell'onda del
+polso nel tempo, ed export CSV della sessione.
 
-Vincolo Geometrico Fondamentale (Inquadratura Laterale): tutto il materiale di
-test deve presentare una vista rigorosamente laterale (profilo a 90 gradi).
-L'asse ottico della telecamera deve essere perpendicolare al piano sagittale del
-soggetto. Questa inquadratura consente alla pipeline software di mappare la
-cinematica articolare nello spazio cartesiano X-Y del frame video senza subire
-distorsioni significative dovute ad accorciamenti prospettici sull'asse Z.
+Contesto strategico:
+Questo PoC e' la leva per un pitch di finanziamento: dimostrare a costo zero la
+fattibilita' software e algoritmica per ottenere i fondi con cui costruire la
+versione "seria" con hardware e sensori (mini-PC edge, telecamere subacquee,
+sensor fusion/LiDAR). La logica e' "provare il software prima di chiedere soldi
+per l'hardware". La demo si svolge in un sandbox di validazione controllato
+costruito apposta per l'MVP (sez. 3.4).
 
-4. Stack Tecnologico Open Source
+---
 
-- Python 3.10+: linguaggio core per l'intero ecosistema.
-- OpenCV (opencv-python): ingestione flussi video, manipolazione frame,
-  ridimensionamento e rendering overlay.
-- MediaPipe Pose: framework di percezione per tracciare 33 landmark corporei in
-  tempo reale su CPU.
-- Streamlit: framework per interfaccia utente locale e grafici interattivi.
-- NumPy, Pandas e Matplotlib: organizzazione dati, analisi statistica ed export.
-- SQLite / CSV: persistenza locale serverless, con alternativa minimale CSV.
+## 1. Obiettivo del sistema
 
-5. Moduli Software e Architettura del Sistema
+### 1.1 Obiettivo principale
 
-1. Video Acquisition Module (vision_tracker.py): inizializza sorgente video
-   tramite webcam o file MP4, estrae i frame e sincronizza il frame rate.
-2. Pose Detection Module (vision_tracker.py): converte frame in RGB, passa il
-   frame a MediaPipe Pose, estrae landmark e coordinate cartesiane normalizzate.
-3. Motion Analysis & Metrics Engine (metrics_engine.py): isola vettori di
-   interesse ed esegue calcoli trigonometrici e statistici.
-4. Dashboard Module (app.py): gestisce UI Streamlit, rendering video con
-   scheletro in overlay e visualizzazione grafici.
-5. Storage Module (data/): persiste dati aggregati a fine sessione.
+Il sistema deve estrarre metriche cinematiche 2D da un video laterale di
+movimento simulato a secco, per uno studente/sviluppatore che valida un motore
+di analisi biomeccanica, producendo conteggio bracciate, angolo del gomito e
+indice di regolarita' del ritmo in modo deterministico, riproducibile e senza
+crash.
 
-6. Algoritmi e Metriche Biomeccaniche
+Riformulazione onesta dell'obiettivo (decisione DA-03).
+Questo PoC valida la logica software e algoritmica, non la validita'
+biomeccanica sportiva del gesto natatorio. La simulazione a secco e' uno
+stand-in controllato per verificare che la pipeline calcoli numeri corretti e
+stabili su input 2D laterale. La validazione e la demo avvengono in un sandbox
+controllato (sez. 3.4) che garantisce le condizioni geometriche e di
+illuminazione, non in vasca. Il sistema NON dimostra che quei numeri predicano
+la prestazione di un nuotatore reale in acqua: quella validazione appartiene
+alle fasi industriali future (sez. 14). Ogni claim di "equivalenza a un sistema
+da laboratorio professionale" e' stato rimosso perche' non difendibile con una
+singola webcam 2D + MediaPipe.
 
-6.1 Conteggio Automatico delle Bracciate (Stroke Counter)
+### 1.2 Criterio di successo
 
-L'algoritmo sfrutta un approccio cinematico basato sul tracciamento della
-coordinata Y del polso (landmark 15 per sinistro, landmark 16 per destro). Nel
-nuoto di profilo il polso compie una traiettoria ciclica sinusoidale.
-L'algoritmo monitora l'inversione del vettore di movimento della coordinata Y e
-registra un ciclo completo quando l'escursione d'onda viene completata. Un
-filtro di debounce temporale, ad esempio minimo 0.6 secondi tra i picchi,
-previene falsi positivi generati dal tremolio del tracking.
+| Criterio | Soglia minima | Come viene misurato |
+| --- | --- | --- |
+| Pipeline end-to-end | Il video di riferimento viene processato dall'inizio alla fine senza eccezioni non gestite | Esecuzione su test_videos/profilo_test.mp4 |
+| Accuratezza conteggio bracciate | Errore <= +/-1 bracciata rispetto al conteggio manuale sul video di riferimento | Conteggio manuale vs stroke_count |
+| Stabilita' angolo gomito | Nessun picco spurio quando un landmark e' occluso (visibility < 0.5) | Ispezione grafico angoli sul video di riferimento |
+| Prestazione elaborazione | Il video di riferimento elaborato senza blocchi della UI (target indicativo >= 15 fps su hardware consumer) | Log fps / percezione fluidita' |
+| Costo operativo | 0 EUR | Nessuna dipendenza a pagamento, nessuna chiamata di rete a runtime |
+| Export dati | Il CSV di sessione viene generato con i campi attesi e un timestamp | Apertura di data/sessions.csv |
+| Riproducibilita' | Due esecuzioni sullo stesso MP4 producono gli stessi KPI | Confronto output |
+| Ripetibilita' demo | La demo nel sandbox gira end-to-end davanti agli stakeholder senza intoppi, >=2 volte di fila | Prova ripetuta in ambiente controllato (sez. 3.4) |
 
-6.2 Analisi dell'Angolo del Gomito (Elbow Angle Analysis)
+---
 
-La metrica valuta la presenza del gomito alto durante trazione o recupero.
-L'algoritmo isola tre punti nello spazio 2D: spalla (A), gomito (B) e polso
-(C). Utilizzando funzioni arcotangente bidimensionali viene calcolato l'angolo
-interno espresso in gradi tra 0 e 180.
+## 2. Problema che risolve
 
-Funzione richiesta in metrics_engine.py:
+### 2.1 Problema reale
 
-```python
-import numpy as np
+Chi vuole prototipare un sistema di analisi biomeccanica del nuoto affronta
+subito costi e complessita' fisiche (installazione in vasca, rifrazione, schizzi,
+sensori). Non esiste un modo economico per validare la logica software prima di
+spendere in hardware. Questo PoC risponde a quel problema specifico: separare la
+validazione del software dalla validazione in acqua.
 
-def calculate_elbow_angle(shoulder, elbow, wrist):
-    """
-    shoulder, elbow, wrist sono tuple o liste (x, y).
-    Calcola l'angolo in gradi formato dal gomito.
-    """
-    a = np.array(shoulder)
-    b = np.array(elbow)
-    c = np.array(wrist)
+### 2.2 Perche' e' importante
 
-    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(
-        a[1] - b[1],
-        a[0] - b[0],
-    )
-    angle = np.abs(radians * 180.0 / np.pi)
+- Permette di verificare architettura e algoritmi con costo e rischio quasi nulli.
+- Riduce il rischio di investire in hardware su una pipeline software non ancora
+  provata.
+- Produce una base di codice modulare riusabile nelle fasi successive.
+- E' il passo che sblocca i fondi per la versione con sensori: prova la
+  fattibilita' software prima di chiedere investimenti hardware.
 
-    if angle > 180.0:
-        angle = 360.0 - angle
+### 2.3 Soluzioni attuali
 
-    return angle
-```
+| Soluzione attuale | Limite principale |
+| --- | --- |
+| Sistemi professionali di video-analisi / sensori inerziali | Costo elevato; accessibili solo a realta' d'elite |
+| Occhio dell'allenatore | Soggettivo; non misura angoli/frequenze con precisione numerica |
+| Sistemi di tracking in vasca | Rifrazione, riflessi e schizzi rendono il tracking ottico difficile |
 
-6.3 Indice di Fluidita' e Costanza (Fluidity Score)
+### 2.4 Perche' usare l'AI (visione artificiale)
 
-Il Fluidity Score viene calcolato sulla regolarita' temporale dei cicli motori.
-Il sistema registra il timestamp di ogni picco d'onda rilevato dallo Stroke
-Counter e calcola la deviazione standard degli intervalli di tempo tra i cicli.
+L'AI e' utile perche': la pose estimation (BlazePose/MediaPipe) fornisce 33
+landmark corporei da un semplice frame RGB, cosa non ottenibile con logica
+procedurale classica senza marcatori fisici.
 
-Formula:
+L'AI non e' necessaria se: l'utente accettasse marcatori fisici o
+un'annotazione manuale - ma questo contraddirebbe l'obiettivo "senza sensori, a
+costo zero". Tutta la parte metriche (angoli, conteggio, ritmo) e' matematica
+deterministica, non AI: l'AI si limita a fornire le coordinate.
 
-```text
-Fluidity Score = max(0, 100 - (Standard_Deviation(Delta_Tempi) * 50))
-```
+---
 
-6.4 Punteggio di Simmetria Bilaterale (Symmetry Score)
+## 3. Utenti target e contesto d'uso
 
-Lo score viene espresso come rapporto percentuale tra la media degli angoli
-massimi destro e sinistro:
+### 3.1 Utente primario
 
-```text
-Symmetry Score = (Min(Media_Angoli_Dx, Media_Angoli_Sx) /
-                  Max(Media_Angoli_Dx, Media_Angoli_Sx)) * 100
-```
+| Campo | Descrizione |
+| --- | --- |
+| Utente primario | Studente/sviluppatore che valida il motore (in questa fase); in prospettiva, allenatore o atleta |
+| Livello tecnico | Medio-avanzato (esegue script Python/Streamlit in locale) |
+| Bisogno principale | Verificare che la pipeline calcoli metriche corrette e stabili |
+| Contesto d'uso | PC consumer, offline, in laboratorio o a casa |
 
-7. Interfaccia Utente (UI/UX Dashboard)
+### 3.2 Utenti secondari
 
-La GUI viene sviluppata in `app.py` usando Streamlit con layout minimale a due
-macro-colonne:
+| Utente | Ruolo nel sistema | Bisogno |
+| --- | --- | --- |
+| Docente / valutatore | Revisore del PoC | Vedere una demo end-to-end funzionante e riproducibile |
+| (futuro) Allenatore | Interpreta le metriche | Feedback quantitativo sul gesto |
 
-- Colonna sinistra: selettore input, caricamento MP4 o webcam live, rendering
-  video frame per frame con scheletro MediaPipe in overlay e angolo gomito
-  istantaneo.
-- Colonna destra: KPI aggregati tramite blocchi numerici (Total Strokes,
-  Fluidity Index, Symmetry %) e grafici a linee aggiornati dinamicamente.
-- Barra funzioni: pulsanti per iniziare sessione, interrompere e salvare,
-  esportare in CSV.
+### 3.3 Scenario d'uso principale
 
-8. Struttura del Progetto
+Quando lo studente vuole validare il motore, apre la dashboard Streamlit.
+Carica un file MP4 laterale (profilo 90 gradi) di movimento simulato a secco.
+Il sistema legge i frame, esegue MediaPipe Pose, calcola angolo del gomito,
+conta le bracciate e stima la regolarita' del ritmo, mostrando video annotato
+e KPI in tempo reale. Al termine, lo studente esporta la sessione in CSV per
+confronto storico.
 
-```text
-swim_ai_poc/
-+-- app.py
-+-- vision_tracker.py
-+-- metrics_engine.py
-+-- requirements.txt
-+-- data/
-|   +-- sessions.csv
-+-- test_videos/
-    +-- profilo_test.mp4
-```
+### 3.4 Ambiente di validazione e demo (sandbox controllato / "blackbox")
 
-9. Roadmap di Sviluppo
+Per la presentazione, la simulazione a secco avviene in un sandbox di
+validazione costruito apposta per l'MVP, a costo zero, che rende la demo
+ripetibile e riduce il rumore del tracking. Il sandbox non e' un componente
+software: e' la condizione controllata entro cui il PoC dimostra la propria
+logica. Garantisce:
 
-- Settimana 1: ingestione video e pose tracking corporeo.
-- Settimana 2: sviluppo algoritmi e calcolo metriche.
-- Settimana 3: UI frontend e integrazione dashboard.
-- Settimana 4: debugging generale, ottimizzazione e demo pitch.
+- Vista laterale 90 gradi fissa: camera/telefono su supporto fisso, asse ottico
+  perpendicolare al piano sagittale (rispetta il vincolo geometrico di sez. 3 e
+  RF-004).
+- Illuminazione controllata e uniforme: luci esistenti posizionate per ridurre
+  ombre e sfarfallii che degradano la pose estimation.
+- Sfondo neutro: telo o parete uniforme per massimizzare la separazione
+  soggetto/sfondo.
+- Spazio delimitato e ripetibile: posizione del soggetto marcata a terra per
+  riprodurre la stessa inquadratura tra una prova e l'altra.
 
-10. Mitigazione delle Criticita' e Sviluppi Futuri
+Questo ambiente e' cio' che permette di affermare onestamente che la validazione
+avviene "in condizioni controllate": non maschera i limiti del sistema, li
+circoscrive. La realizzazione fisica e l'elenco materiali (tutti a costo zero)
+sono decisione aperta DA-08 (sez. 14.3).
 
-L'inquadratura laterale 2D puo' soffrire di occlusioni temporanee. In questa
-fase MVP l'algoritmo ignora landmark con visibility score inferiore a 0.5 e
-mantiene l'ultimo angolo valido fino al ritorno del punto nel campo visivo,
-prevenendo picchi anomali o crash del software.
+---
+
+## 4. Perimetro del MVP
+
+### 4.1 Funzionalita' core del MVP
+
+| ID | Funzionalita' core | Priorita' | Perche' e' necessaria |
+| --- | --- | --- | --- |
+| MVP-001 | Ingestione video da file MP4 (percorso primario) | Alta | Percorso di input garantito e riproducibile (decisione DA-02) |
+| MVP-002 | Pose tracking MediaPipe con overlay scheletro | Alta | Fornisce i landmark su cui si basa tutto il resto |
+| MVP-003 | Selezione arto lato-camera e calcolo angolo gomito 2D | Alta | Coerente con vista laterale; il gomito e' la metrica tecnica centrale |
+| MVP-004 | Stroke Counter deterministico (picchi coordinata Y polso) | Alta | Metrica cardine; deve essere riproducibile |
+| MVP-005 | Fluidity Score (deviazione standard intervalli tra picchi) | Media | Indice di regolarita' del ritmo, a basso costo di calcolo |
+| MVP-006 | Gestione occlusioni (visibility < 0.5 -> forward-fill) | Alta | Evita picchi spuri e crash quando un arto e' coperto |
+| MVP-007 | Dashboard Streamlit a due colonne (video + KPI + grafico onda Y) | Alta | E' l'interfaccia di validazione e di demo |
+| MVP-008 | Export CSV sessione con timestamp | Media | Persistenza e confronto storico; richiesto per la demo |
+| MVP-009 | Input webcam live come modalita' best-effort/sperimentale | Bassa | Utile alla demo, ma non garantita (limiti Streamlit, sez. 14.2) |
+
+### 4.2 Funzionalita' escluse / fuori scope
+
+| Fuori scope | Motivo dell'esclusione | Possibile versione futura |
+| --- | --- | --- |
+| Symmetry Score bilaterale | Contraddice il vincolo di vista laterale: l'arto lontano e' strutturalmente occluso, quindi la misura simultanea dei due gomiti non e' affidabile (decisione DA-01 = A). Codice esistente calculate_symmetry_score conservato ma non collegato alla pipeline MVP (airbag, non rimosso) | v2, previo cambio di protocollo di ripresa (frontale/45 gradi) o misura in due passaggi |
+| Analisi in vasca / video subacquei | Fuori dallo scopo del PoC a secco | Fase industriale |
+| Riconoscimento dello stile di nuoto (classificatore) | Richiederebbe modelli e dataset dedicati | v2+ |
+| Analisi multi-utente simultanea | Complessita' elevata, non necessaria a validare il motore | Fase industriale (LiDAR/sensor fusion) |
+| Database SQLite | CSV e' sufficiente per la persistenza del PoC | v2 se serve query storiche |
+| Migrazione a MediaPipe Tasks (PoseLandmarker) | L'API legacy gia' funzionante basta per l'MVP; migrare ora aggiunge attrito | v2 (vedi sez. 7 e sez. 14.2) |
+
+Regola: se una funzionalita' non e' nella sez. 4.1, non si costruisce nella v1.
+
+---
+
+## 5. Flusso operativo
+
+### 5.1 Flusso principale
+
+[Avvio dashboard Streamlit]
+  -> [Utente seleziona input: File MP4 (primario) | Webcam (best-effort)]
+  -> [vision_tracker: lettura frame + resize + MediaPipe Pose]
+  -> [Estrazione landmark lato-camera + controllo visibility]
+  -> [metrics_engine: angolo gomito, stroke counter, fluidity]
+  -> [Aggiornamento UI: video annotato + KPI + grafico onda Y]
+  -> [Utente termina sessione]
+  -> [Export CSV con metriche aggregate + timestamp]
+
+### 5.2 Input richiesti
+
+| Input | Formato | Obbligatorio? | Esempio |
+| --- | --- | --- | --- |
+| Video laterale | File .mp4, vista profilo 90 gradi | Si | test_videos/profilo_test.mp4 |
+| Stream webcam | Device index (0) | No (best-effort) | webcam integrata |
+
+### 5.3 Output atteso
+
+| Output | Formato | Destinazione |
+| --- | --- | --- |
+| Video annotato (scheletro + angolo gomito) | Frame renderizzati | Dashboard (colonna sinistra) |
+| KPI: bracciate totali, Fluidity Score | Numerico | Dashboard (colonna destra) |
+| Grafico onda coordinata Y del polso | Line chart | Dashboard (colonna destra) |
+| Sessione | Riga CSV con timestamp | data/sessions.csv |
+
+### 5.4 Punto di intervento umano
+
+Intervento umano previsto: Si.
+Dove avviene: interpretazione dei risultati. Il sistema e' decision-support,
+non decisore autonomo.
+Che cosa deve verificare: che i valori siano plausibili (angolo 0-180, conteggio
+coerente col video). Nessun output viene presentato come diagnosi o consiglio
+medico.
+
+---
+
+## 6. Requisiti funzionali
+
+| ID | Requisito | Priorita' | Criterio di accettazione |
+| --- | --- | --- | --- |
+| RF-001 | Aprire un file MP4 da test_videos/ o da percorso, e fallire in modo controllato se la sorgente non e' valida | Alta | Sorgente inesistente -> messaggio d'errore leggibile, nessun crash |
+| RF-002 | Ridimensionare i frame a larghezza max 800px mantenendo le proporzioni | Alta | Frame piu' larghi vengono ridotti; piu' stretti restano invariati |
+| RF-003 | Eseguire MediaPipe Pose e disegnare lo scheletro sul frame | Alta | Con soggetto inquadrato, i 33 landmark sono visibili in overlay |
+| RF-004 | Selezionare l'arto lato-camera (spalla/gomito/polso) in base alla visibility | Alta | Viene usato l'arto con visibility media piu' alta tra sinistro (11/13/15) e destro (12/14/16) |
+| RF-005 | Calcolare l'angolo del gomito 2D tra 0 e 180 via arctan2 | Alta | calculate_elbow_angle restituisce valori in [0,180] su input noti |
+| RF-006 | Contare le bracciate rilevando l'inversione di direzione della coordinata Y del polso oltre una dead-band, con gate sulla spalla e debounce di 0.6 s | Alta | Su video di riferimento, conteggio entro +/-1 dal manuale; nessun doppio conteggio entro 0.6 s |
+| RF-007 | Calcolare il Fluidity Score come max(0, 100 - std(intervalli)*K) con >=3 picchi | Media | Con <3 picchi restituisce 0; con ritmo regolare tende a 100 |
+| RF-008 | Ignorare i landmark con visibility < 0.5 e mantenere l'ultimo angolo valido (forward-fill) | Alta | Occludendo l'arto, l'angolo non produce picchi spuri ne' eccezioni |
+| RF-009 | Mostrare una dashboard a due colonne con video a sinistra e KPI/grafico a destra | Alta | Layout visibile in Streamlit; angolo gomito stampato frame per frame |
+| RF-010 | Aggiornare in tempo (quasi) reale il grafico dell'onda Y del polso | Media | Il grafico si popola durante l'elaborazione del video |
+| RF-011 | Esportare in data/sessions.csv (append) le metriche aggregate con timestamp | Media | Nuova riga con data/ora, bracciate totali, fluidita', angolo medio/max |
+| RF-012 | Funzionare 100% offline dopo il primo setup | Alta | Nessuna chiamata di rete a runtime (modello MediaPipe gia' disponibile in locale) |
+| RF-013 | Chiudersi/liberare le risorse senza crash a fine stream o su input interrotto | Alta | Fine video o stop webcam -> nessuna eccezione non gestita |
+| RF-014 | (Best-effort) Poter usare la webcam come sorgente alternativa | Bassa | Se la webcam e' disponibile, i frame vengono processati; se instabile, resta documentato come limite |
+
+---
+
+## 7. Stack tecnologico e dipendenze
+
+### 7.1 Scelte tecniche principali
+
+| Area | Scelta | Motivazione |
+| --- | --- | --- |
+| Linguaggio | Python 3.11 (gia' nel venv del progetto) | Ecosistema CV/AI maturo; coerente con l'ambiente esistente |
+| Pose estimation | MediaPipe Pose API legacy mp.solutions.pose, versione pinnata | Gia' implementata e funzionante in vision_tracker.py; gira su CPU, offline, zero costi |
+| Elaborazione video | OpenCV (opencv-python) | Ingestione frame, resize, color space, rendering overlay |
+| Calcolo | NumPy | Trigonometria (arctan2) e statistica (std) |
+| UI | Streamlit | Dashboard web locale in solo Python; sviluppo rapido |
+| Persistenza | CSV via Pandas | Sufficiente per il PoC; niente DB nel MVP |
+| Hosting/deploy | 100% locale | Nessun cloud, nessuna API |
+
+Nota su MediaPipe (decisione tecnica). L'API mp.solutions.pose e' legacy: Google
+l'ha sostituita con MediaPipe Tasks (PoseLandmarker) e ha chiuso il supporto ad
+alcune Legacy Solutions, continuando pero' a fornire i binari "as-is". Per l'MVP
+si resta sul legacy (gia' funzionante, zero attrito) e si pinna la versione
+attualmente installata nel venv (da leggere con "pip freeze | grep mediapipe")
+per evitare rotture future. La migrazione a Tasks e' debito tecnico esplicito
+per la v2 (sez. 14.2). Isolare la pose estimation in vision_tracker.py rende la
+migrazione localizzata.
+
+### 7.2 Dipendenze esterne
+
+| Dipendenza | Uso | Rischio | Alternativa |
+| --- | --- | --- | --- |
+| mediapipe (legacy Pose) | Pose estimation | API legacy in dismissione; possibili rotture con upgrade | Pin versione ora; MediaPipe Tasks in v2 |
+| opencv-python | I/O video, frame ops | Basso; libreria matura | - |
+| streamlit | UI | Rendering webcam real-time fragile (sez. 14.2) | MP4 come percorso primario |
+| numpy, pandas | Calcolo, CSV | Basso | - |
+
+matplotlib era elencato ma non e' necessario nell'MVP: i grafici usano
+st.line_chart. Va tenuto in requirements.txt solo se serve altrove (es.
+dipendenza transitiva di MediaPipe), altrimenti rimosso per pulizia (decisione
+minore, DA-07, sez. 14.3).
+
+### 7.3 Stima costi
+
+| Voce | Stima | Note |
+| --- | --- | --- |
+| Modello/inference AI | 0 EUR | MediaPipe gira in locale su CPU; nessun provider |
+| Hosting | 0 EUR | Esecuzione locale |
+| Storage | 0 EUR | CSV su file system |
+| Totale stimato | 0 EUR/mese | Limite massimo accettabile: 0 EUR (vincolo di progetto) |
+
+---
+
+## 8. Architettura e flusso dati
+
+### 8.1 Componenti principali
+
+| Componente | Responsabilita' | Input | Output |
+| --- | --- | --- | --- |
+| vision_tracker.py | Ingestione video + MediaPipe Pose + overlay | MP4/webcam | Frame annotato + lista landmark normalizzati |
+| metrics_engine.py | Angolo gomito, stroke counter, fluidity | Landmark (X,Y) + timestamp | KPI + stato picchi |
+| app.py | Dashboard Streamlit, orchestrazione, export | Frame + metriche | UI (video, KPI, grafico) + CSV |
+| data/sessions.csv | Persistenza sessioni | Metriche aggregate | Storico righe |
+
+### 8.2 Diagramma testuale del flusso dati
+
+[Utente]
+  -> [app.py: selezione input MP4/webcam]
+  -> [vision_tracker.py: frame + landmark]
+  -> [metrics_engine.py: angolo/bracciate/fluidity]
+  -> [app.py: rendering UI + grafico]
+  -> [Export CSV]
+
+### 8.3 Dati salvati
+
+| Dato | Dove | Per quanto | Perche' serve |
+| --- | --- | --- | --- |
+| Metriche aggregate di sessione (bracciate, fluidity, angolo medio/max, timestamp) | data/sessions.csv | Persistente | Confronto storico tra sessioni |
+| Video | Non salvato | - | Riduce rischio privacy: si conservano solo metriche numeriche, mai i frame |
+
+---
+
+## 9. Comportamento del modello (pose estimation)
+
+Questa sezione sostituisce "Comportamento AI e prompt": il progetto non usa LLM
+ne' prompt. L'unico modello e' MediaPipe BlazePose.
+
+### 9.1 Task affidato al modello
+
+| Task | Input | Output | Modello | Rischio principale |
+| --- | --- | --- | --- | --- |
+| Stima 33 landmark corporei | Frame RGB | Coordinate (x,y,z,visibility) normalizzate | MediaPipe Pose (legacy, model_complexity=1) | Fuori distribuzione su pose orizzontali/prone; occlusioni |
+
+### 9.2 Parametri del modello
+
+Configurazione confermata dal codice esistente: static_image_mode=False,
+model_complexity=1, smooth_landmarks=True, enable_segmentation=False,
+min_detection_confidence=0.5, min_tracking_confidence=0.5.
+
+### 9.3 Regole di comportamento
+
+- Usare solo landmark con visibility >= 0.5; sotto soglia -> forward-fill
+  dell'ultimo angolo valido.
+- Selezionare l'arto lato-camera (visibility media piu' alta), coerente con la
+  vista laterale.
+- Nessun dato lascia la macchina; nessuna chiamata di rete a runtime.
+- Il sistema non emette diagnosi ne' consigli medici (disclaimer, sez. 10.3).
+
+### 9.4 Algoritmi deterministici (specifica formale)
+
+Angolo del gomito - vettori gomito->spalla e gomito->polso, arctan2,
+normalizzazione in [0,180]. (Funzione calculate_elbow_angle gia' presente.)
+
+Stroke Counter - parametri espliciti:
+- min_delta = 0.003 (dead-band su Y normalizzata: variazioni sotto soglia =
+  direzione 0).
+- Picco = transizione direzione salita->discesa della Y (nota: in MediaPipe Y
+  cresce verso il basso, quindi il punto "alto" del polso e' un minimo locale
+  di Y).
+- Gate spalla: il picco e' valido solo se il polso e' sopra la spalla
+  (peak_y < shoulder_y).
+- Debounce: 0.6 s minimi tra due picchi validi.
+
+Fluidity Score - max(0, 100 - std(intervalli_tra_picchi)*K), K = 50, minimo 3
+picchi.
+ATTENZIONE: K = 50 e' una costante euristica: il punteggio e' un indice
+relativo, non una misura assoluta, ed e' sensibile a frame rate e regime di
+debounce. Va documentato come tale; l'eventuale calibrazione e' decisione aperta
+(DA-04, sez. 14.3).
+
+---
+
+## 10. Dati, privacy e vincoli normativi
+
+### 10.1 Dati trattati
+
+| Tipo di dato | E' personale? | Fonte | Dove viene inviato? |
+| --- | --- | --- | --- |
+| Video/frame di una persona | Si (immagine di persona identificabile) | Webcam o file MP4 | Solo locale; mai trasmesso; mai salvato |
+| Landmark/coordinate | Potenzialmente si (derivano dalla persona) | MediaPipe | Solo in memoria a runtime |
+| Metriche aggregate | No (numeri anonimi) | Calcolo | data/sessions.csv locale |
+
+### 10.2 GDPR
+
+Il sistema tratta dati personali? Si, ma solo in locale e in modo effimero.
+- Il video non viene salvato: si conservano solo metriche numeriche anonime.
+- Nessuna trasmissione a terzi, nessun cloud.
+- Decisione GDPR: minimizzazione by design - nessuna persistenza di frame/volti;
+  consenso dell'eventuale persona ripresa; se si usano video di terzi (es.
+  YouTube) serve base giuridica/licenza adeguata (vedi DA-05).
+
+### 10.3 AI Act
+
+Categoria di rischio stimata: Minima.
+Motivazione: il sistema analizza il movimento, non identifica chi e' la persona
+(nessuna identificazione biometrica). Resta un PoC locale a scopo di studio.
+Obblighi/attenzioni: disclaimer esplicito "non e' un dispositivo medico e non
+fornisce consigli clinici o di prevenzione infortuni"; supervisione umana
+sull'interpretazione dei numeri.
+
+### 10.4 Sicurezza minima
+
+- [x] Nessuna API key necessaria (nessun provider esterno)
+- [x] .env non richiesto dall'MVP; se introdotto, va in .gitignore
+- [x] Nessun frame video salvato
+- [x] Gli errori non espongono percorsi/dati sensibili
+- [x] La cache MediaPipe/Matplotlib e' locale e ignorata in Git
+
+---
+
+## 11. Validazione e quality control
+
+### 11.1 Cosa deve essere validato
+
+| Elemento | Metodo | Soglia/criterio |
+| --- | --- | --- |
+| Range angolo | Test unita' su calculate_elbow_angle | Sempre in [0,180] |
+| Conteggio bracciate | Confronto con conteggio manuale sul video di riferimento | Errore <= +/-1 |
+| Robustezza occlusioni | Video con arto occluso | Nessun picco spurio, nessun crash |
+| Fluidity | Input sintetici (intervalli regolari/irregolari) | Regolare -> ~100, irregolare -> basso |
+| Stabilita' runtime | Fine stream / stop / MP4 corrotto | Nessuna eccezione non gestita |
+
+### 11.2 Validatori previsti
+
+| Validatore | Tipo | Cosa controlla | Azione se fallisce |
+| --- | --- | --- | --- |
+| test_metrics | Python (unit) | Angolo, fluidity, stroke su input noti | Blocco: fixare prima di procedere |
+| Controllo visibility | Runtime | Landmark affidabili | Forward-fill |
+| Controllo sorgente | Runtime | Sorgente video valida | Messaggio d'errore controllato |
+
+### 11.3 Test minimi prima della demo
+
+Ambiente di riferimento dei test e della demo: il sandbox controllato (sez. 3.4).
+
+| Test | Input | Output atteso | Stato |
+| --- | --- | --- | --- |
+| Caso normale | profilo_test.mp4 | KPI coerenti, nessun crash | Da fare |
+| Caso limite (occlusione) | Video con arto coperto | Angolo forward-filled, nessun picco | Da fare |
+| Input non valido | Percorso inesistente | Errore leggibile | Da fare |
+| Fine stream / stop | Stop a meta' | Chiusura pulita risorse | Da fare |
+| Webcam best-effort | Device 0 | Funziona o degrada in modo documentato | Da fare |
+
+---
+
+## 12. Gestione errori e fallback
+
+| Scenario di errore | Comportamento atteso | Retry? | Messaggio / fallback |
+| --- | --- | --- | --- |
+| Sorgente video non apribile | Errore controllato, nessun crash | No | "Impossibile aprire la sorgente. Usa 0 (webcam) o un MP4 in test_videos/." |
+| Landmark occluso (visibility < 0.5) | Ignora dato, mantiene ultimo angolo valido | - | Nessun messaggio, log opzionale |
+| Nessuna persona rilevata nel frame | Salta il frame, KPI invariati | - | Overlay assente sul frame |
+| Webcam instabile in Streamlit | Degrada a percorso MP4 | No | Nota all'utente: modalita' webcam sperimentale |
+| MP4 corrotto / fine stream | Chiusura pulita risorse | No | "Elaborazione terminata." |
+
+Errori da registrare in incidents.md:
+- Crash o eccezione ricorrente in fase di build
+- Comportamento anomalo del tracking (picchi spuri, drop di landmark)
+- Rottura dovuta a upgrade mediapipe
+- Decisione tecnica cambiata a causa di un problema
+
+---
+
+## 13. Deploy, manutenzione e aggiornamenti
+
+### 13.1 Piano di deploy
+
+| Elemento | Decisione |
+| --- | --- |
+| Ambiente di sviluppo | Locale (Windows, venv Python 3.11) |
+| Ambiente di "produzione" | Locale (e' un PoC) |
+| Comando di avvio | streamlit run app.py |
+| Variabili ambiente | Nessuna richiesta dall'MVP |
+| Logging | Console + incidents.md per problemi rilevanti |
+
+### 13.2 Monitoring minimo
+- Errori di esecuzione (console)
+- fps effettivo / fluidita' elaborazione
+- Coerenza conteggio bracciate vs atteso
+
+### 13.3 Manutenzione
+
+| Attivita' | Frequenza | Responsabile |
+| --- | --- | --- |
+| Controllo dipendenze (pin mediapipe) | A ogni upgrade | Studente |
+| Aggiornamento incidents.md / prompt_log.md | Quando serve | Studente |
+| Rivalutazione migrazione a MediaPipe Tasks | v2 | Studente |
+
+---
+
+## 14. Rischi, assunzioni e decisioni aperte
+
+### 14.1 Assunzioni
+
+- Il video di test e' realmente laterale (profilo 90 gradi), come da vincolo
+  geometrico.
+- MediaPipe Pose fornisce landmark utilizzabili sul movimento simulato a secco.
+- Il movimento a secco e' un proxy sufficiente per validare il software, non per
+  validare la biomeccanica sportiva.
+- La versione di mediapipe nel venv resta disponibile e installabile (pin).
+- La demo avviene nel sandbox controllato (sez. 3.4): le condizioni geometriche
+  e di illuminazione sono garantite, non lasciate al caso.
+
+### 14.2 Rischi
+
+| Rischio | Probabilita' | Impatto | Mitigazione |
+| --- | --- | --- | --- |
+| MediaPipe fuori distribuzione su pose orizzontali/prone | Media | Medio | Simulazione a secco in piedi/di profilo; usare arto lato-camera; model_complexity=1 |
+| Webcam real-time fragile in Streamlit | Alta | Medio | MP4 come percorso primario (DA-02); webcam documentata come best-effort |
+| Deprecazione API MediaPipe legacy | Media | Medio | Pin versione; isolamento in vision_tracker.py; migrazione a Tasks in v2 |
+| Falsi positivi/negativi dello stroke counter a secco | Media | Medio | Dead-band + gate spalla + debounce 0.6 s + validazione manuale |
+| Fluidity Score interpretato come misura assoluta | Media | Basso | Documentarlo come indice relativo; calibrazione aperta (DA-04) |
+| Uso di video di terzi senza licenza/consenso | Media | Medio-alto | Preferire footage proprio o dataset con licenza chiara (DA-05) |
+
+### 14.3 Decisioni aperte
+
+| Decisione | Opzioni | Deadline | Responsabile |
+| --- | --- | --- | --- |
+| DA-04 - Costante Fluidity K | Tenere 50 / calibrare su riferimento | Prima del congelamento o in v2 | Studente |
+| DA-05 - Fonte video di riferimento e licenza | Footage proprio / dataset open (Kaggle) con licenza | Prima dei test FASE 4 | Studente |
+| DA-06 - Versione esatta mediapipe da pinnare | Leggere da pip freeze del venv funzionante | Setup FASE 3 | Studente |
+| DA-07 - matplotlib in requirements | Tenere / rimuovere se inutilizzato | Pulizia FASE 4 | Studente |
+| DA-08 - Realizzazione fisica del sandbox/blackbox | Materiali a costo zero (telo/parete neutra, supporto camera fisso, luci esistenti), spazio disponibile, marker a terra | Prima della demo (FASE 4) | Studente |
+
+### 14.4 Contraddizioni della versione precedente risolte in questa spec
+
+- Vista laterale vs Symmetry Score bilaterale: risolta rimuovendo la simmetria
+  dall'MVP (DA-01 = A).
+- Symmetry "max" nel testo vs "media" nella formula: resa irrilevante per l'MVP
+  (metrica fuori scope); se reintrodotta in v2 va definita in modo univoco.
+- Overclaiming ("equivalente a laboratorio professionale", "millimetri"):
+  rimosso; obiettivo riformulato onestamente (DA-03).
+- K = 50 costante magica del Fluidity: dichiarata euristica e indice relativo.
+- Webcam real-time come requisito forte: declassata a best-effort; MP4 primario
+  (DA-02).
+
+---
+
+## 15. Checklist pre-build
+
+### Problema e obiettivo
+- [x] Il problema e' reale e ben definito
+- [x] L'obiettivo del sistema e' chiaro e onesto
+- [x] Il successo e' misurabile (sez. 1.2)
+- [x] L'utente target e' definito
+
+### Scope e MVP
+- [x] Funzionalita' core esplicite (sez. 4.1)
+- [x] Fuori scope esplicito (sez. 4.2)
+- [x] Realizzabile nel tempo (FASE 3-4 su base gia' costruita)
+- [x] Sostenibile a costo zero
+
+### Architettura e implementazione
+- [x] Flusso operativo completo (sez. 5)
+- [x] Requisiti funzionali verificabili (sez. 6)
+- [x] Stack motivato (sez. 7)
+- [x] Dipendenze note (sez. 7.2)
+- [x] Nessun segreto/API key da gestire
+
+### Modello, dati e validazione
+- [x] E' chiaro dove agisce il modello (sez. 9)
+- [x] Parametri del modello definiti (sez. 9.2)
+- [x] Dati trattati mappati (sez. 10.1)
+- [x] GDPR / AI Act considerati (sez. 10)
+- [x] Criteri di validazione definiti (sez. 11)
+- [x] Fallback previsti (sez. 12)
+
+### Deploy e manutenzione
+- [x] Piano di deploy realistico (sez. 13)
+- [x] Cosa monitorare definito
+- [x] Errori/modifiche documentati in incidents.md
+- [x] Specifica congelata (2026-07-13, task T01)
+
+---
+
+## 16. Registro versioni
+
+| Versione | Data | Modifica | Autore |
+| --- | --- | --- | --- |
+| 1.0 | 02/07/2026 | Prima versione della specifica ricostruita dal brainstorming di validazione; sostituisce spec.txt; risolte le contraddizioni sez. 14.4; simmetria fuori MVP; MP4 primario; obiettivo riformulato | studente + supporto F. Moruzzi |
+| 1.1 | 02/07/2026 | Aggiunto contesto strategico (pitch per finanziamento); formalizzato il sandbox di validazione controllato (sez. 3.4); criterio di ripetibilita' demo (sez. 1.2); DA-08 | studente + F. Moruzzi |
+| 1.1 (freeze) | 2026-07-13 | Specifica portata a stato CONGELATA e scritta in spec.txt (task T01). Da qui in avanti le modifiche vanno in SPEC_ERRATA.md | Codex assistant per lo studente |
+
+---
+
+Documento creato per il corso AI Projects Development - ITS ICT Academy Roma
