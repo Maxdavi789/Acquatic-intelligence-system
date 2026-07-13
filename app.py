@@ -36,6 +36,9 @@ SESSIONS_CSV_PATH = PROJECT_ROOT / "data" / "sessions.csv"
 INPUT_MP4 = "File MP4 (primario)"
 INPUT_WEBCAM = "Webcam (sperimentale)"
 WEBCAM_DEVICE_INDEX = 0
+# L'anteprima webcam e' best-effort (RF-014): durata limitata, cosi' il loop
+# termina sempre da solo e rilascia le risorse anche senza uno stop manuale.
+WEBCAM_PREVIEW_FRAMES = 300
 
 
 st.set_page_config(
@@ -133,6 +136,7 @@ def render_video_stream(
     chart_slot: Any = None,
     stroke_slot: Any = None,
     fluidity_slot: Any = None,
+    max_frames: int | None = None,
 ) -> dict[str, Any]:
     """Loop di rendering delle task T17/T18/T20/T21.
 
@@ -173,6 +177,9 @@ def render_video_stream(
     try:
         with create_pose_estimator() as pose:
             while True:
+                if max_frames is not None and frames_rendered >= max_frames:
+                    break
+
                 ok, frame = capture.read()
                 if not ok:
                     break
@@ -290,20 +297,27 @@ def _execute_processing(
     chart_slot: Any,
     stroke_slot: Any,
     fluidity_slot: Any,
+    max_frames: int | None = None,
 ) -> dict[str, Any] | None:
-    """Avvia il loop gestendo gli errori di sorgente in UI (T27, RF-001).
+    """Avvia il loop gestendo gli errori di sorgente in UI (T27/T28, RF-001).
 
     Sorgente non apribile -> `st.error` leggibile, nessuna eccezione non
-    gestita (spec sez. 12). Restituisce il riepilogo, o None in caso di
-    errore.
+    gestita (spec sez. 12); per la webcam il degrado e' documentato con il
+    rimando al percorso MP4 primario (RF-014). Restituisce il riepilogo,
+    o None in caso di errore.
     """
     placeholder = st.empty()
     try:
         return render_video_stream(
-            source, placeholder, chart_slot, stroke_slot, fluidity_slot
+            source, placeholder, chart_slot, stroke_slot, fluidity_slot, max_frames
         )
     except RuntimeError as error:
         st.error(str(error))
+        if isinstance(source, int):
+            st.info(
+                "La modalità webcam è sperimentale (best-effort): se il "
+                "problema persiste usa il percorso primario File MP4."
+            )
         return None
 
 
@@ -316,39 +330,48 @@ def render_video_section(
     render_input_selector()
     source = st.session_state.get("video_source")
 
+    summary = None
     if isinstance(source, str):
         if st.button("Avvia elaborazione video", type="primary"):
             summary = _execute_processing(
                 source, chart_slot, stroke_slot, fluidity_slot
             )
-            if summary is None:
-                return
-            # T22: i risultati sopravvivono ai rerun di Streamlit (interazioni
-            # con i widget) finche' non parte una nuova elaborazione.
-            st.session_state["last_kpi"] = {
-                "stroke_count": summary["stroke_count"],
-                "fluidity_score": summary["fluidity_score"],
-            }
-            st.session_state["wrist_series"] = summary["wrist_series"]
-            st.session_state["last_summary"] = {
-                key: summary[key]
-                for key in (
-                    "frames_rendered",
-                    "stroke_count",
-                    "fluidity_score",
-                    "elbow_angle_mean",
-                    "elbow_angle_max",
-                )
-            }
-            st.caption(
-                f"Elaborazione terminata: {summary['frames_rendered']} frame "
-                "renderizzati."
-            )
     elif source == WEBCAM_DEVICE_INDEX:
-        st.info(
-            "L'elaborazione live della webcam verrà collegata nella task T28 "
-            "(percorso best-effort)."
+        # T28: anteprima a durata limitata, cosi' il loop termina da solo
+        # (lo stop manuale arriva con T29/limiti Streamlit, spec sez. 14.2).
+        if st.button("Avvia anteprima webcam (sperimentale)"):
+            summary = _execute_processing(
+                source,
+                chart_slot,
+                stroke_slot,
+                fluidity_slot,
+                max_frames=WEBCAM_PREVIEW_FRAMES,
+            )
+
+    if summary is None:
+        return
+
+    # T22: i risultati sopravvivono ai rerun di Streamlit (interazioni
+    # con i widget) finche' non parte una nuova elaborazione.
+    st.session_state["last_kpi"] = {
+        "stroke_count": summary["stroke_count"],
+        "fluidity_score": summary["fluidity_score"],
+    }
+    st.session_state["wrist_series"] = summary["wrist_series"]
+    st.session_state["last_summary"] = {
+        key: summary[key]
+        for key in (
+            "frames_rendered",
+            "stroke_count",
+            "fluidity_score",
+            "elbow_angle_mean",
+            "elbow_angle_max",
         )
+    }
+    st.caption(
+        f"Elaborazione terminata: {summary['frames_rendered']} frame "
+        "renderizzati."
+    )
 
 
 def main() -> None:
