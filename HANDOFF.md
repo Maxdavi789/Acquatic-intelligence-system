@@ -54,7 +54,7 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T37 (inizio M8, demo e pitch)
+## 2. PUNTO DI RIPRESA -> BREAKDOWN COMPLETATO (restano azioni utente)
 
 - M2 e' completata (T13-T14: `analyze_frame` + script CLI
   `scripts/analyze_video.py`, validati sul video provvisorio).
@@ -73,23 +73,20 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
     `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
     valori persistiti.
-- M7 risolta in deroga DA-05: il video ufficiale e' la clip Pexels
-  37264420 (HD 720x1280 25fps, licenza Pexels, versionata in repo come
-  `test_videos/profilo_test.mp4`, SHA256 in SPEC_ERRATA). Validazione T36
-  completa: 175/175 posa, 10 bracciate (manuale 10, diff 0), Fluidity
-  93,1, CSV ok, riproducibilita' bit-identica.
-- Demo della presentazione (concordata con l'utente): elaborazione LIVE
-  del video ufficiale nella dashboard (KPI che salgono, grafico che si
-  disegna, export CSV) + EVENTUALE momento webcam live best-effort, da
-  decidere ("poi capiamo se aggiungere un video live").
-- T37 e' la prossima task (M8): README finale con descrizione onesta,
-  "come funziona", disclaimer non-medicale, vincolo 0 euro, roadmap con
-  sensori, link a spec v1.1 e alla deroga video in SPEC_ERRATA.
-- Poi: T38 (screenshot per slide: gia' disponibili come base la contact
-  sheet annotata e il grafico dell'onda del video ufficiale), T39 (slide
-  pitch 8-12 con richiesta fondi, inquadrando il dry-run onestamente),
-  T40 (rehearsal demo x2 cronometrata), T41 (chiusura governance, >= 5
-  entry in incidents: ampiamente superato).
+- Tutte le task software del breakdown (T01-T41) sono completate; vedi
+  breakdown_status.md per il dettaglio con commit ed evidenze.
+- Numeri di riferimento della demo (video ufficiale, riproducibili):
+  175/175 frame con posa, 10 bracciate (manuale 10, diff 0), Fluidity
+  93,1, angolo medio 163,17 / max 179,92; elaborazione ~3,6 s a giro
+  (~48 fps). Avvio: `.\venv\Scripts\python.exe -m streamlit run app.py`.
+- RESTANO ALL'UTENTE: revisione/approvazione del pitch deck (importo e
+  nome da inserire in docs/pitch/pitch_deck.md, poi rigenerare il PDF o
+  modificarlo a mano); rehearsal umana con proiettore (+ screenshot
+  dashboard per le slide); decisione sul momento webcam live
+  (best-effort, gia' implementato e validato in T28).
+- Se si riprende da un'altra macchina: clone -> `python -m venv venv` ->
+  `pip install -r requirements.txt` -> suite 23/23 -> demo. Il video
+  ufficiale e' NEL repo; il vecchio provvisorio resta solo locale.
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.

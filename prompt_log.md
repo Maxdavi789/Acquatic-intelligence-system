@@ -1033,6 +1033,71 @@
 - M0-M7 COMPLETATI (T01-T36, 36/41). Prossima task: M8/T37 (README
   finale), poi T38-T41. Push di chiusura eseguito.
 
+## 2026-07-14 - Consulenze brevi: API key e ruolo dell'AI
+
+### Domanda 1: "non mi hai ancora chiesto l'API key del modello"
+- Risposta: nessuna API key esiste ne' serve, BY DESIGN. MediaPipe
+  BlazePose gira in locale su CPU (spec sez. 7, 10.4, RF-012, costo 0).
+  E' un punto di forza del pitch, non una mancanza. Ribadita la regola:
+  eventuali segreti mai in chat, solo `.env` gitignored (cfr. INC-006).
+- Nessuna azione tecnica.
+
+### Domanda 2: "quindi il progetto fa uso dell'AI oppure no?"
+- Risposta: SI', nella percezione: BlazePose e' una rete neurale profonda
+  pre-addestrata (33 landmark da frame RGB, inferenza locale). NO nella
+  misura: angolo/conteggio/fluidity sono matematica deterministica, per
+  riproducibilita' e verificabilita'. Non e' un sistema generativo/LLM
+  (spec sez. 0, 2.4, 9). Fornita la frase pronta per la presentazione.
+- Nessuna azione tecnica.
+
+## 2026-07-14 02:00 +02:00 - Approvazione "procediamo": modulo M8 (T37-T41)
+
+### Messaggio utente
+- "ok perfetto procediamo".
+
+### T37 - README finale (commit ac22859)
+- Riscrittura completa: cosa dimostra/non dimostra (DA-03), demo con
+  numeri attesi riproducibili, tabella "dove sta l'AI e dove no",
+  installazione pinnata, tabella criteri di validazione, video ufficiale
+  con licenza e rimando alla deroga, limiti onesti (DA-04, INC-011,
+  DA-01), roadmap finanziata, privacy e disclaimer, mappa governance.
+
+### T38 - Asset per le slide (commit c5cbaed)
+- `docs/pitch/`: frame annotato full-res, sequenza 12 frame annotati,
+  onda del polso con i 10 picchi, tabella reale export CSV. Tutti output
+  autentici della pipeline, nessun mockup.
+- Tentato screenshot headless della dashboard (Edge --headless): cattura
+  solo lo skeleton di caricamento (l'app importa MediaPipe al primo run);
+   scartato per onesta'. Screenshot live da fare nella rehearsal umana.
+
+### T39 - Bozza pitch deck (commit 395519f)
+- `pitch_deck.md` (sorgente con note presentatore) +
+  `pitch_deck_bozza.pdf` (10 slide, immagini reali incluse). Angolo:
+  "rischio software azzerato, finanziate il rischio hardware"; dry-run
+  inquadrato onestamente (spec sez. 14.4).
+- DoD parziale: PDF esportato; REVISIONE UTENTE PENDENTE (importo, nome,
+  approvazione testi).
+
+### T40 - Rehearsal tecnica della demo
+- Due giri completi consecutivi (elaborazione + export CSV) cronometrati:
+  3,6 s ciascuno, ~48 fps di elaborazione (criterio spec >= 15 fps),
+  KPI identici tra i giri (10 bracciate / Fluidity 93,1), zero intoppi.
+- Resta raccomandata la rehearsal umana con proiettore (occasione per
+  gli screenshot dashboard e per decidere il momento webcam live).
+
+### T41 - Chiusura governance (questo commit)
+- breakdown_status: FASE 3 e FASE 4 completate; dettaglio M8; sezione
+  "Azioni rimanenti" (revisione deck, rehearsal umana, decisione webcam).
+- HANDOFF: punto di ripresa = breakdown completato, numeri di riferimento
+  demo e istruzioni di ripresa da altra macchina.
+- incidents.md: 20+ entry totali (DoD T41 >= 5 superato).
+- Push finale di sessione.
+
+### Stato iterazione
+- BREAKDOWN T01-T41 COMPLETATO lato software (T39 bozza in revisione
+  utente; T40 rehearsal umana raccomandata). Il PoC e' pronto per la
+  presentazione: demo riproducibile, deck bozza, governance completa.
+
 ### Follow-up utente (stessa iterazione)
 - Commit dell'entry rifiutato dall'utente con due domande: perche' non si
   puo' usare il video in Downloads? e il tutto necessita di una demo il

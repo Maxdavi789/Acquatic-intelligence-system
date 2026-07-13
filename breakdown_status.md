@@ -31,8 +31,8 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | FASE 0 - scaffold e ambiente | Completata | Struttura presente; venv 3.12 ricreato in questo percorso. |
 | FASE 1 - `vision_tracker.py` | Implementata e validata | Runtime legacy ripristinato; MP4 provvisorio: posa 448/448 frame, chiusura `q` pulita. Webcam tentata ma hardware assente (best-effort, INC-010). |
 | FASE 2 - `metrics_engine.py` | Implementata + hardening M1 + T13 | Angolo gomito, StrokeCounter, Fluidity (K documentata), selezione arto, smoothing e `analyze_frame`. Symmetry resta airbag fuori pipeline. |
-| FASE 3 - `app.py` | Iniziata | T15 completata: scaffold Streamlit e layout asimmetrico a due colonne. |
-| FASE 4 - persistenza/robustezza/demo | Non iniziata | Dipende da M2-M3. |
+| FASE 3 - `app.py` | Completata | Dashboard completa: input, rendering annotato, angolo live, KPI reali, grafico, persistenza rerun (T15-T22). |
+| FASE 4 - persistenza/robustezza/demo | Completata | Export CSV (M4), robustezza (M5), test formali (M6), video ufficiale in deroga (M7), README/asset/deck/rehearsal (M8). |
 
 ## Avanzamento per modulo (nuovo breakdown)
 
@@ -46,7 +46,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M5 | Robustezza e gestione errori | T26-T29 | Completata: 4/4 |
 | M6 | Test e validazione | T30-T33 | Completata: 4/4; T30/T33 RIPETUTI sul video ufficiale (T30: diff 0; T33: identici) |
 | M7 | Sandbox demo controllato | T34-T36 | Completata: 3/3 in deroga DA-05 (video licenziato al posto del sandbox fisico, vedi SPEC_ERRATA) |
-| M8 | Demo, pitch e chiusura governance | T37-T41 | Da iniziare |
+| M8 | Demo, pitch e chiusura governance | T37-T41 | In chiusura: T37/T38/T40/T41 fatte; T39 bozza PDF in revisione utente |
 
 ## Dettaglio M0
 
@@ -137,15 +137,24 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | T35 | Completata in deroga | Video ufficiale = Pexels 37264420 HD 720x1280 25fps, `test_videos/profilo_test.mp4`, VERSIONATO (licenza Pexels, 1,9 MB), SHA256 e fonte in SPEC_ERRATA (6adac64). Mulinelli ritmici in piedi: 10 cicli in 7 s. |
 | T36 | Completata | Giro completo pipeline sul video ufficiale: 175/175 frame, 10 bracciate, Fluidity 93,1, angoli [58,49; 179,92], grafico e KPI live, CSV esportato (riga: 10 / 93,1 / 163,17 / 179,92). Nessun picco spurio (intervalli >= 0,6 s; oscillazione bassa a f100 scartata dal gate spalla). 11/11 check. |
 
-## Prossima Task
+## Dettaglio M8
 
-- Prossima task in ordine: M8/T37, README finale (descrizione onesta, "come
-  funziona", disclaimer non-medicale, vincolo 0 euro, roadmap sensori,
-  link alla spec e alla deroga video). Dipendenza T36 soddisfatta.
-- A seguire: T38 (screenshot/grafici per le slide: contact sheet e onda
-  gia' disponibili come base), T39 (slide pitch con richiesta fondi),
-  T40 (rehearsal demo x2 con il video ufficiale; da decidere l'eventuale
-  momento webcam live), T41 (chiusura governance).
+| Task | Stato | Note |
+| --- | --- | --- |
+| T37 | Completata | README finale riscritto (ac22859): scope onesto DA-03, demo con numeri attesi, confine AI/deterministico, limiti, roadmap, disclaimer non-medicale, governance. |
+| T38 | Completata | 4 asset REALI in `docs/pitch/` (c5cbaed): frame annotato full-res, sequenza 12 frame, onda polso con picchi, tabella export CSV. Screenshot della dashboard live da catturare durante la rehearsal umana (la cattura headless mostra solo lo skeleton di caricamento). |
+| T39 | Bozza in revisione | `pitch_deck.md` + `pitch_deck_bozza.pdf`, 10 slide con immagini reali e note presentatore (395519f). RESTANO ALL'UTENTE: importo richiesto, nome, approvazione testi (DoD "riviste"). |
+| T40 | Completata (tecnica) | 2 giri demo consecutivi cronometrati: 3,6 s l'uno, 48 fps di elaborazione (target spec >= 15), KPI identici (10 / 93,1), CSV in append, zero intoppi. Rehearsal UMANA con proiettore raccomandata prima del giorno X (occasione per gli screenshot dashboard). |
+| T41 | Completata | Questa chiusura: breakdown_status, HANDOFF, prompt_log aggiornati e committati. incidents.md: 20+ entry (DoD >= 5 ampiamente superato). |
+
+## Azioni rimanenti (fuori breakdown, in mano all'utente)
+
+- Rivedere e approvare il pitch deck (importo fondi, nome, testi) - chiude
+  il DoD di T39.
+- Rehearsal umana della demo con proiettore + cattura screenshot dashboard.
+- Decidere il momento webcam live nella scaletta (best-effort, T28 pronta).
+- Eventuale replica dei test su altra macchina per la portabilita' (clone
+  -> venv -> requirements -> demo).
 
 ## Task Arretrate o Bloccate
 
