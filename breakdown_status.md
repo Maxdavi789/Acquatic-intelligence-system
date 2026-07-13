@@ -44,7 +44,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Completata: 8/8 |
 | M4 | Persistenza CSV | T23-T25 | Completata: 3/3 |
 | M5 | Robustezza e gestione errori | T26-T29 | Completata: 4/4 |
-| M6 | Test e validazione | T30-T33 | Da iniziare |
+| M6 | Test e validazione | T30-T33 | Completata: 4/4 (sul video provvisorio; da ripetere T30/T33 sul video ufficiale T35) |
 | M7 | Sandbox demo controllato | T34-T36 | Da iniziare |
 | M8 | Demo, pitch e chiusura governance | T37-T41 | Da iniziare |
 
@@ -120,16 +120,26 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | T28 | Completata | Anteprima webcam sperimentale a frame limitati (c4dc9a3, `WEBCAM_PREVIEW_FRAMES=300`): termina da sola e rilascia le risorse; su errore degrado documentato con rimando a MP4 primario. Validata con webcam REALE: 13/13 check inclusi click end-to-end via AppTest. |
 | T29 | Completata | Verifica senza modifiche al codice: stop simulato a meta' elaborazione (MP4 e webcam) -> `capture.release()` chiamata esattamente una volta dal `finally`, interruzione propagata a Streamlit, webcam subito riapribile. 6/6 check. |
 
+## Dettaglio M6
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T30 | Completata (provvisorio) | Conteggio manuale documentato = 1 (una recovery sopra la spalla, evidenze frame 300-440 + tracciato polso/spalla); automatico = 2; differenza = 1 ENTRO tolleranza +-1. Causa del +1 e requisito per il video T35 (bracciate ritmiche continue) in incidents.md. Da ripetere sul video ufficiale T35. |
+| T31 | Completata | Esito formale = verifica occlusione T26: scenario controllato (box nero 100 frame + iniezione visibility), nessun picco spurio, nessun crash; registrato in INC-011. |
+| T32 | Completata | Tre casi limite eseguiti e loggati (incidents.md): input non valido -> errore leggibile UI+CLI; fine stream -> chiusura pulita; stop a meta' -> release singolo, nessun handle. |
+| T33 | Completata (provvisorio) | Due run sullo stesso MP4: KPI IDENTICI (bracciate 2, fluidity 0.0, angolo medio 146,2519, max 179,9191), serie polso e serie angoli identiche frame per frame. 7/7 check. Da ripetere sul video ufficiale T35. |
+
 ## Prossima Task
 
-- Prossima task in ordine: M6/T30, test caso normale: conteggio manuale
-  documentato vs `stroke_count` (tolleranza +-1). Utilizzabile l'MP4
-  provvisorio in attesa del video ufficiale del sandbox (T35). Nota: il
-  provvisorio mostra un ciclo lento (INC-009) e il counter rileva 2 picchi;
-  il confronto manuale va documentato con attenzione.
-- A seguire: T31 (occlusione formale: evidenza T26/INC-011 gia' registrata,
-  da formalizzare), T32 (input non valido + fine stream + stop: evidenze
-  T27/T29), T33 (riproducibilita': due run stesso MP4 -> KPI identici).
+- Prossima task in ordine: M7/T34, montare il sandbox controllato (spec
+  sez. 3.4, DA-08): AZIONE FISICA dell'utente (supporto camera fisso a 90
+  gradi, sfondo neutro, luci uniformi, marker a terra, costo 0, foto del
+  setup). Subito dopo T35: registrare il video ufficiale
+  `test_videos/profilo_test.mp4` nel sandbox, con bracciate CONTINUE e
+  RITMICHE (>= 4-5 cicli, vedi esito T30).
+- Software eseguibile senza sandbox nel frattempo: T36 attende T35;
+  di M8 sono anticipabili T37 (README finale) e T38 (screenshot) solo dopo
+  T36; T39 (slide pitch) e' preparabile in bozza.
 
 ## Task Arretrate o Bloccate
 

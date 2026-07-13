@@ -64,10 +64,16 @@ Aggiornato al 2026-07-13.
   occlusioni prolungate, mai sovrastima), errori di sorgente gestiti con
   messaggi leggibili, anteprima webcam sperimentale a durata limitata con
   degrado documentato, risorse rilasciate anche su stop a meta'.
-- M6-M8: non iniziate.
+- M6/T30-T33: completata sul video provvisorio. Conteggio: manuale 1 vs
+  automatico 2, entro la tolleranza +-1 del criterio di successo (causa e
+  dettagli in incidents.md). Riproducibilita': due esecuzioni sullo stesso
+  MP4 producono KPI e serie IDENTICHE. T30/T33 verranno ripetuti sul video
+  ufficiale del sandbox (T35).
+- M7-M8: da iniziare. M7 e' fisico: sandbox controllato e registrazione del
+  video ufficiale con bracciate ritmiche continue.
 
-La prossima task in ordine e' T30 (modulo M6, test): confronto del conteggio
-bracciate con il conteggio manuale documentato.
+La prossima task in ordine e' T34 (modulo M7): montaggio del sandbox
+controllato a costo zero.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -85,8 +91,9 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-I test formali di validazione (conteggio manuale, riproducibilita') sono
-previsti nelle task T30-T33 (modulo M6).
+I test formali di validazione sul video provvisorio sono documentati in
+`incidents.md` e `breakdown_status.md` (modulo M6); la validazione finale
+avverra' sul video ufficiale del sandbox (T35-T36).
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.

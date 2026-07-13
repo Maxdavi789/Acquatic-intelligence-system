@@ -40,14 +40,18 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
     falso negativo post-occlusione = limite MediaPipe documentato); errori
     sorgente gestiti in UI (`_execute_processing`); anteprima webcam
     sperimentale a frame limitati validata con hardware reale; cleanup
-    risorse garantito anche su stop a meta'. Prossimo modulo: M6 (test).
+    risorse garantito anche su stop a meta'.
+  - M6 (T30-T33): COMPLETATA sul video provvisorio. T30: manuale 1 vs auto
+    2, entro tolleranza +-1 (dettagli in incidents). T33: riproducibilita'
+    PERFETTA (KPI e serie identiche tra due run). T30/T33 da ripetere sul
+    video ufficiale T35. Prossimo modulo: M7 (sandbox, FISICO).
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T30 pronta (inizio M6)
+## 2. PUNTO DI RIPRESA -> T34/T35 (sandbox: serve l'utente)
 
 - M2 e' completata (T13-T14: `analyze_frame` + script CLI
   `scripts/analyze_video.py`, validati sul video provvisorio).
@@ -66,21 +70,21 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
     `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
     valori persistiti.
-- M5 e' completata (T26 b4df5f2, T27 cd704e0, T28 c4dc9a3, T29 447991f).
-  Vedi il dettaglio in breakdown_status.md; finding chiave INC-011 (falso
-  negativo del conteggio dopo occlusioni prolungate: limite MediaPipe, non
-  del motore; nessuna sovrastima possibile).
-- T30 e' la prossima task (M6): conteggio manuale documentato vs
-  `stroke_count` sul video di riferimento, tolleranza +-1 (spec sez. 1.2).
-  Si puo' usare l'MP4 provvisorio in attesa del video ufficiale T35.
-  ATTENZIONE: il provvisorio mostra un ciclo lento (INC-009) ma il counter
-  rileva 2 picchi a frame 358 e 402; il conteggio manuale va fatto
-  guardando il video (quante volte il polso supera la spalla e inverte) e
-  documentato in modo verificabile prima del confronto.
-- T31: formalizzare l'esito occlusione (evidenza T26/INC-011 gia' in
-  incidents.md). T32: eseguire e loggare i tre casi limite (evidenze
-  T27/T29). T33: riproducibilita' (due run stesso MP4 -> KPI identici;
-  attenzione: il timestamp dell'export cambia, i KPI no).
+- M6 e' completata sul video provvisorio (T30-T32 in 38b29ac, esiti in
+  incidents.md; T33: due run -> KPI e serie IDENTICHE, 7/7).
+- Le prossime task in ordine sono FISICHE e richiedono l'utente:
+  - T34: montare il sandbox controllato (spec sez. 3.4, DA-08): camera su
+    supporto fisso a 90 gradi, sfondo neutro, luci uniformi, marker a
+    terra, costo 0, foto del setup da salvare.
+  - T35: registrare nel sandbox il video ufficiale
+    `test_videos/profilo_test.mp4`: dryland di profilo, un solo soggetto
+    interamente visibile, continuo, con BRACCIATE RITMICHE (>= 4-5 cicli):
+    requisito emerso dal T30 (il debounce 0,6 s e' calibrato su gesto
+    ritmico, non su demo lente con pause).
+- Dopo T35 il software riprende con: T36 (pipeline completa sul video
+  ufficiale: KPI plausibili, niente picchi spuri, CSV), ripetizione
+  T30/T33 sul video ufficiale, poi M8 (T37 README finale, T38 screenshot,
+  T39 slide pitch, T40 rehearsal x2, T41 chiusura governance).
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.

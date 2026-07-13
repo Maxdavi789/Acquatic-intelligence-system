@@ -900,3 +900,54 @@
 - M0-M5 COMPLETATI (T01-T29, 29/41 task). Prossima task: M6/T30.
 - Restano: M6 (test formali T30-T33), M7 (sandbox e video ufficiale
   T34-T36), M8 (README finale, screenshot, pitch, rehearsal, chiusura).
+
+## 2026-07-14 00:25 +02:00 - Prosecuzione approvata: modulo M6 completato (T30-T33)
+
+### Messaggio utente
+- "procedi, ricordati di aggiornare prompt log ecc ecc". Push di sessione
+  ancora autorizzato.
+
+### T30 - Conteggio manuale vs automatico (evidenze + registrazione)
+- Prodotte due evidenze sul video provvisorio: sequenza densa di 12 frame
+  (300-440) con numero frame sovrimpresso e tracciato polso-vs-spalla con
+  i picchi rilevati marcati (salvati come diagnostica locale).
+- Ispezione visiva: il soggetto esegue UNA sola bracciata completa (una
+  recovery sopra la spalla, frame ~340-420); la mano resta ferma vicino
+  alla testa ~1,5 s e oscilla, generando le due inversioni contate (358 e
+  402, distanti 1,47 s > debounce 0,6 s).
+- ESITO: manuale 1, automatico 2, |differenza| = 1 -> ENTRO tolleranza +-1
+  (spec sez. 1.2). Documentato in incidents.md con il requisito derivato
+  per il video T35: bracciate continue e ritmiche (>= 4-5 cicli).
+- Nota onesta: test superato al limite della tolleranza su un video
+  didattico lento; la validazione vera sara' sul video ufficiale T35.
+
+### T31 - Occlusione formale
+- Esito formale = scenario controllato T26 (box nero 100 frame +
+  iniezione visibility): nessun picco spurio, nessun crash. Registrato
+  con aggiornamento in INC-011.
+
+### T32 - Casi limite
+- Input non valido, fine stream e stop a meta' eseguiti e verificati
+  (esecuzioni formali T27: 11/11 e T29: 6/6); esiti registrati in
+  incidents.md.
+
+### T33 - Riproducibilita'
+- Due esecuzioni complete sullo stesso MP4: KPI IDENTICI (bracciate 2,
+  fluidity 0.0, angolo medio 146,2519, max 179,9191) e serie polso/angoli
+  identiche FRAME PER FRAME. 7/7 check. Determinismo confermato.
+
+### Governance e chiusura
+- incidents.md: entry T30 e T32, aggiornamento INC-011 per T31 (38b29ac).
+- breakdown_status: M6 completata 4/4 (con nota: T30/T33 da ripetere sul
+  video ufficiale T35); prossima task M7/T34 FISICA (serve l'utente).
+- HANDOFF: punto di ripresa T34/T35 con requisiti del video ufficiale.
+- README aggiornato. Push di chiusura eseguito.
+
+### Stato iterazione
+- M0-M6 COMPLETATI (T01-T33, 33/41 task). Il software del PoC e' finito e
+  validato sul materiale disponibile.
+- PALLA ALL'UTENTE per M7: T34 (montare il sandbox: camera fissa 90 gradi,
+  sfondo neutro, luci uniformi, marker a terra, foto del setup, costo 0) e
+  T35 (registrare profilo_test.mp4 con bracciate ritmiche continue).
+- Dopo il video ufficiale: T36, ripetizione T30/T33, poi M8 (README
+  finale, screenshot, slide pitch, rehearsal, chiusura governance).
