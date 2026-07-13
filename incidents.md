@@ -159,3 +159,17 @@
 - Azione eseguita: pinnato `mediapipe==0.10.35` (T02). Verificato che matplotlib
   e' dipendenza transitiva di mediapipe (mediapipe Requires: ...matplotlib...);
   rimosso da requirements.txt, resta installato via mediapipe (T04).
+
+### INC-2026-07-13-006 - Push negato: credenziali GitHub di un altro account
+- Tipo: ambiente GitHub / permessi.
+- Evidenza: `git push origin main` fallisce con HTTP 403: "Permission to
+  Maxdavi789/Acquatic-intelligence-system.git denied to MrChuck118".
+- Impatto: impossibile pushare i 6 commit di M0 sul remoto. Le credenziali Git
+  memorizzate su questa macchina appartengono all'account GitHub MrChuck118, che
+  NON ha permesso di scrittura sul repo di Maxdavi789. (MrChuck118 e' anche il
+  proprietario del repo live-draft-companion, non collegato a questo progetto.)
+- Stato: aperto, richiede azione dell'utente.
+- Azione residua: autenticarsi come Maxdavi789 (proprietario del repo) tramite
+  credential manager / personal access token, oppure aggiungere MrChuck118 come
+  collaboratore con permesso di scrittura sul repo di Maxdavi789. I 6 commit
+  restano al sicuro in locale finche' l'autenticazione non e' risolta.
