@@ -42,7 +42,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
 | M2 | Step di analisi per-frame (glue) | T13-T14 | Completata: 2/2 |
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Completata: 8/8 |
-| M4 | Persistenza CSV | T23-T25 | Da iniziare |
+| M4 | Persistenza CSV | T23-T25 | Completata: 3/3 |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
 | M7 | Sandbox demo controllato | T34-T36 | Da iniziare |
@@ -103,14 +103,24 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 - README riallineato in modo intermedio il 2026-07-13; il DoD completo T37 resta
   futuro, dopo la validazione end-to-end.
 
+## Dettaglio M4
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T23 | Completata | Riepilogo loop esteso con angolo medio/max; `build_session_dataframe` (timestamp ISO, bracciate, fluidity, angolo medio/max) e bottone "Termina Sessione ed Esporta Dati" con preview (8e877ad). 14/14 check; sul video reale: medio 146,25 / max 179,92. |
+| T24 | Completata | `append_session_to_csv`: header alla prima scrittura, append mai distruttivo (8031b20). 9/9 check: doppio append su path temporaneo e via click AppTest reali su `data/sessions.csv`. |
+| T25 | Completata | Ispezione: `data/` contiene solo `sessions.csv` + `.gitkeep`; nessun media persistito nel progetto; CSV gitignored. Nota di design sul file transitorio `.cache/uploaded_session.mp4` registrata in incidents.md. |
+
 ## Prossima Task
 
-- Prossima task in ordine: M4/T23, pulsante "Termina Sessione ed Esporta
-  Dati" con aggregazione delle metriche finali (bracciate totali, fluidity,
-  angolo medio/max) in un DataFrame Pandas. Dipendenza T21 soddisfatta.
-  Nota implementativa: il riepilogo di `render_video_stream` non traccia
-  ancora angolo medio/max, da aggiungere in T23.
-- A seguire: T24 (append CSV con timestamp), T25 (verifica privacy data/).
+- Prossima task in ordine: M5/T26, occlusion smoothing verificato nel loop
+  dell'app. Nota: `analyze_frame` usa gia' `ElbowAngleSmoother` (T08/T13),
+  quindi il collegamento c'e'; resta da verificare formalmente su un video
+  con arto occluso che non compaiano picchi spuri o crash nella dashboard.
+- A seguire: T27 (sorgente non valida / fine stream / nessuna persona in UI:
+  oggi un sorgente non apribile solleva RuntimeError non catturato dal
+  bottone), T28 (webcam best-effort, ora testabile: hardware presente),
+  T29 (cleanup risorse su stop/switch).
 
 ## Task Arretrate o Bloccate
 

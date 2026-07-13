@@ -266,6 +266,18 @@
   Restano validi i limiti noti (risoluzione, formato verticale, possibile
   licenza di terzi): non sostituisce il video ufficiale del sandbox T35.
 
+### 2026-07-13 - Verifica privacy T25 (esito positivo, nessun incidente)
+- Tipo: verifica pianificata dal breakdown (T25; spec sez. 8.3 e 10).
+- Esito: `data/` contiene SOLO `sessions.csv` (piu' il `.gitkeep`); nessun
+  frame, immagine o video persistito altrove nel progetto;
+  `data/sessions.csv` e' coperto da `.gitignore` (riga 8) e non finisce su Git.
+- Nota di design documentata: l'upload della dashboard scrive un file
+  transitorio `.cache/uploaded_session.mp4` (cartella gitignored),
+  sovrascritto a ogni nuovo upload; serve a OpenCV per leggere il video
+  caricato. Non e' una persistenza di sessione, non tocca `data/` e non
+  viene versionato. Comportamento dichiarato nel docstring di
+  `persist_uploaded_video` (T16).
+
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
 - Evidenza: `cv2.VideoCapture(0)` restituisce `isOpened() == False` e OpenCV
