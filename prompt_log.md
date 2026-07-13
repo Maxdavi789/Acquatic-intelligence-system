@@ -1098,6 +1098,24 @@
   utente; T40 rehearsal umana raccomandata). Il PoC e' pronto per la
   presentazione: demo riproducibile, deck bozza, governance completa.
 
+## 2026-07-14 - Chiusura sessione: consegne per le prossime sessioni
+
+### Messaggio utente
+- "ok segna tutto per bene cosi nelle prossime sessioni procediamo".
+
+### Azioni
+- Verificato che tutta la governance di progetto e' gia' committata e
+  pushata (ultimo commit 8fba712, locale = origin). Unico file locale
+  non tracciato: `test_videos/profilo_provvisorio.mp4` (intenzionale).
+- Punto di ripresa per la prossima sessione: leggere `HANDOFF.md`
+  (sezione 2: breakdown completato, azioni rimanenti all'utente).
+- Azioni aperte in mano all'utente: (1) revisione pitch deck con importo
+  e nome, (2) rehearsal umana con proiettore + screenshot dashboard,
+  (3) decisione momento webcam live nella scaletta.
+- L'assistente ha inoltre salvato nella propria memoria persistente le
+  coordinate del progetto e le regole di lavoro concordate, per ripartire
+  senza ricostruire il contesto.
+
 ### Follow-up utente (stessa iterazione)
 - Commit dell'entry rifiutato dall'utente con due domande: perche' non si
   puo' usare il video in Downloads? e il tutto necessita di una demo il
