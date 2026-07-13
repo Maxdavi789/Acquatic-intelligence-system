@@ -9,6 +9,16 @@ branch `main`. All'inizio dell'audit Codex del 2026-07-13, locale e
 `origin/main` coincidevano al commit `f32f661` (0 ahead / 0 behind). Le modifiche
 della ripresa Codex restano locali fino a un nuovo OK esplicito per il push.
 
+Ripresa da casa (2026-07-13, sera): repo clonata pulita in
+`C:\none\Acquatic-intelligence-system` al commit `9d33510` (allineato a
+`origin/main`, 0/0). Ambiente ricreato e rivalidato su questa macchina:
+venv Python 3.12.10, install da `requirements.txt`, `pip check` pulito,
+`mp.solutions.pose` inizializzabile, suite `scripts/test_metrics.py` 23/23,
+AppTest Streamlit 0 eccezioni / 2 colonne. Su questa macchina la webcam
+all'indice 0 ESISTE e legge frame (INC-010 risolto per la macchina di casa).
+Il video provvisorio e' stato riscaricato dall'utente, hash SHA256 identico a
+quello approvato, e ricopiato untracked in `test_videos/`.
+
 Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 
 > Correzione storica: la versione 2026-05-28 indicava "FASE 3 con KPI Simmetria".

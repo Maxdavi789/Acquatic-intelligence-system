@@ -587,3 +587,64 @@
   `origin/main`.
 - Unico file residuo: `test_videos/profilo_provvisorio.mp4`, untracked e non
   pubblicato intenzionalmente.
+
+## 2026-07-13 18:10 +02:00 - Ripresa da casa: clone, audit completo e piano in attesa di approvazione
+
+### Messaggio utente
+- Richiesto di continuare il breakdown con la data odierna, catalogando ogni
+  iterazione in `prompt_log.md` prima dell'output e mantenendo `incidents.md`.
+- Metodo: leggere integralmente gli allegati (spec v1.1 e breakdown_tasks_v1),
+  l'intero `prompt_log.md` e `breakdown_status.md`; analizzare le discordanze
+  tra progetto e documenti; individuare prossima task e arretrati; verificare
+  l'allineamento Git locale vs origin; valutare il README; validare il piano ed
+  esporlo in attesa di approvazione. Vincoli: non inventare, non costruire.
+- Subtask: il progetto esisteva solo su GitHub (lavoro svolto in ufficio);
+  clonarlo sulla macchina di casa, dare alla cartella locale il nome corretto
+  della repo ed eliminare il file locale `b` inutile dopo la pull.
+- Nel messaggio il link repo indicato era di nuovo
+  `MrChuck118/live-draft-companion` (refuso ricorrente, vedi INC-001);
+  a richiesta l'utente ha confermato `Maxdavi789/Acquatic-intelligence-system`.
+
+### Messaggi/azioni assistente
+- Verificata l'esistenza di entrambe le repo con `git ls-remote`; segnalata la
+  discordanza del link; l'utente ha confermato la repo corretta.
+- Clonata `Maxdavi789/Acquatic-intelligence-system` in
+  `C:\none\Acquatic-intelligence-system` (nome cartella = nome repo GitHub).
+  Eliminato il file vuoto `C:\none\b` (0 byte) come richiesto.
+- Stato Git dopo il clone: `main` allineato a `origin/main` al commit `9d33510`
+  (0 ahead / 0 behind), working tree pulito. Nulla da pushare o pullare.
+- Letti integralmente: i due allegati, `prompt_log.md`, `breakdown_status.md`,
+  `incidents.md`, `HANDOFF.md`, `SPEC_ERRATA.md`, `README.md`,
+  `requirements.txt`, `app.py`, `vision_tracker.py`, `metrics_engine.py`
+  (sezioni chiave verificate anche via grep) e la history dei commit.
+- Verificato: `spec.txt` = v1.1 CONGELATA; `analyze_frame`/`FrameAnalysisState`
+  presenti; `calculate_symmetry_score` airbag con 0 chiamate attive; suite di
+  test e scaffold T15 coerenti con lo status.
+- Discordanza operativa rilevata: HANDOFF e status dichiarano "T14 sbloccata",
+  ma il campione `test_videos/profilo_provvisorio.mp4` e' deliberatamente
+  untracked (licenza terzi) ed e' rimasto sulla macchina ufficio. Su questa
+  macchina `test_videos/` contiene solo `.gitkeep`: T14 e' localmente ribloccata
+  finche' il video non viene trasferito/riscaricato o sostituito.
+- Ambiente casa: Python 3.12.10 sul PATH (stessa versione validata in ufficio);
+  py launcher con default 3.14 da NON usare per il venv; `venv/` assente
+  (gitignored), da ricreare da `requirements.txt`.
+- README valutato: aggiornamento intermedio del 2026-07-13 ancora accurato
+  rispetto allo stato reale; nessuna modifica necessaria ora (DoD completo in
+  T37).
+- Nessun codice applicativo scritto, nessun commit, nessun push. Unica modifica:
+  questa entry obbligatoria di `prompt_log.md`.
+
+### Piano proposto, in attesa di approvazione
+- Step A (setup ambiente casa): venv con Python 3.12, install da
+  `requirements.txt`, `pip check`, verifica `mp.solutions.pose`, validatore
+  `scripts/test_metrics.py` (atteso 23/23) e AppTest Streamlit su `app.py`.
+  Opportunita': ritestare la webcam best-effort su questa macchina (INC-010).
+- Step B (governance): aggiornare INC-001 (refuso link ricorrente, causa nota:
+  credenziali ufficio MrChuck118), `breakdown_status.md` con la nota di ripresa
+  da casa e il riblocco locale di T14; commit locale di governance.
+- Step C (input utente): trasferire `profilo_provvisorio.mp4` dal PC ufficio o
+  riscaricarlo (SHA256 noto per verifica:
+  `49702466FF32DA10D633A2FCF41BA2BB594F7A57C979BAF9BAA95D6FCCE906A3`).
+- Step D (build, previa approvazione): M3/T16 selettore input (eseguibile senza
+  video); M2/T14 appena il video e' disponibile.
+- Push su `origin` solo dopo OK esplicito, come da politica concordata.

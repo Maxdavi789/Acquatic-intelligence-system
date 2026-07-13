@@ -114,6 +114,12 @@
 - Azione eseguita: segnalata la discordanza; l'utente ha confermato che la repo
   corretta e' `Maxdavi789/Acquatic-intelligence-system`, coerente con spec e
   breakdown.
+- Aggiornamento 2026-07-13 (sessione casa): il refuso si e' ripresentato
+  identico nella consegna di ripresa da casa. Causa ormai nota: la macchina
+  ufficio e' autenticata come MrChuck118, proprietario del repo
+  live-draft-companion, e il link finisce nei template di consegna. Verificate
+  entrambe le repo con `git ls-remote`; l'utente ha riconfermato quella
+  corretta e il clone e' stato eseguito dalla repo giusta. Nessun impatto.
 
 ### INC-2026-07-13-002 - Workspace locale vuoto, base non clonata qui
 - Tipo: repository locale.
@@ -252,6 +258,13 @@
   frame (visibilita' minima 0,9341); overlay ispezionato su 12 campioni. Il file
   resta intenzionalmente non tracciato da Git finche' la licenza non e'
   chiarita.
+- Aggiornamento 2026-07-13 (sessione casa): il campione provvisorio non viaggia
+  con Git (untracked di proposito) ed era rimasto sulla macchina ufficio.
+  L'utente lo ha riscaricato sulla macchina di casa: SHA256 verificato e
+  IDENTICO (`49702466FF32DA10D633A2FCF41BA2BB594F7A57C979BAF9BAA95D6FCCE906A3`),
+  ricopiato in `test_videos/profilo_provvisorio.mp4` e mantenuto untracked.
+  Restano validi i limiti noti (risoluzione, formato verticale, possibile
+  licenza di terzi): non sostituisce il video ufficiale del sandbox T35.
 
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
@@ -263,3 +276,9 @@
 - Azione eseguita: tentata l'apertura non interattiva e rilasciato il capture.
   T03 considera soddisfatto il requisito webcam come best-effort; ripetere la
   prova quando sara' collegata una webcam reale.
+- Aggiornamento 2026-07-13 (macchina casa): risolto su questa macchina. Dopo la
+  ripresa da casa e la ricreazione del venv, `cv2.VideoCapture(0)` apre
+  correttamente (`isOpened() == True`) e legge un frame reale 480x640x3.
+  La modalita' webcam best-effort (RF-014) torna quindi verificabile
+  visivamente; la prova UI completa resta in T28. Stato: risolto sulla
+  macchina di casa, non bloccante.
