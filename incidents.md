@@ -171,5 +171,11 @@
 - Stato: aperto, richiede azione dell'utente.
 - Azione residua: autenticarsi come Maxdavi789 (proprietario del repo) tramite
   credential manager / personal access token, oppure aggiungere MrChuck118 come
-  collaboratore con permesso di scrittura sul repo di Maxdavi789. I 6 commit
+  collaboratore con permesso di scrittura sul repo di Maxdavi789. I commit
   restano al sicuro in locale finche' l'autenticazione non e' risolta.
+- Aggiornamento 2026-07-13: tentato push con username/password dell'account
+  Maxdavi789 (one-shot, credential helper disabilitato): RIFIUTATO da GitHub
+  ("Password authentication is not supported for Git operations"). Conferma che
+  serve un Personal Access Token oppure l'aggiunta di MrChuck118 come
+  collaboratore. La credenziale NON e' stata salvata su disco. In quel momento
+  i commit locali in attesa di push erano 14.
