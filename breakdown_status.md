@@ -41,7 +41,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Completata: 6/6 |
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
 | M2 | Step di analisi per-frame (glue) | T13-T14 | Completata: 2/2 |
-| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15-T16 completate, T17 prossima |
+| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15-T17 completate, T18 prossima |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
@@ -70,7 +70,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
 | T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
 
-Validatore dopo T16: `python scripts/test_metrics.py` -> 23/23 test, exit 0
+Validatore dopo T17: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 (riverificato anche sulla macchina di casa).
 
 ## Dettaglio M2
@@ -86,7 +86,8 @@ Validatore dopo T16: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | --- | --- | --- |
 | T15 | Completata | `app.py` con page config, intestazione e colonne Video/Metriche 2:1. Server health 200; Streamlit AppTest: 0 eccezioni, 2 colonne. |
 | T16 | Completata | Selettore radio MP4 (default) / Webcam sperimentale con avviso (6a23f00); uploader `.mp4` che persiste in `.cache/` gitignored ed espone il percorso in `st.session_state["video_source"]`. AppTest: 16/16 check; server health 200. |
-| T17-T22 | Da iniziare | T17 e' ora sbloccata (T16 e T03 completate, INC-008 risolto) ed e' la prossima task. Le altre seguono l'ordine del breakdown. |
+| T17 | Completata | Loop `render_video_stream` con overlay scheletro su placeholder `st.image` (ab917d0); bottone di avvio solo con MP4 caricato; loop live webcam rimandato a T28 con nota esplicita. Estratto `create_pose_estimator` in `vision_tracker` (config spec 9.2 in un punto solo). Validazione: 15/15 check, 448/448 frame renderizzati, contact sheet ispezionata, suite 23/23, health 200. |
+| T18-T22 | Da iniziare | T18 (overlay angolo gomito live) e' la prossima: dipendenze T17 e T13 soddisfatte. Le altre seguono l'ordine del breakdown. |
 
 ## Governance
 
@@ -100,10 +101,10 @@ Validatore dopo T16: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 
 ## Prossima Task
 
-- Prossima task in ordine: M3/T17, rendering del video con overlay scheletro
-  nella colonna sinistra (`st.image` su placeholder, riuso funzioni
-  `vision_tracker`). Dipendenze T16 e T03 soddisfatte.
-- A seguire: T18 (overlay angolo live), T19 (KPI), T20 (grafico onda Y).
+- Prossima task in ordine: M3/T18, overlay dell'angolo del gomito live
+  (testo sul frame e/o accanto al video, aggiornato frame per frame).
+  Dipendenze T17 e T13 soddisfatte.
+- A seguire: T19 (KPI), T20 (grafico onda Y), T21 (collegamento dati reali).
 
 ## Task Arretrate o Bloccate
 

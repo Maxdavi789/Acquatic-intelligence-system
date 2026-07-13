@@ -48,12 +48,13 @@ Aggiornato al 2026-07-13.
 - M2/T13-T14: completata. `analyze_frame` e' collegata ai landmark reali dallo
   script CLI `scripts/analyze_video.py`: sul video provvisorio 448/448 frame
   con posa, angolo in [4,40; 179,92] e conteggio finale 2.
-- M3: T15 (scaffold a due colonne) e T16 (selettore input: MP4 primario di
-  default, webcam sperimentale con avviso, uploader `.mp4`) completate.
+- M3: T15 (scaffold a due colonne), T16 (selettore input: MP4 primario di
+  default, webcam sperimentale con avviso, uploader `.mp4`) e T17 (rendering
+  del video annotato con scheletro nella colonna sinistra) completate.
 - M4-M8: non iniziate.
 
-La prossima task in ordine e' T17: rendering del video con overlay scheletro
-nella colonna sinistra della dashboard (`st.image`).
+La prossima task in ordine e' T18: overlay dell'angolo del gomito live,
+aggiornato frame per frame.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -71,7 +72,8 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-Le funzioni di rendering e KPI verranno aggiunte nelle task T17-T22.
+Le funzioni di overlay angolo, KPI e grafico verranno aggiunte nelle task
+T18-T22.
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.

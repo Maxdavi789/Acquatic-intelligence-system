@@ -28,15 +28,16 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - M2 (T13-T14): completata. `analyze_frame` validata su input sintetici e,
     con `scripts/analyze_video.py`, sul video reale provvisorio (448/448 frame,
     angolo in [4,40; 179,92], conteggio 2).
-  - M3: T15 (scaffold due colonne) e T16 (selettore input MP4 primario /
-    webcam sperimentale con uploader) completate; T17 e' la prossima task.
+  - M3: T15 (scaffold due colonne), T16 (selettore input MP4 primario /
+    webcam sperimentale con uploader) e T17 (rendering video annotato via
+    placeholder `st.image`) completate; T18 e' la prossima task.
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T17 pronta
+## 2. PUNTO DI RIPRESA -> T18 pronta
 
 - T14 e' completata: `scripts/analyze_video.py` collega l'output reale di
   `extract_pose_landmarks` ad `analyze_frame` (headless) e stampa angolo e
@@ -48,11 +49,21 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   in `.cache/` (gitignored, fuori da `data/`) ed espone il percorso in
   `st.session_state["video_source"]` (webcam -> indice 0). Validazione:
   AppTest 16/16 check, server health 200.
-- T17 e' la prossima task in ordine: loop di lettura frame nella colonna
-  sinistra con overlay scheletro via `st.image` su placeholder, riusando le
-  funzioni di `vision_tracker` e consumando
-  `st.session_state["video_source"]`. Sostituire `cv2.imshow` (vietato in
-  Streamlit) con l'aggiornamento del placeholder.
+- T17 e' completata: `render_video_stream` in `app.py` legge i frame dalla
+  sorgente in `st.session_state["video_source"]`, applica l'overlay scheletro
+  (riuso funzioni `vision_tracker`) e aggiorna un placeholder `st.empty` via
+  `st.image` (BGR->RGB); bottone di avvio solo con MP4 caricato; risorse
+  rilasciate a fine stream; loop live webcam rimandato a T28 con info in UI.
+  In `vision_tracker` e' stato estratto `create_pose_estimator()` come unico
+  punto di configurazione del modello (spec sez. 9.2): riusato da CLI, script
+  T14 e dashboard. Validazione: 15/15 check, 448/448 frame renderizzati sul
+  video provvisorio, contact sheet annotata ispezionata, suite 23/23,
+  riepilogo `analyze_video` invariato dopo il refactor, health 200.
+- T18 e' la prossima task in ordine: overlay dell'angolo del gomito live
+  (testo sul frame e/o accanto al video, frame per frame). Richiede di
+  calcolare l'angolo nel loop di rendering: collegare `analyze_frame` (T13)
+  ai landmark gia' estratti da `process_pose_frame` dentro
+  `render_video_stream`, senza anticipare KPI (T19) o grafico (T20).
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.

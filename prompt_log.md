@@ -711,3 +711,44 @@
 - Suite 23/23 verde; ambiente casa pienamente operativo; webcam disponibile.
 - Commit locali della sessione: 50952f2, 2c8eb82, 6a23f00 + governance finale.
   Push NON eseguito: resta subordinato all'OK esplicito dell'utente.
+
+## 2026-07-13 21:05 +02:00 - Push autorizzato e completamento M3/T17
+
+### Messaggio utente
+- "bene fai un push e procediamo".
+
+### Messaggi/azioni assistente - push
+- Eseguito `git push origin main`: riuscito, `9d33510..3afeae5`. Primo push
+  dalla macchina di casa: le credenziali GitHub presenti funzionano.
+  Dopo il push: locale e `origin/main` allineati (0/0); unico file residuo
+  l'MP4 provvisorio, untracked di proposito.
+
+### T17 - Rendering video annotato nella dashboard
+- Refactor propedeutico: estratto `create_pose_estimator()` in
+  `vision_tracker.py` come UNICO punto di configurazione del modello (spec
+  sez. 9.2), riusato da `run_pose_tracking`, `scripts/analyze_video.py` e
+  dalla dashboard. Eliminata la triplicazione dei parametri Pose.
+- Implementato in `app.py` `render_video_stream(source, placeholder)`: loop
+  di lettura frame, overlay scheletro via `process_pose_frame`, conversione
+  BGR->RGB e aggiornamento del placeholder `st.empty`/`st.image`
+  (sostituto di `cv2.imshow`, non utilizzabile in Streamlit, spec sez. 14.2).
+  Risorse rilasciate nel `finally` (RF-013).
+- Bottone "Avvia elaborazione video" visibile solo con un MP4 caricato;
+  per la webcam la UI rimanda esplicitamente a T28 (best-effort), evitando
+  un loop live non arrestabile prima di T29.
+- Validazione (15/15 check): 448/448 frame renderizzati sul video provvisorio
+  con payload RGB corretti; sorgente non valida -> RuntimeError controllato;
+  AppTest pulito su percorso default e webcam; contact sheet 2x2 dei frame
+  annotati ispezionata visivamente (scheletro coerente su catch/pull/push/
+  recovery); suite 23/23; riepilogo `analyze_video` INVARIATO dopo il
+  refactor (448/448, angolo [4,40; 179,92], conteggio 2); py_compile OK;
+  server reale health 200 anche con l'import MediaPipe all'avvio pagina.
+- Commit `ab917d0` (T17). Governance aggiornata: breakdown_status (T17
+  completata, prossima T18), HANDOFF (punto di ripresa T18 con indicazioni
+  implementative), README (stato intermedio).
+
+### Stato iterazione
+- M3 a 3/8 (T15-T17). Prossima task in ordine: T18 (overlay angolo live).
+- Suite 23/23 verde; nessuna regressione su CLI e script T14.
+- Commit locali post-push: ab917d0 (T17) + commit di governance in chiusura.
+  Push dei nuovi commit subordinato al prossimo OK esplicito.
