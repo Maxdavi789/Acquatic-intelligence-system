@@ -40,8 +40,8 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | --- | --- | --- | --- |
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Completata: 6/6 |
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
-| M2 | Step di analisi per-frame (glue) | T13-T14 | T13 completata; T14 sbloccata e prossima |
-| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15 completata, T16 prossima |
+| M2 | Step di analisi per-frame (glue) | T13-T14 | Completata: 2/2 |
+| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15-T16 completate, T17 prossima |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
@@ -70,22 +70,23 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
 | T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
 
-Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
+Validatore dopo T16: `python scripts/test_metrics.py` -> 23/23 test, exit 0
+(riverificato anche sulla macchina di casa).
 
 ## Dettaglio M2
 
 | Task | Stato | Note |
 | --- | --- | --- |
 | T13 | Completata | `FrameAnalysisState` + `analyze_frame`; contratto a sei chiavi, persistenza, occlusione e frame senza landmark coperti da test sintetici. |
-| T14 | Prossima | Dipendenze soddisfatte. Va aggiunto lo script CLI di progetto che collega landmark reali ad `analyze_frame` e stampa angolo/conteggio. |
+| T14 | Completata | `scripts/analyze_video.py` (2c8eb82): landmark reali -> `analyze_frame`, stampa angolo/conteggio in console. Sul video provvisorio: 448/448 frame con posa, angolo in [4,40; 179,92], conteggio 2, exit 0; sorgente non valida -> messaggio leggibile, exit 1. |
 
 ## Dettaglio M3
 
 | Task | Stato | Note |
 | --- | --- | --- |
 | T15 | Completata | `app.py` con page config, intestazione e colonne Video/Metriche 2:1. Server health 200; Streamlit AppTest: 0 eccezioni, 2 colonne. |
-| T16 | Prossima eseguibile | Selettore File MP4 / Webcam sperimentale; MP4 default. |
-| T17-T22 | Da iniziare | T17 resta bloccata da T03/INC-008; le altre dipendono dal relativo ordine del breakdown. |
+| T16 | Completata | Selettore radio MP4 (default) / Webcam sperimentale con avviso (6a23f00); uploader `.mp4` che persiste in `.cache/` gitignored ed espone il percorso in `st.session_state["video_source"]`. AppTest: 16/16 check; server health 200. |
+| T17-T22 | Da iniziare | T17 e' ora sbloccata (T16 e T03 completate, INC-008 risolto) ed e' la prossima task. Le altre seguono l'ordine del breakdown. |
 
 ## Governance
 
@@ -99,18 +100,19 @@ Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
 
 ## Prossima Task
 
-- Prossima task in ordine: M2/T14, ora sbloccata. La validazione temporanea ha
-  gia' mostrato angoli in [4,40; 179,92] e conteggio finale 2; resta da creare
-  lo script CLI previsto dal breakdown e verificarne l'output console.
-- Subito dopo: M3/T16, selettore input con MP4 primario e webcam sperimentale.
+- Prossima task in ordine: M3/T17, rendering del video con overlay scheletro
+  nella colonna sinistra (`st.image` su placeholder, riuso funzioni
+  `vision_tracker`). Dipendenze T16 e T03 soddisfatte.
+- A seguire: T18 (overlay angolo live), T19 (KPI), T20 (grafico onda Y).
 
 ## Task Arretrate o Bloccate
 
-- Webcam: prova best-effort eseguita, ma non esiste un dispositivo all'indice 0
-  su questa macchina (INC-010). Non blocca il flusso MP4 primario.
-- Video provvisorio: presente solo localmente e deliberatamente non tracciato
-  da Git per possibile licenza di terzi. Va sostituito dal video proprio T35.
-- Push su `origin`: risolto (MrChuck118 aggiunto come collaboratore); locale e
-  origin erano allineati all'inizio dell'audit; il nuovo lavoro Codex non e'
-  ancora stato pushato.
+- Webcam: sulla macchina di casa il dispositivo indice 0 esiste e legge frame
+  (INC-010 risolto qui); la prova UI completa resta in T28 come da breakdown.
+- Video provvisorio: riscaricato sulla macchina di casa con SHA256 identico;
+  resta deliberatamente non tracciato da Git per possibile licenza di terzi.
+  Va sostituito dal video proprio T35.
+- Push su `origin`: i commit della sessione casa (governance + T14 + T16)
+  sono locali; push subordinato all'OK esplicito dell'utente. Da verificare
+  al primo push le credenziali GitHub di questa macchina.
 - `data/sessions.csv` non creato: generato dal modulo di export (M4).

@@ -45,15 +45,15 @@ Aggiornato al 2026-07-13.
   macchina non e' presente alcuna camera (INC-010).
 - M1/T07-T12: completata; suite sintetica corrente 23/23 verde, inclusa la
   regressione sul gate spalla stretto di T10.
-- M2: T13 completata (`FrameAnalysisState` + `analyze_frame`); T14 e' ora la
-  prossima task ed e' sbloccata dal completamento di T03.
-- M3: T15 completata; la dashboard Streamlit ha lo scaffold a due colonne.
-  Prossima task eseguibile T16 (selettore input).
+- M2/T13-T14: completata. `analyze_frame` e' collegata ai landmark reali dallo
+  script CLI `scripts/analyze_video.py`: sul video provvisorio 448/448 frame
+  con posa, angolo in [4,40; 179,92] e conteggio finale 2.
+- M3: T15 (scaffold a due colonne) e T16 (selettore input: MP4 primario di
+  default, webcam sperimentale con avviso, uploader `.mp4`) completate.
 - M4-M8: non iniziate.
 
-La prossima task in ordine e' T14: collegare formalmente `analyze_frame` ai
-landmark reali in uno script CLI e stampare angolo/conteggio. T16 resta la task
-successiva gia' eseguibile sul ramo dashboard.
+La prossima task in ordine e' T17: rendering del video con overlay scheletro
+nella colonna sinistra della dashboard (`st.image`).
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -62,6 +62,7 @@ Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 ```powershell
 .\venv\Scripts\python.exe scripts\test_metrics.py
 .\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4
+.\venv\Scripts\python.exe scripts\analyze_video.py --source <clip>.mp4
 ```
 
 Lo scaffold della dashboard e' avviabile con:
@@ -70,7 +71,7 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-Le funzioni di input, rendering e KPI verranno aggiunte nelle task T16-T22.
+Le funzioni di rendering e KPI verranno aggiunte nelle task T17-T22.
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.
@@ -84,6 +85,7 @@ Il riferimento ufficiale verra' registrato nel sandbox T35.
 +-- vision_tracker.py
 +-- metrics_engine.py
 +-- scripts/test_metrics.py
++-- scripts/analyze_video.py
 +-- requirements.txt
 +-- spec.txt
 +-- SPEC_ERRATA.md

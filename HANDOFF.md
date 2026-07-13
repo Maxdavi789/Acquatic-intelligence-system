@@ -1,9 +1,16 @@
 # HANDOFF - Punto di ripresa del lavoro
 
-Data: 2026-07-13
-Scopo: consentire a un altro assistente (Codex) di riprendere il progetto senza
+Data: 2026-07-13 (aggiornato in serata dalla sessione casa)
+Scopo: consentire a un altro assistente di riprendere il progetto senza
 ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 `breakdown_status.md`, `prompt_log.md`, `incidents.md`, `SPEC_ERRATA.md`.
+
+> Nota multi-macchina: il progetto viene sviluppato da due postazioni.
+> Ufficio: workspace storico, autenticato come MrChuck118 (collaboratore).
+> Casa: clone in `C:\none\Acquatic-intelligence-system`, venv ricreato e
+> baseline rivalidata il 2026-07-13; credenziali push da verificare al primo
+> push. Il video provvisorio untracked va ricopiato a mano su ogni macchina
+> (SHA256 di riferimento in incidents.md, INC-009).
 
 ---
 
@@ -18,35 +25,40 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
     best-effort non e' disponibile sull'hardware corrente (INC-010).
   - M1 (T07-T12): hardening del motore metriche + suite di test. Codex ha
     corretto anche il bordo T10 `peak_y == shoulder_y` con test di regressione.
-  - M2/T13: `FrameAnalysisState` e `analyze_frame` implementati e validati su
-    input sintetici; T14 e' ora la prossima task, non piu' bloccata.
-  - M3/T15: scaffold Streamlit con layout Video/Metriche a due colonne
-    completato; T16 e' la prossima task eseguibile.
+  - M2 (T13-T14): completata. `analyze_frame` validata su input sintetici e,
+    con `scripts/analyze_video.py`, sul video reale provvisorio (448/448 frame,
+    angolo in [4,40; 179,92], conteggio 2).
+  - M3: T15 (scaffold due colonne) e T16 (selettore input MP4 primario /
+    webcam sperimentale con uploader) completate; T17 e' la prossima task.
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T14 pronta
+## 2. PUNTO DI RIPRESA -> T17 pronta
 
-- T13 e' completata. `analyze_frame` restituisce le sei chiavi richieste, usa
-  stato persistente e non contiene simmetria.
+- T14 e' completata: `scripts/analyze_video.py` collega l'output reale di
+  `extract_pose_landmarks` ad `analyze_frame` (headless) e stampa angolo e
+  conteggio in console. Validata sul video provvisorio: 448/448 frame con
+  posa, angolo in [4,40; 179,92], conteggio finale 2, fluidity 0 (<3 picchi),
+  exit 0; sorgente non valida -> messaggio leggibile, exit 1.
+- T16 e' completata: radio "File MP4 (primario)" (default) / "Webcam
+  (sperimentale)" con avviso esplicito; uploader `.mp4` che persiste il file
+  in `.cache/` (gitignored, fuori da `data/`) ed espone il percorso in
+  `st.session_state["video_source"]` (webcam -> indice 0). Validazione:
+  AppTest 16/16 check, server health 200.
+- T17 e' la prossima task in ordine: loop di lettura frame nella colonna
+  sinistra con overlay scheletro via `st.image` su placeholder, riusando le
+  funzioni di `vision_tracker` e consumando
+  `st.session_state["video_source"]`. Sostituire `cv2.imshow` (vietato in
+  Streamlit) con l'aggiornamento del placeholder.
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
-- Validazione sintetica: 23/23 test passati, compilazione Python OK.
-- T03 e' completata sul campione locale
-  `test_videos/profilo_provvisorio.mp4`: 448/448 frame decodificati, posa e arto
-  affidabile su 448/448 frame, visibilita' minima 0,9341; il ramo `q` rilascia
-  capture e finestra senza crash. La webcam e' stata tentata ma l'indice 0 non
-  esiste su questa macchina; e' best-effort e resta INC-010 non bloccante.
-- T14 e' la prossima task in ordine: trasformare la validazione temporanea gia'
-  riuscita in uno script CLI di progetto che colleghi landmark reali e
-  `analyze_frame`, stampando angolo e conteggio.
-- T15 e' completata: `app.py` espone una pagina wide con colonne Video/Metriche
-  2:1. Verifica: server health 200, AppTest senza eccezioni e due colonne.
-- M3/T16 resta eseguibile dopo T14: radio File MP4/Webcam sperimentale e
-  uploader `.mp4` con MP4 default.
+- Suite sintetica: 23/23 test passati anche sulla macchina di casa.
+- Sulla macchina di casa la webcam indice 0 ESISTE e legge frame reali
+  (480x640x3): INC-010 e' risolto qui e la modalita' sperimentale T28 sara'
+  verificabile visivamente.
 
 ## 3. Ambiente
 
@@ -67,23 +79,27 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 ## 4. Git / autenticazione
 
 - Repo: https://github.com/Maxdavi789/Acquatic-intelligence-system (branch `main`).
-- Questa macchina e' autenticata su GitHub come account `MrChuck118`, aggiunto
-  come collaboratore (Write) sul repo di Maxdavi789: quindi `git push origin main`
-  FUNZIONA.
-- Identita' dei commit configurata in locale:
+- Macchina UFFICIO: autenticata su GitHub come account `MrChuck118`, aggiunto
+  come collaboratore (Write) sul repo di Maxdavi789: `git push origin main`
+  FUNZIONA da li'.
+- Macchina CASA: identita' git globale MrChuck118; credenziali push non ancora
+  esercitate da qui, da verificare al primo push autorizzato.
+- Identita' dei commit configurata in locale su entrambe le postazioni:
   `Massimo davide fedrigo <115544464+Maxdavi789@users.noreply.github.com>`.
 - Le password di account NON funzionano per il push (GitHub le ha disabilitate):
   usare le credenziali collaboratore gia' presenti, o un token.
 
 ## 5. Blocchi / cose in sospeso (serve l'utente)
 
-- Il campione provvisorio e' copiato localmente come
-  `test_videos/profilo_provvisorio.mp4`, ma resta fuori da Git per possibile
-  licenza di terzi. Non pubblicarlo finche' provenienza e diritti non sono
-  chiariti. Il video ufficiale sara' quello proprio del sandbox T35.
-- Webcam: nessun dispositivo all'indice 0 su questa macchina (INC-010). Serve
-  hardware disponibile solo per una futura prova best-effort; non blocca MP4,
-  T14 o la pipeline primaria.
+- Il campione provvisorio e' presente su entrambe le macchine come
+  `test_videos/profilo_provvisorio.mp4` (SHA256 identico, vedi INC-009), ma
+  resta fuori da Git per possibile licenza di terzi. Non pubblicarlo finche'
+  provenienza e diritti non sono chiariti. Il video ufficiale sara' quello
+  proprio del sandbox T35.
+- Webcam: assente sulla macchina ufficio, presente e funzionante sulla
+  macchina casa (INC-010). Non blocca il percorso MP4 primario.
+- I commit della sessione casa (governance, T14, T16) sono locali: push solo
+  dopo OK esplicito dell'utente.
 - `data/sessions.csv` non ancora creato: lo generera' il modulo di export (M4).
 
 ## 6. Trappole da NON ripetere

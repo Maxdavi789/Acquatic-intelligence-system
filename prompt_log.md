@@ -648,3 +648,66 @@
 - Step D (build, previa approvazione): M3/T16 selettore input (eseguibile senza
   video); M2/T14 appena il video e' disponibile.
 - Push su `origin` solo dopo OK esplicito, come da politica concordata.
+
+## 2026-07-13 20:35 +02:00 - Piano approvato: Step A-B eseguiti, video verificato, T14 e T16 completate
+
+### Messaggio utente
+- Approvazione: "vai con A e B intanto poi quando ti mando il video procedi con
+  la C e con la D e la E".
+- Follow-up: "prosegui, il video e' in download, e' il piu' recente"
+  (riferito alla cartella Downloads).
+
+### Messaggi/azioni assistente - Step A (ambiente casa)
+- Impostata l'identita' git locale del repo a quella dei commit precedenti
+  (Maxdavi789 noreply); l'identita' globale della macchina e' MrChuck118.
+- Creato `venv` con Python 3.12.10; installate le dipendenze pinnate da
+  `requirements.txt`; `pip check` senza rotture.
+- Verificato `mediapipe==0.10.21` con `mp.solutions.pose` inizializzabile.
+- Validatore motore: 23/23 test passati, exit 0, anche su questa macchina.
+- AppTest su `app.py` (stato T15): 0 eccezioni, 2 colonne, titolo e subheader
+  corretti.
+- Webcam best-effort: su questa macchina `VideoCapture(0)` APRE e legge un
+  frame reale 480x640x3. INC-010 risolto per la macchina di casa.
+
+### Step B (governance)
+- Aggiornati INC-001 (refuso link ricorrente, causa nota), INC-010 (webcam
+  presente a casa) e `breakdown_status.md` (nota di ripresa da casa).
+- Commit locale `50952f2` (`governance: resume from home, rebuild venv,
+  revalidate baseline`). Nessun push.
+
+### Step C (video provvisorio)
+- Individuato `Downloads\videoplayback.mp4` (file piu' recente, 1.182.093
+  byte). SHA256 calcolato: IDENTICO al riferimento approvato in ufficio
+  (`49702466...906A3`).
+- Copiato in `test_videos/profilo_provvisorio.mp4` e mantenuto untracked;
+  aggiornato INC-009 con la nota della sessione casa.
+
+### Step E/D - T14 (prima, come da ordine breakdown) e T16
+- T14: creato `scripts/analyze_video.py`, script CLI headless che collega
+  l'output reale di `extract_pose_landmarks` ad `analyze_frame` e stampa
+  angolo/conteggio per frame piu' riepilogo aggregato.
+- Validazione T14 sul video provvisorio: 448/448 frame con posa, angolo in
+  [4,40; 179,92], conteggio finale 2, fluidity 0 (<3 picchi, coerente), exit 0.
+  Valori identici alla prova temporanea dell'ufficio. Sorgente non valida ->
+  messaggio leggibile ed exit 1 (RF-001). Regressione 23/23; py_compile OK.
+  Commit `2c8eb82`.
+- T16: aggiunto in `app.py` il selettore radio "File MP4 (primario)" (default)
+  / "Webcam (sperimentale)" con avviso esplicito; uploader `.mp4` che persiste
+  il file in `.cache/` (gitignored, fuori da `data/`) ed espone il percorso
+  alla pipeline via `st.session_state["video_source"]` (webcam -> indice 0).
+  Nessuna anticipazione del rendering T17.
+- Validazione T16: AppTest 16/16 check (default MP4 senza warning, webcam con
+  warning e device 0, cleanup dello stato, integrita' della persistenza fuori
+  da `data/`); server reale health 200 e arrestato pulito; py_compile OK.
+  Commit `6a23f00`.
+- Governance finale: `breakdown_status.md` (M2 2/2, T16 completata, prossima
+  T17), `HANDOFF.md` (punto di ripresa T17, nota multi-macchina, git/auth,
+  blocchi), README (stato intermedio, comando analyze_video, struttura),
+  questa entry di prompt_log. Commit di governance in chiusura.
+
+### Stato iterazione
+- M2 completata (2/2); M3 a 2/8 (T15-T16 fatte). Prossima task in ordine: T17
+  (rendering video nella colonna sinistra).
+- Suite 23/23 verde; ambiente casa pienamente operativo; webcam disponibile.
+- Commit locali della sessione: 50952f2, 2c8eb82, 6a23f00 + governance finale.
+  Push NON eseguito: resta subordinato all'OK esplicito dell'utente.
