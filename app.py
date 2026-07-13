@@ -20,6 +20,13 @@ from metrics_engine import FrameAnalysisState, analyze_frame
 FALLBACK_FPS = 30.0
 CHART_UPDATE_EVERY = 10  # frame tra due aggiornamenti del grafico (T20)
 WRIST_CHART_COLUMNS = ("tempo (s)", "polso Y")
+SESSION_CSV_COLUMNS = (
+    "timestamp",
+    "bracciate_totali",
+    "fluidity_score",
+    "angolo_medio",
+    "angolo_max",
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 UPLOAD_CACHE_DIR = PROJECT_ROOT / ".cache"
@@ -138,7 +145,8 @@ def render_video_stream(
     rilasciate a fine stream (RF-013).
 
     Restituisce il riepilogo della sessione di elaborazione:
-    `frames_rendered`, `stroke_count`, `fluidity_score`, `wrist_series`.
+    `frames_rendered`, `stroke_count`, `fluidity_score`, `wrist_series`,
+    `elbow_angle_mean`, `elbow_angle_max` (angoli per l'export T23, RF-011).
     """
     capture = open_video_capture(source)
     frames_rendered = 0
@@ -149,6 +157,7 @@ def render_video_stream(
 
     state = FrameAnalysisState()
     wrist_series: list[dict[str, float]] = []
+    elbow_angles: list[float] = []
     result: dict[str, Any] = {}
 
     def update_kpis() -> None:
@@ -174,6 +183,8 @@ def render_video_stream(
                 result = analyze_frame(landmarks, timestamp, state)
                 draw_elbow_angle(annotated_frame, result["elbow_angle"])
 
+                if result["elbow_angle"] is not None:
+                    elbow_angles.append(float(result["elbow_angle"]))
                 if result["wrist_y"] is not None:
                     wrist_series.append(
                         {
@@ -206,7 +217,38 @@ def render_video_stream(
         "stroke_count": result.get("stroke_count", 0) if result else 0,
         "fluidity_score": result.get("fluidity_score", 0.0) if result else 0.0,
         "wrist_series": wrist_series,
+        "elbow_angle_mean": (
+            sum(elbow_angles) / len(elbow_angles) if elbow_angles else 0.0
+        ),
+        "elbow_angle_max": max(elbow_angles) if elbow_angles else 0.0,
     }
+
+
+def build_session_dataframe(summary: dict[str, Any]) -> pd.DataFrame:
+    """Aggrega le metriche finali di sessione in un DataFrame (T23, RF-011).
+
+    Una riga per sessione: data/ora dell'export (ISO), bracciate totali,
+    Fluidity Score, angolo del gomito medio e massimo. Solo metriche
+    aggregate anonime: nessun frame o dato grezzo (spec sez. 8.3, 10.1).
+    """
+    row = {
+        "timestamp": pd.Timestamp.now().isoformat(timespec="seconds"),
+        "bracciate_totali": int(summary["stroke_count"]),
+        "fluidity_score": round(float(summary["fluidity_score"]), 1),
+        "angolo_medio": round(float(summary["elbow_angle_mean"]), 2),
+        "angolo_max": round(float(summary["elbow_angle_max"]), 2),
+    }
+    return pd.DataFrame([row], columns=list(SESSION_CSV_COLUMNS))
+
+
+def render_export_section() -> None:
+    """Fine sessione (T23): aggrega le metriche e mostra la preview."""
+    if "last_summary" not in st.session_state:
+        return
+
+    if st.button("Termina Sessione ed Esporta Dati"):
+        session_df = build_session_dataframe(st.session_state["last_summary"])
+        st.dataframe(session_df, hide_index=True, use_container_width=True)
 
 
 def render_kpis(
@@ -246,6 +288,16 @@ def render_video_section(
                 "fluidity_score": summary["fluidity_score"],
             }
             st.session_state["wrist_series"] = summary["wrist_series"]
+            st.session_state["last_summary"] = {
+                key: summary[key]
+                for key in (
+                    "frames_rendered",
+                    "stroke_count",
+                    "fluidity_score",
+                    "elbow_angle_mean",
+                    "elbow_angle_max",
+                )
+            }
             st.caption(
                 f"Elaborazione terminata: {summary['frames_rendered']} frame "
                 "renderizzati."
@@ -292,6 +344,7 @@ def main() -> None:
             chart_slot.caption(
                 "Il grafico dell'onda Y del polso si popola durante l'elaborazione."
             )
+        render_export_section()
 
     with video_column:
         st.subheader("Video")
