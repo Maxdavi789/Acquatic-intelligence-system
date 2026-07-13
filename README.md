@@ -48,13 +48,16 @@ Aggiornato al 2026-07-13.
 - M2/T13-T14: completata. `analyze_frame` e' collegata ai landmark reali dallo
   script CLI `scripts/analyze_video.py`: sul video provvisorio 448/448 frame
   con posa, angolo in [4,40; 179,92] e conteggio finale 2.
-- M3: T15 (scaffold a due colonne), T16 (selettore input: MP4 primario di
-  default, webcam sperimentale con avviso, uploader `.mp4`) e T17 (rendering
-  del video annotato con scheletro nella colonna sinistra) completate.
+- M3/T15-T22: completata. La dashboard Streamlit ha selettore input (MP4
+  primario, webcam sperimentale), video annotato con scheletro e angolo del
+  gomito live, KPI reali (bracciate totali e Fluidity Score), grafico
+  dell'onda Y del polso popolato durante l'elaborazione e risultati che
+  sopravvivono ai rerun dell'interfaccia. Sul video provvisorio: conteggio
+  finale 2, coerente con le bracciate visibili.
 - M4-M8: non iniziate.
 
-La prossima task in ordine e' T18: overlay dell'angolo del gomito live,
-aggiornato frame per frame.
+La prossima task in ordine e' T23 (modulo M4): pulsante di fine sessione con
+aggregazione delle metriche ed export CSV.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -72,8 +75,7 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-Le funzioni di overlay angolo, KPI e grafico verranno aggiunte nelle task
-T18-T22.
+L'export CSV della sessione verra' aggiunto nelle task T23-T25 (modulo M4).
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.

@@ -28,42 +28,42 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - M2 (T13-T14): completata. `analyze_frame` validata su input sintetici e,
     con `scripts/analyze_video.py`, sul video reale provvisorio (448/448 frame,
     angolo in [4,40; 179,92], conteggio 2).
-  - M3: T15 (scaffold due colonne), T16 (selettore input MP4 primario /
-    webcam sperimentale con uploader) e T17 (rendering video annotato via
-    placeholder `st.image`) completate; T18 e' la prossima task.
+  - M3 (T15-T22): COMPLETATA. Dashboard con selettore input (MP4 primario,
+    webcam sperimentale), video annotato con scheletro e angolo gomito live,
+    KPI reali (bracciate, fluidity), grafico onda Y del polso e persistenza
+    dei risultati tra i rerun. Prossimo modulo: M4 (persistenza CSV).
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T18 pronta
+## 2. PUNTO DI RIPRESA -> T23 pronta (inizio M4)
 
-- T14 e' completata: `scripts/analyze_video.py` collega l'output reale di
-  `extract_pose_landmarks` ad `analyze_frame` (headless) e stampa angolo e
-  conteggio in console. Validata sul video provvisorio: 448/448 frame con
-  posa, angolo in [4,40; 179,92], conteggio finale 2, fluidity 0 (<3 picchi),
-  exit 0; sorgente non valida -> messaggio leggibile, exit 1.
-- T16 e' completata: radio "File MP4 (primario)" (default) / "Webcam
-  (sperimentale)" con avviso esplicito; uploader `.mp4` che persiste il file
-  in `.cache/` (gitignored, fuori da `data/`) ed espone il percorso in
-  `st.session_state["video_source"]` (webcam -> indice 0). Validazione:
-  AppTest 16/16 check, server health 200.
-- T17 e' completata: `render_video_stream` in `app.py` legge i frame dalla
-  sorgente in `st.session_state["video_source"]`, applica l'overlay scheletro
-  (riuso funzioni `vision_tracker`) e aggiorna un placeholder `st.empty` via
-  `st.image` (BGR->RGB); bottone di avvio solo con MP4 caricato; risorse
-  rilasciate a fine stream; loop live webcam rimandato a T28 con info in UI.
-  In `vision_tracker` e' stato estratto `create_pose_estimator()` come unico
-  punto di configurazione del modello (spec sez. 9.2): riusato da CLI, script
-  T14 e dashboard. Validazione: 15/15 check, 448/448 frame renderizzati sul
-  video provvisorio, contact sheet annotata ispezionata, suite 23/23,
-  riepilogo `analyze_video` invariato dopo il refactor, health 200.
-- T18 e' la prossima task in ordine: overlay dell'angolo del gomito live
-  (testo sul frame e/o accanto al video, frame per frame). Richiede di
-  calcolare l'angolo nel loop di rendering: collegare `analyze_frame` (T13)
-  ai landmark gia' estratti da `process_pose_frame` dentro
-  `render_video_stream`, senza anticipare KPI (T19) o grafico (T20).
+- M2 e' completata (T13-T14: `analyze_frame` + script CLI
+  `scripts/analyze_video.py`, validati sul video provvisorio).
+- M3 e' completata (T15-T22, un commit per task: ab917d0, 21d0a56, 5980826,
+  7b6a480, 77ba2a1, 5678103). Architettura attuale di `app.py`:
+  - `render_input_selector` (T16): radio MP4/webcam + uploader; sorgente in
+    `st.session_state["video_source"]` (percorso file o indice 0).
+  - `render_video_stream(source, placeholder, chart_slot, stroke_slot,
+    fluidity_slot)` (T17/T18/T20/T21): loop frame -> posa -> `analyze_frame`
+    (stato T13, timestamp da fps) -> overlay scheletro+angolo -> `st.image`;
+    aggiorna grafico e KPI live; ritorna il riepilogo
+    `{frames_rendered, stroke_count, fluidity_score, wrist_series}`.
+  - `render_kpis` (T19): due `st.metric`, nessuna simmetria.
+  - La colonna metriche viene costruita PRIMA della colonna video cosi' che
+    gli slot esistano quando il loop li aggiorna.
+  - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
+    `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
+    valori persistiti.
+- T23 e' la prossima task (M4): pulsante "Termina Sessione ed Esporta Dati"
+  che aggrega le metriche finali in un DataFrame Pandas (bracciate totali,
+  fluidity finale, angolo medio/max). ATTENZIONE: il riepilogo del loop non
+  traccia ancora angolo medio/max -> estendere `render_video_stream` (o lo
+  stato persistito) per accumularli. Poi T24 (append `data/sessions.csv`
+  con timestamp, header se assente) e T25 (verifica che in `data/` ci sia
+  solo il CSV, RF-011 e privacy sez. 8.3/10).
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.

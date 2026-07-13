@@ -752,3 +752,60 @@
 - Suite 23/23 verde; nessuna regressione su CLI e script T14.
 - Commit locali post-push: ab917d0 (T17) + commit di governance in chiusura.
   Push dei nuovi commit subordinato al prossimo OK esplicito.
+
+## 2026-07-13 22:20 +02:00 - Autorizzazione push di sessione e completamento M3 (T18-T22)
+
+### Messaggio utente
+- "esegui push e proseguiamo, ricordati di aggiornare i documenti necessari".
+- Letta come autorizzazione di sessione per i push (proposta "OK cumulativo"
+  della iterazione precedente): push eseguiti senza richiedere conferma a
+  ogni task, sempre con verifica dello stato prima/dopo.
+
+### Push iniziale
+- `git push origin main`: riuscito, `3afeae5..abb9c63` (T17 + governance).
+
+### T18 - Overlay angolo gomito live (commit 21d0a56)
+- `analyze_frame` (stato persistente T13, timestamp da fps sorgente) eseguita
+  su ogni frame del loop; `draw_elbow_angle` sovrimprime l'angolo con testo
+  bordato (font Hershey solo ASCII -> "deg" al posto del simbolo gradi).
+- Validazione 11/11: pixel-diff sul disegno, spy sugli angoli reali
+  (448 chiamate, escursione 4,40-179,92), contact sheet coerente con le fasi
+  del gesto (catch 169,0 / pull 117,9 / push 179,4 deg). Suite 23/23.
+
+### T19 - KPI bracciate e fluidity (commit 5980826)
+- Due blocchi `st.metric` via slot `render_kpis`, letti da session_state con
+  default 0. Nessun riferimento alla simmetria (DA-01 rispettata).
+- AppTest: 0 eccezioni, entrambi i KPI renderizzati.
+
+### T20 - Grafico onda Y del polso (commit 7b6a480)
+- Slot grafico creato prima del loop (la colonna metriche viene costruita
+  prima di quella video); serie (tempo, polso Y) accumulata da
+  `analyze_frame`, `st.line_chart` aggiornato ogni 10 frame + render finale.
+- Sul video reale: 46 aggiornamenti incrementali, serie monotona fino a 448
+  campioni, frame occlusi esclusi; loop retrocompatibile senza chart_slot.
+
+### T21 - KPI collegati ai dati reali (commit 77ba2a1)
+- KPI aggiornati live sul picco rilevato e periodicamente; il loop restituisce
+  il riepilogo `{frames_rendered, stroke_count, fluidity_score, wrist_series}`.
+- Sul video reale: progressione conteggio 0->1->2 in 48 aggiornamenti live,
+  conteggio finale 2 COERENTE con le bracciate visibili, fluidity 0.0.
+
+### T22 - Persistenza tra i rerun (commit 5678103)
+- Riepilogo persistito in `st.session_state` a fine elaborazione; KPI e
+  grafico ri-renderizzati dai valori persistiti a ogni rerun.
+- AppTest 11/11: i valori sopravvivono ai cambi radio avanti/indietro, il
+  grafico sostituisce la caption placeholder, una sessione pulita resta a 0.
+- Health finale server: 200. Suite finale: 23/23.
+
+### Governance
+- breakdown_status: M3 completata 8/8 con evidenze per task; prossima M4/T23
+  (con nota: aggiungere angolo medio/max al riepilogo del loop).
+- HANDOFF: punto di ripresa T23 con architettura attuale di `app.py`.
+- README: stato M3 completata, prossime T23-T25.
+- Push di chiusura sessione eseguito dopo il commit di governance.
+
+### Stato iterazione
+- M0-M3 COMPLETATI (T01-T22). Prossima task: M4/T23 (export dati).
+- Suite 23/23; dashboard end-to-end funzionante sul video provvisorio.
+- Restano aperti: video ufficiale sandbox (T35), webcam UI (T28), export CSV
+  (M4), robustezza formale (M5), test finali (M6).

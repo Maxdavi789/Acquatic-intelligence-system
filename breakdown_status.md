@@ -41,7 +41,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Completata: 6/6 |
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
 | M2 | Step di analisi per-frame (glue) | T13-T14 | Completata: 2/2 |
-| M3 | Dashboard Streamlit `app.py` | T15-T22 | In corso: T15-T17 completate, T18 prossima |
+| M3 | Dashboard Streamlit `app.py` | T15-T22 | Completata: 8/8 |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
 | M6 | Test e validazione | T30-T33 | Da iniziare |
@@ -70,7 +70,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
 | T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
 
-Validatore dopo T17: `python scripts/test_metrics.py` -> 23/23 test, exit 0
+Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 (riverificato anche sulla macchina di casa).
 
 ## Dettaglio M2
@@ -87,7 +87,11 @@ Validatore dopo T17: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | T15 | Completata | `app.py` con page config, intestazione e colonne Video/Metriche 2:1. Server health 200; Streamlit AppTest: 0 eccezioni, 2 colonne. |
 | T16 | Completata | Selettore radio MP4 (default) / Webcam sperimentale con avviso (6a23f00); uploader `.mp4` che persiste in `.cache/` gitignored ed espone il percorso in `st.session_state["video_source"]`. AppTest: 16/16 check; server health 200. |
 | T17 | Completata | Loop `render_video_stream` con overlay scheletro su placeholder `st.image` (ab917d0); bottone di avvio solo con MP4 caricato; loop live webcam rimandato a T28 con nota esplicita. Estratto `create_pose_estimator` in `vision_tracker` (config spec 9.2 in un punto solo). Validazione: 15/15 check, 448/448 frame renderizzati, contact sheet ispezionata, suite 23/23, health 200. |
-| T18-T22 | Da iniziare | T18 (overlay angolo gomito live) e' la prossima: dipendenze T17 e T13 soddisfatte. Le altre seguono l'ordine del breakdown. |
+| T18 | Completata | `analyze_frame` (stato T13, timestamp da fps sorgente) in ogni frame del loop; `draw_elbow_angle` sovrimprime l'angolo con testo bordato (21d0a56). Validazione: 11/11 check, spy sugli angoli reali [4,40; 179,92], contact sheet coerente con le fasi (catch 169,0 / pull 117,9 / push 179,4). |
+| T19 | Completata | Due blocchi `st.metric` (Bracciate totali, Fluidity Score) via slot `render_kpis`, letti da session_state con default 0 (5980826). Nessun KPI simmetria (DA-01). AppTest verde. |
+| T20 | Completata | Slot grafico creato prima del loop; serie (tempo, polso Y) da `analyze_frame`, `st.line_chart` aggiornato ogni 10 frame + render finale (7b6a480). Sul video reale: 46 aggiornamenti incrementali, 448 campioni, frame occlusi esclusi. |
+| T21 | Completata | KPI aggiornati live sul picco e periodicamente con i valori reali; il loop restituisce il riepilogo di sessione (77ba2a1). Sul video reale: progressione 0->1->2, conteggio finale 2 coerente col video, fluidity 0.0. |
+| T22 | Completata | Riepilogo persistito in `st.session_state` a fine loop; KPI e grafico ri-renderizzati dai valori persistiti a ogni rerun (5678103). AppTest 11/11: i KPI sopravvivono ai cambi di widget; sessione pulita resta a 0. |
 
 ## Governance
 
@@ -101,10 +105,12 @@ Validatore dopo T17: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 
 ## Prossima Task
 
-- Prossima task in ordine: M3/T18, overlay dell'angolo del gomito live
-  (testo sul frame e/o accanto al video, aggiornato frame per frame).
-  Dipendenze T17 e T13 soddisfatte.
-- A seguire: T19 (KPI), T20 (grafico onda Y), T21 (collegamento dati reali).
+- Prossima task in ordine: M4/T23, pulsante "Termina Sessione ed Esporta
+  Dati" con aggregazione delle metriche finali (bracciate totali, fluidity,
+  angolo medio/max) in un DataFrame Pandas. Dipendenza T21 soddisfatta.
+  Nota implementativa: il riepilogo di `render_video_stream` non traccia
+  ancora angolo medio/max, da aggiungere in T23.
+- A seguire: T24 (append CSV con timestamp), T25 (verifica privacy data/).
 
 ## Task Arretrate o Bloccate
 
