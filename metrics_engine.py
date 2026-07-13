@@ -128,14 +128,25 @@ class ElbowAngleSmoother:
         return self._last_angle
 
 
+# K = 50 e' una COSTANTE EURISTICA: il Fluidity Score e' un INDICE RELATIVO, non
+# una misura assoluta, ed e' sensibile a frame rate e regime di debounce.
+# L'eventuale calibrazione e' decisione aperta DA-04 (spec sez. 9.4).
+FLUIDITY_K = 50.0
+
+
 def calculate_fluidity_score(peak_timestamps: list[float]) -> float:
-    """Stima la regolarita' del ritmo dalle distanze temporali tra picchi."""
+    """Stima la regolarita' del ritmo dalle distanze temporali tra picchi.
+
+    Fluidity Score = max(0, 100 - std(intervalli) * FLUIDITY_K), con >= 3 picchi.
+    Ritmo regolare -> punteggio alto (tende a 100); irregolare -> basso. E' un
+    indice relativo (vedi commento su FLUIDITY_K, DA-04).
+    """
     if len(peak_timestamps) < 3:
         return 0.0
 
     intervals = np.diff(np.array(peak_timestamps, dtype=float))
     standard_deviation = float(np.std(intervals))
-    return max(0.0, 100.0 - (standard_deviation * 50.0))
+    return max(0.0, 100.0 - (standard_deviation * FLUIDITY_K))
 
 
 # FUORI MVP v1 - vedi spec sez. 4.2: il Symmetry Score bilaterale contraddice la

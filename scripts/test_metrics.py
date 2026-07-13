@@ -22,6 +22,7 @@ from metrics_engine import (  # noqa: E402
     RIGHT_ARM_LANDMARK_IDS,
     StrokeCounter,
     calculate_elbow_angle,
+    calculate_fluidity_score,
     select_camera_side_arm,
 )
 
@@ -191,6 +192,33 @@ def test_stroke_counter_shoulder_gate_blocks_low_wrist() -> None:
     assert counter.stroke_count == 0, counter.stroke_count
 
 
+# --- T11: Fluidity Score (calculate_fluidity_score) ----------------------------------
+
+def test_fluidity_regular_intervals_high() -> None:
+    # Intervalli identici -> std 0 -> punteggio massimo.
+    score = calculate_fluidity_score([0.0, 1.0, 2.0, 3.0, 4.0])
+    assert abs(score - 100.0) < 1e-9, score
+
+
+def test_fluidity_irregular_intervals_low() -> None:
+    regular = calculate_fluidity_score([0.0, 1.0, 2.0, 3.0, 4.0])
+    irregular = calculate_fluidity_score([0.0, 0.1, 4.1, 4.2, 8.2])
+    assert irregular < regular, (irregular, regular)
+    assert 0.0 <= irregular < 10.0, irregular
+
+
+def test_fluidity_fewer_than_three_peaks_zero() -> None:
+    assert calculate_fluidity_score([]) == 0.0
+    assert calculate_fluidity_score([0.0]) == 0.0
+    assert calculate_fluidity_score([0.0, 1.0]) == 0.0
+
+
+def test_fluidity_never_negative() -> None:
+    # Intervalli molto irregolari: il punteggio e' troncato a 0, mai negativo.
+    score = calculate_fluidity_score([0.0, 0.01, 10.0, 10.01, 25.0])
+    assert score >= 0.0, score
+
+
 TESTS = [
     test_select_camera_side_arm_picks_more_visible_side,
     test_select_camera_side_arm_left_side,
@@ -206,6 +234,10 @@ TESTS = [
     test_stroke_counter_deadband_ignores_jitter,
     test_stroke_counter_debounce_blocks_fast_second_peak,
     test_stroke_counter_shoulder_gate_blocks_low_wrist,
+    test_fluidity_regular_intervals_high,
+    test_fluidity_irregular_intervals_low,
+    test_fluidity_fewer_than_three_peaks_zero,
+    test_fluidity_never_negative,
 ]
 
 
