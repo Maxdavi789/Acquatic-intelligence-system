@@ -29,7 +29,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | Modulo | Descrizione | Task | Stato |
 | --- | --- | --- | --- |
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Parziale: 5/6, T03 bloccata |
-| M1 | Hardening motore metriche | T07-T12 | Completata; arretrata puntuale T10 rilevata nell'audit |
+| M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
 | M2 | Step di analisi per-frame (glue) | T13-T14 | Prossima |
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Da iniziare |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
@@ -56,11 +56,12 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | T07 | Completata | `select_camera_side_arm` + test (f50ff0e). |
 | T08 | Completata | `ElbowAngleSmoother` forward-fill + test (6e30641). |
 | T09 | Completata | Unit test `calculate_elbow_angle` (b348ef7). |
-| T10 | Arretrata puntuale | Suite verde, ma il gate spalla accetta impropriamente `peak_y == shoulder_y`; fix e test richiesti prima di T13. |
+| T10 | Completata | Unit test `StrokeCounter` (7a2d62f) + correzione gate stretto e test di regressione (audit Codex). |
 | T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
 | T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
 
-Validatore: `python scripts/test_metrics.py` -> 18/18 test, exit 0.
+Validatore dopo la correzione T10: `python scripts/test_metrics.py` -> 19/19
+test, exit 0.
 
 ## Governance
 
@@ -73,8 +74,7 @@ Validatore: `python scripts/test_metrics.py` -> 18/18 test, exit 0.
 
 ## Prossima Task
 
-Chiudere prima l'arretrata puntuale T10 sul gate spalla, poi M2 / T13 -
-`analyze_frame(landmarks, timestamp, state)`: orchestrare per-frame
+M2 / T13 - `analyze_frame(landmarks, timestamp, state)`: orchestrare per-frame
 selezione arto (T07) + angolo con forward-fill (T08) + StrokeCounter, restituendo
 un dict senza campo simmetria. Non richiede video reale.
 
@@ -82,8 +82,6 @@ un dict senza campo simmetria. Non richiede video reale.
 
 - T03 (test reale FASE 1) e T14 (validazione CLI): servono un MP4 laterale
   provvisorio in `test_videos/`.
-- T10: gate spalla da rendere strettamente conforme a `peak_y < shoulder_y` e
-  coprire con un test di regressione.
 - Push su `origin`: risolto (MrChuck118 aggiunto come collaboratore); locale e
   origin erano allineati all'inizio dell'audit; il nuovo lavoro Codex non e'
   ancora stato pushato.

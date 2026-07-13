@@ -192,6 +192,14 @@ def test_stroke_counter_shoulder_gate_blocks_low_wrist() -> None:
     assert counter.stroke_count == 0, counter.stroke_count
 
 
+def test_stroke_counter_shoulder_gate_blocks_equal_height() -> None:
+    counter = StrokeCounter()
+    # RF-006 richiede peak_y < shoulder_y: alla stessa altezza non deve contare.
+    for wrist_y, timestamp in [(0.6, 0.0), (0.3, 0.1), (0.6, 0.2)]:
+        counter.update(wrist_y, timestamp, shoulder_y=0.3)
+    assert counter.stroke_count == 0, counter.stroke_count
+
+
 # --- T11: Fluidity Score (calculate_fluidity_score) ----------------------------------
 
 def test_fluidity_regular_intervals_high() -> None:

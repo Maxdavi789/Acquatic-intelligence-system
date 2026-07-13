@@ -41,8 +41,8 @@ Aggiornato al 2026-07-13.
 
 - M0/T01-T06: 5 task su 6 completate; T03 resta bloccata finche' non e'
   disponibile un MP4 laterale provvisorio per il test reale.
-- M1/T07-T12: implementata; suite sintetica corrente 18/18 verde. E' stata
-  rilevata una correzione puntuale da applicare al gate spalla di T10.
+- M1/T07-T12: completata; suite sintetica corrente 19/19 verde, inclusa la
+  regressione sul gate spalla stretto di T10.
 - M2: prossima task T13, funzione `analyze_frame`; T14 dipende dal video di T03.
 - M3-M8: non iniziate.
 

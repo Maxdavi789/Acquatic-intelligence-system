@@ -242,7 +242,10 @@ class StrokeCounter:
         if not changed_from_up_to_down:
             return False
 
-        if shoulder_y is not None and peak_y > shoulder_y:
+        # La spec richiede un confronto stretto: il polso deve essere
+        # effettivamente sopra la spalla (peak_y < shoulder_y). L'uguaglianza
+        # non e' un picco valido.
+        if shoulder_y is not None and peak_y >= shoulder_y:
             return False
 
         if self._last_peak_time is not None:

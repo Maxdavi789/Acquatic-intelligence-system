@@ -192,6 +192,7 @@
   quindi accettata. La suite esistente non copre questo bordo.
 - Impatto: un campione esattamente all'altezza della spalla puo' essere contato
   come bracciata nonostante il criterio stretto RF-006.
-- Stato: aperto, da chiudere prima di M2/T13.
-- Azione prevista: usare il confronto `peak_y >= shoulder_y` per rifiutare il
-  picco e aggiungere un test di regressione dedicato.
+- Stato: risolto (2026-07-13).
+- Azione eseguita: il confronto usa `peak_y >= shoulder_y` per rifiutare il
+  picco; aggiunto il test `test_stroke_counter_shoulder_gate_blocks_equal_height`.
+  Validatore completo: 19/19 test passati, exit code 0.
