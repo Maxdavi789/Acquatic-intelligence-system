@@ -14,6 +14,10 @@ from vision_tracker import (
     resize_frame,
 )
 
+from metrics_engine import FrameAnalysisState, analyze_frame
+
+FALLBACK_FPS = 30.0
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 UPLOAD_CACHE_DIR = PROJECT_ROOT / ".cache"
 UPLOADED_VIDEO_PATH = UPLOAD_CACHE_DIR / "uploaded_session.mp4"
@@ -83,17 +87,43 @@ def render_input_selector() -> None:
         )
 
 
+def draw_elbow_angle(frame: Any, angle: float | None) -> Any:
+    """Disegna l'angolo del gomito sul frame (task T18, RF-005).
+
+    Testo bianco con bordo nero per restare leggibile su sfondi chiari e
+    scuri. I font Hershey di OpenCV non rendono i caratteri non ASCII,
+    quindi si usa "deg" al posto del simbolo dei gradi.
+    """
+    label = "Gomito: n/d" if angle is None else f"Gomito: {angle:5.1f} deg"
+    position = (12, 34)
+    cv2.putText(
+        frame, label, position, cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 4, cv2.LINE_AA
+    )
+    cv2.putText(
+        frame, label, position, cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA
+    )
+    return frame
+
+
 def render_video_stream(source: str | int, placeholder: Any) -> int:
-    """Loop di rendering della task T17 (RF-003).
+    """Loop di rendering delle task T17/T18 (RF-003, RF-005).
 
     Legge i frame dalla sorgente, esegue MediaPipe Pose con overlay scheletro
     (riuso delle funzioni di `vision_tracker`) e aggiorna il placeholder
     Streamlit: e' il sostituto di `cv2.imshow`, non utilizzabile qui (spec
-    sez. 14.2). Restituisce il numero di frame renderizzati; le risorse
-    vengono sempre rilasciate a fine stream (RF-013).
+    sez. 14.2). Ogni frame passa da `analyze_frame` (stato persistente T13) e
+    l'angolo del gomito viene sovrimpresso live (T18). Restituisce il numero
+    di frame renderizzati; le risorse vengono sempre rilasciate a fine stream
+    (RF-013).
     """
     capture = open_video_capture(source)
     frames_rendered = 0
+
+    fps = capture.get(cv2.CAP_PROP_FPS)
+    if not fps or fps <= 0:
+        fps = FALLBACK_FPS
+
+    state = FrameAnalysisState()
 
     try:
         with create_pose_estimator() as pose:
@@ -103,7 +133,11 @@ def render_video_stream(source: str | int, placeholder: Any) -> int:
                     break
 
                 frame = resize_frame(frame)
-                annotated_frame, _landmarks = process_pose_frame(frame, pose)
+                annotated_frame, landmarks = process_pose_frame(frame, pose)
+
+                result = analyze_frame(landmarks, frames_rendered / fps, state)
+                draw_elbow_angle(annotated_frame, result["elbow_angle"])
+
                 placeholder.image(
                     cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB),
                     channels="RGB",
