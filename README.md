@@ -4,49 +4,94 @@ Proof of Concept locale per un AI Swimming Motion Analyzer a secco.
 
 ## Obiettivo
 
-Il progetto mira a validare una pipeline offline di Computer Vision per analisi
-biomeccanica del gesto natatorio, usando webcam o file MP4 laterali. L'MVP segue
-la specifica tecnica e il breakdown operativo forniti nei PDF di progetto.
+Il progetto valida a costo zero una pipeline offline di Computer Vision che
+analizza un video laterale di movimenti natatori simulati a secco. MediaPipe
+fornisce i landmark corporei; il motore deterministico calcola angolo del
+gomito, conteggio delle bracciate e regolarita' del ritmo.
 
-## Stack Previsto
+Il PoC dimostra la fattibilita' software e algoritmica. Non dimostra validita'
+biomeccanica in acqua e non equivale a un sistema professionale da laboratorio.
+La specifica di riferimento e' [`spec.txt`](spec.txt), versione 1.1 congelata.
 
-- Python 3.10+
-- OpenCV
-- MediaPipe Pose
-- Streamlit
-- NumPy
-- Pandas
-- Matplotlib
-- CSV locale per export sessioni
+## Input e output MVP
 
-## Struttura
+- Input primario: file MP4 laterale (profilo 90 gradi).
+- Input secondario: webcam, modalita' sperimentale/best-effort.
+- Output previsto: video annotato, angolo gomito live, bracciate totali,
+  Fluidity Score, grafico Y del polso ed export CSV della sessione.
+- Esecuzione: interamente locale, senza API o servizi a pagamento.
+
+## Stack
+
+- Python 3.11 come riferimento di specifica; ambiente locale validato anche con
+  Python 3.12.10.
+- OpenCV.
+- MediaPipe Pose legacy, pinnato a `mediapipe==0.10.35`.
+- Streamlit.
+- NumPy e Pandas.
+- CSV locale per l'export delle sessioni.
+
+`matplotlib` non e' una dipendenza diretta del progetto: viene installato
+transitivamente da MediaPipe. I grafici della dashboard useranno
+`st.line_chart`.
+
+## Stato
+
+Aggiornato al 2026-07-13.
+
+- M0/T01-T06: 5 task su 6 completate; T03 resta bloccata finche' non e'
+  disponibile un MP4 laterale provvisorio per il test reale.
+- M1/T07-T12: implementata; suite sintetica corrente 18/18 verde. E' stata
+  rilevata una correzione puntuale da applicare al gate spalla di T10.
+- M2: prossima task T13, funzione `analyze_frame`; T14 dipende dal video di T03.
+- M3-M8: non iniziate.
+
+Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
+
+## Avvio e validazione
+
+```powershell
+.\venv\Scripts\python.exe scripts\test_metrics.py
+.\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4
+```
+
+La dashboard sara' avviabile con `streamlit run app.py` dopo il completamento
+del modulo M3.
+
+## Struttura principale
 
 ```text
 .
 +-- app.py
 +-- vision_tracker.py
 +-- metrics_engine.py
++-- scripts/test_metrics.py
 +-- requirements.txt
 +-- spec.txt
++-- SPEC_ERRATA.md
 +-- data/
 +-- test_videos/
 +-- breakdown_status.md
 +-- prompt_log.md
 +-- incidents.md
++-- HANDOFF.md
 ```
 
-## Stato
+## Privacy e disclaimer
 
-Aggiornato al 2026-05-28.
+I frame e i video non vengono persistiti dall'MVP; vengono salvate solo
+metriche aggregate nel CSV locale. Eventuali persone riprese devono essere
+consenzienti e i video di terzi richiedono una licenza/base d'uso adeguata.
 
-- FASE 0: completata.
-- FASE 1: implementata in `vision_tracker.py`; test reale webcam/MP4 ancora da fare.
-- FASE 2: implementata in `metrics_engine.py` con test sintetici.
-- FASE 3: prossima, dashboard Streamlit in `app.py`.
-- FASE 4: non iniziata.
+**Questo progetto non e' un dispositivo medico e non fornisce consigli clinici
+o di prevenzione degli infortuni.**
 
-## Governance Operativa
+## Governance operativa
 
-- `breakdown_status.md`: stato avanzamento rispetto alla roadmap.
-- `prompt_log.md`: log catalogato delle iterazioni e dei messaggi rilevanti.
-- `incidents.md`: registro incidenti, blocchi e mitigazioni.
+- `breakdown_status.md`: avanzamento rispetto alle task T01-T41.
+- `prompt_log.md`: iterazioni, richieste, azioni ed esiti.
+- `incidents.md`: incidenti reali, impatto, mitigazioni e stato.
+- `SPEC_ERRATA.md`: modifiche successive al congelamento della specifica.
+
+Questo e' un aggiornamento intermedio di coerenza. La revisione conclusiva del
+README resta prevista nel task T37, dopo la validazione end-to-end.

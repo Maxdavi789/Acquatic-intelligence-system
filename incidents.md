@@ -126,17 +126,18 @@
 - Azione eseguita: `git init`, collegato `origin`, `fetch` e checkout di `main`.
   Branch locale allineato a `origin/main` (0 ahead / 0 behind, commit ff016b8).
 
-### INC-2026-07-13-003 - spec.txt e breakdown_status obsoleti rispetto a v1.1
+### INC-2026-07-13-003 - spec.txt e governance obsoleti rispetto a v1.1
 - Tipo: allineamento specifica.
 - Evidenza: il `spec.txt` in repo e' la spec vecchia (contiene Symmetry Score,
   overclaiming, Python 3.10+, SQLite). Il `breakdown_status.md` indicava come
   prossima task "FASE 3 dashboard con KPI Simmetria".
 - Impatto: seguendo lo status obsoleto si costruirebbe la simmetria, fuori
   scope MVP per la v1.1 (trappola di scope creep documentata nel breakdown).
-- Stato: in risoluzione.
-- Azione eseguita: riallineato `breakdown_status.md` al modello T01-T41; la
-  sostituzione di `spec.txt` con la v1.1 e' pianificata nel task T01; la
-  demossione della simmetria nel task T05.
+- Stato: risolto (2026-07-13).
+- Azione eseguita: T01 ha congelato `spec.txt` v1.1; T05 ha demansionato la
+  simmetria ad airbag senza chiamate attive; `breakdown_status.md`, `HANDOFF.md`
+  e README sono stati riallineati allo stato reale nell'audit Codex. Il README
+  conclusivo resta pianificato in T37.
 
 ### INC-2026-07-13-004 - Python 3.12 sul PATH, la spec fissa 3.11
 - Tipo: ambiente Python.
@@ -183,3 +184,14 @@
   collaboratore con permesso Write sul repo di Maxdavi789. `git push origin main`
   riuscito (ff016b8..9718657) usando le credenziali gia' presenti; locale e
   `origin/main` allineati (0/0).
+
+### INC-2026-07-13-007 - Gate spalla T10 non strettamente conforme alla spec
+- Tipo: logica deterministica / allineamento specifica.
+- Evidenza: la spec richiede un picco valido solo con `peak_y < shoulder_y`, ma
+  `StrokeCounter` rifiuta soltanto `peak_y > shoulder_y`; l'uguaglianza viene
+  quindi accettata. La suite esistente non copre questo bordo.
+- Impatto: un campione esattamente all'altezza della spalla puo' essere contato
+  come bracciata nonostante il criterio stretto RF-006.
+- Stato: aperto, da chiudere prima di M2/T13.
+- Azione prevista: usare il confronto `peak_y >= shoulder_y` per rifiutare il
+  picco e aggiungere un test di regressione dedicato.

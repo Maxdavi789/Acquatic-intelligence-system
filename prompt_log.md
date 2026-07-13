@@ -225,3 +225,91 @@
 ### Stato iterazione (fine)
 - Tutto pushato su origin/main. M0 e M1 completate; T03/T14 bloccate (manca MP4).
 - Prossima task per Codex: M2/T13 `analyze_frame`. Vedi HANDOFF.md.
+
+## 2026-07-13 11:28 +02:00 - Audit Codex e piano T13 in attesa di approvazione
+
+### Messaggio utente
+- Richiesto di continuare il breakdown usando la data odierna e di catalogare
+  ogni iterazione/messaggio in `prompt_log.md` prima dell'output.
+- Richiesto di mantenere `incidents.md` per tutti gli incidenti reali del
+  progetto.
+- Richiesto di leggere integralmente i due allegati Markdown, l'intero
+  `prompt_log.md`, il breakdown status e tutti i file della repo, senza
+  tralasciare contenuto.
+- Richiesto di confrontare specifica, breakdown, status, prompt log e codice;
+  individuare prossima task e arretrati; verificare Git locale vs `origin` e
+  valutare il README.
+- Vincolo: sola analisi e piano prima dell'approvazione; non inventare e non
+  iniziare a costruire.
+- Subtask: capire dove Claude si era fermato e riprendere da quel punto.
+
+### Messaggi/azioni assistente
+- Annunciato l'uso della skill GitHub per la verifica tracciabile di repo,
+  branch locale e `origin`; nessuna azione remota di scrittura eseguita.
+- Verificata l'assenza di `AGENTS.md`; nessuna istruzione locale aggiuntiva.
+- Una prima istruzione PowerShell di inventario ha avuto un errore di sintassi;
+  il comando e' stato corretto senza modificare file. Non e' un incidente del
+  progetto.
+- Letti integralmente in UTF-8 i due allegati:
+  `AISwimmingAnalyzer_breakdown_tasks_v1.md` (20.985 byte, SHA256
+  `951D4821A40A60F1A45937D82E8B4B57369CA80B5D2E966469C1066ACBA22A79`)
+  e `AISwimmingAnalyzer_TechnicalSpec_v1_1.md` (31.507 byte, SHA256
+  `99974568064C0CFD36572FFF6028ED5B059B519FE5D263CA0572E517F268B45C`).
+- Letti integralmente tutti i file versionati e il file locale non tracciato:
+  `prompt_log.md`, `breakdown_status.md`, `incidents.md`, `HANDOFF.md`,
+  `spec.txt`, `SPEC_ERRATA.md`, `README.md`, `requirements.txt`, `.gitignore`,
+  `metrics_engine.py`, `vision_tracker.py`, `scripts/test_metrics.py`, `app.py`,
+  i due `.gitkeep` e `readme` vuoto. Verificati dimensioni e hash dei file.
+- Ricostruito il punto di arresto di Claude: M0/T01-T06 e M1/T07-T12 svolti;
+  T03 rinviata per mancanza MP4; T14 conseguentemente bloccata; nessuna modifica
+  parziale a T13; prossimo lavoro dichiarato M2/T13.
+- Verificata la repo GitHub corretta
+  `Maxdavi789/Acquatic-intelligence-system`, pubblica, branch predefinito `main`.
+- Il primo `git fetch` non ha potuto scrivere `.git/FETCH_HEAD` per il sandbox;
+  ripetuto con autorizzazione sulla sola operazione di fetch e completato. Non
+  e' un incidente del progetto.
+- Dopo il fetch: `HEAD` e `origin/main` coincidono al commit
+  `f32f661666251592e2bacd4de898ac94e791dc44`; divergenza `0 ahead / 0 behind`.
+  Nessun commit da pushare o pullare nello stato iniziale dell'audit.
+- Rilevato il file locale non tracciato `readme`, vuoto (0 byte), distinto dal
+  `README.md`; non rimosso ne' aggiunto per rispettare il vincolo di piano.
+- Validato l'ambiente: Python 3.12.10 nel `venv`, MediaPipe 0.10.35; `pip check`
+  senza dipendenze rotte; import di OpenCV/MediaPipe/Streamlit/NumPy/Pandas OK.
+- Una prima invocazione concatenata del Python del `venv` ha restituito un
+  errore transitorio; la verifica diretta ha confermato che interprete e venv
+  esistono e funzionano. Non registrato come incidente perche' non
+  riproducibile.
+- Eseguito il validatore corrente: `18/18` test passati, exit code 0.
+- Confermato che `analyze_frame` non esiste ancora e che
+  `calculate_symmetry_score` compare solo come funzione airbag, senza chiamate
+  attive nella pipeline.
+- Rilevata una piccola arretrata di T10: la spec richiede il gate stretto
+  `peak_y < shoulder_y`, mentre il codice rifiuta solo `peak_y > shoulder_y` e
+  quindi accetta impropriamente il caso di uguaglianza. Manca il relativo test.
+- Rilevate derive di governance: `breakdown_status.md` dichiara M0 completata
+  pur avendo T03 bloccata e contiene ancora una frase che dice che il push e'
+  bloccato; `HANDOFF.md` indica come ultimo commit `8d7f8c2` invece di `f32f661`;
+  `INC-2026-07-13-003` risulta ancora "in risoluzione" nonostante T01/T05 siano
+  chiuse.
+- Confermato che `README.md` va aggiornato: e' fermo al 2026-05-28, indica
+  Python 3.10+, Matplotlib diretto e FASE 3 come prossima, in contrasto con
+  spec/ambiente/stato attuali. Il completo DoD T37 resta comunque futuro.
+
+### Piano validato, in attesa di approvazione
+- Prima riallineare la governance senza marcare task future come completate:
+  correggere `breakdown_status.md`, `HANDOFF.md`, lo stato di INC-003 e fare un
+  aggiornamento intermedio fattuale del README; gestire il `readme` vuoto solo
+  con approvazione.
+- Chiudere l'arretrata T10 con gate `peak_y >= shoulder_y` rifiutato e test di
+  regressione; rieseguire l'intera suite.
+- Implementare solo M2/T13 in `metrics_engine.py`: stato persistente per
+  `StrokeCounter` e `ElbowAngleSmoother`, orchestrazione per frame, output con
+  le sei chiavi richieste e nessun campo simmetria; non aggiornare il counter su
+  landmark occlusi/non validi.
+- Aggiungere test sintetici T13 per contratto del dict, persistenza dello stato,
+  occlusione e input senza landmark; rieseguire test/import e grep anti-simmetria.
+- Aggiornare `breakdown_status.md`, `prompt_log.md` e `incidents.md` solo con
+  esiti reali; mantenere T03/T14 bloccate fino alla disponibilita' di un MP4.
+- Nessun codice applicativo, fix T10, README/status/incidents, commit, push o
+  pull applicato in questa iterazione. Unica modifica: questa entry obbligatoria
+  di `prompt_log.md`. Attesa approvazione o correzione del piano.

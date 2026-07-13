@@ -12,15 +12,21 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 - Progetto: AI Swimming Motion Analyzer (PoC a secco). Spec di riferimento:
   `spec.txt` = versione v1.1 CONGELATA (2026-07-13). NON modificarla senza
   registrare l'errata in `SPEC_ERRATA.md`.
-- Moduli COMPLETATI in questa sessione:
-  - M0 (T01-T06): allineamento della base alla spec v1.1.
-  - M1 (T07-T12): hardening del motore metriche + suite di test.
-- Stato Git: locale allineato a `origin/main` (0/0). Ultimo commit pushato:
-  `8d7f8c2`. Tutto e' su GitHub.
+- Moduli completati prima dell'audit Codex:
+  - M0: 5/6 task completate; T03 resta bloccata per mancanza MP4.
+  - M1 (T07-T12): hardening del motore metriche + suite di test, con una
+    correzione puntuale T10 rilevata da Codex sul gate spalla.
+- Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
+  allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
+  un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PROSSIMA TASK -> M2 / T13
+## 2. PROSSIMO LAVORO -> arretrata T10, poi M2 / T13
+
+Prima di T13 correggere il gate spalla di `StrokeCounter`: la specifica richiede
+`peak_y < shoulder_y`, quindi il caso di uguaglianza deve essere rifiutato e
+coperto da un test di regressione.
 
 `analyze_frame(landmarks, timestamp, state)` in `metrics_engine.py` (glue
 vision -> metrics).
