@@ -1,140 +1,149 @@
 # Acquatic Intelligence System
 
-Proof of Concept locale per un AI Swimming Motion Analyzer a secco.
+**AI Swimming Motion Analyzer - Proof of Concept a secco, 100% locale, costo 0 euro.**
 
-## Obiettivo
+Il sistema analizza un video laterale di movimenti natatori simulati a secco e
+ne estrae metriche cinematiche 2D: conteggio bracciate, angolo del gomito e
+regolarita' del ritmo. Una rete neurale di pose estimation (MediaPipe
+BlazePose) fornisce i landmark corporei; un motore matematico deterministico
+calcola le metriche. Tutto gira offline sulla CPU di un PC consumer.
 
-Il progetto valida a costo zero una pipeline offline di Computer Vision che
-analizza un video laterale di movimenti natatori simulati a secco. MediaPipe
-fornisce i landmark corporei; il motore deterministico calcola angolo del
-gomito, conteggio delle bracciate e regolarita' del ritmo.
+Specifica di riferimento: [`spec.txt`](spec.txt) (v1.1 CONGELATA).
+Modifiche successive al congelamento: [`SPEC_ERRATA.md`](SPEC_ERRATA.md).
 
-Il PoC dimostra la fattibilita' software e algoritmica. Non dimostra validita'
-biomeccanica in acqua e non equivale a un sistema professionale da laboratorio.
-La specifica di riferimento e' [`spec.txt`](spec.txt), versione 1.1 congelata.
+## Che cosa dimostra (e che cosa NO)
 
-## Input e output MVP
+Questo PoC dimostra che **la pipeline software e gli algoritmi funzionano**:
+ingestione video -> pose tracking -> metriche -> dashboard -> export, in modo
+stabile, riproducibile e a costo zero. E' la leva per un pitch di
+finanziamento: provare il software prima di chiedere fondi per l'hardware.
 
-- Input primario: file MP4 laterale (profilo 90 gradi).
-- Input secondario: webcam, modalita' sperimentale/best-effort.
-- Output previsto: video annotato, angolo gomito live, bracciate totali,
-  Fluidity Score, grafico Y del polso ed export CSV della sessione.
-- Esecuzione: interamente locale, senza API o servizi a pagamento.
+Il PoC **non** dimostra la validita' biomeccanica sportiva del gesto in acqua:
+quella validazione appartiene alla fase industriale successiva (telecamere
+subacquee, edge computing, sensor fusion), come dichiarato onestamente nella
+spec (sez. 1.1, decisione DA-03).
 
-## Stack
-
-- Python 3.11 come riferimento di specifica; ambiente locale validato anche con
-  Python 3.12.10.
-- OpenCV contrib `4.11.0.86` (include il namespace `cv2` completo).
-- MediaPipe Pose legacy, pinnato a `mediapipe==0.10.21`.
-- Streamlit.
-- NumPy `1.26.4`, protobuf `4.25.9` e Pandas.
-- CSV locale per l'export delle sessioni.
-
-`matplotlib` non e' una dipendenza diretta del progetto: viene installato
-transitivamente da MediaPipe. I grafici della dashboard useranno
-`st.line_chart`.
-
-## Stato
-
-Aggiornato al 2026-07-13.
-
-- M0/T01-T06: completata. T03 e' stata validata sul video dryland provvisorio:
-  448/448 frame con posa, arto selezionato affidabile nel 100% dei frame e
-  chiusura `q` pulita. La webcam best-effort e' stata tentata ma su questa
-  macchina non e' presente alcuna camera (INC-010).
-- M1/T07-T12: completata; suite sintetica corrente 23/23 verde, inclusa la
-  regressione sul gate spalla stretto di T10.
-- M2/T13-T14: completata. `analyze_frame` e' collegata ai landmark reali dallo
-  script CLI `scripts/analyze_video.py`: sul video provvisorio 448/448 frame
-  con posa, angolo in [4,40; 179,92] e conteggio finale 2.
-- M3/T15-T22: completata. La dashboard Streamlit ha selettore input (MP4
-  primario, webcam sperimentale), video annotato con scheletro e angolo del
-  gomito live, KPI reali (bracciate totali e Fluidity Score), grafico
-  dell'onda Y del polso popolato durante l'elaborazione e risultati che
-  sopravvivono ai rerun dell'interfaccia. Sul video provvisorio: conteggio
-  finale 2, coerente con le bracciate visibili.
-- M4/T23-T25: completata. Il pulsante "Termina Sessione ed Esporta Dati"
-  aggrega timestamp, bracciate totali, Fluidity Score e angolo medio/max in
-  un DataFrame con preview e lo accoda a `data/sessions.csv` (header alla
-  prima scrittura, append mai distruttivo). Verifica privacy passata: in
-  `data/` restano solo metriche aggregate anonime, nessun frame o video.
-- M5/T26-T29: completata. Robustezza verificata: occlusioni senza picchi
-  spuri ne' crash (limite documentato INC-011: possibile sottostima dopo
-  occlusioni prolungate, mai sovrastima), errori di sorgente gestiti con
-  messaggi leggibili, anteprima webcam sperimentale a durata limitata con
-  degrado documentato, risorse rilasciate anche su stop a meta'.
-- M6/T30-T33: completata. Sul video ufficiale: conteggio manuale 10 vs
-  automatico 10 (differenza 0) e riproducibilita' bit-identica tra run.
-- M7/T34-T36: completata in deroga DA-05 (dettagli in SPEC_ERRATA.md):
-  il video ufficiale e' una clip stock con licenza Pexels, versionata come
-  `test_videos/profilo_test.mp4`. Validazione completa: 175/175 frame con
-  posa, 10 bracciate ritmiche, Fluidity Score 93,1, export CSV verificato.
-- M8: da iniziare (README finale, screenshot, slide pitch, rehearsal).
-
-La prossima task in ordine e' T37 (modulo M8): revisione finale del README.
-
-Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
-
-## Avvio e validazione
-
-```powershell
-.\venv\Scripts\python.exe scripts\test_metrics.py
-.\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4
-.\venv\Scripts\python.exe scripts\analyze_video.py --source <clip>.mp4
-```
-
-Lo scaffold della dashboard e' avviabile con:
+## Demo
 
 ```powershell
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-I test formali di validazione sul video provvisorio sono documentati in
-`incidents.md` e `breakdown_status.md` (modulo M6); la validazione finale
-avverra' sul video ufficiale del sandbox (T35-T36).
+1. Carica `test_videos/profilo_test.mp4` (incluso nella repo).
+2. Premi "Avvia elaborazione video": il video scorre con lo scheletro
+   disegnato e l'angolo del gomito live; il contatore bracciate sale fino a
+   10, il Fluidity Score arriva a 93,1 e il grafico dell'onda del polso si
+   disegna in tempo reale.
+3. Premi "Termina Sessione ed Esporta Dati": la sessione viene accodata a
+   `data/sessions.csv` con timestamp.
 
-Il video ufficiale di riferimento e' `test_videos/profilo_test.mp4` (clip con
-licenza Pexels, fonte e hash in `SPEC_ERRATA.md`), versionato nella repo: dopo
-il clone la demo funziona subito. Il vecchio campione provvisorio
-`profilo_provvisorio.mp4` (terzi, non licenziato) resta solo locale e non
-tracciato.
+I numeri sono **riproducibili**: due esecuzioni sullo stesso video producono
+KPI e serie identiche bit a bit (test T33). Modalita' webcam disponibile come
+percorso sperimentale/best-effort (RF-014).
 
-## Struttura principale
+## Dove sta l'AI (e dove no)
+
+| Componente | Tecnologia | Natura |
+| --- | --- | --- |
+| Pose estimation | MediaPipe BlazePose (rete neurale profonda pre-addestrata, 33 landmark) | AI, inferenza locale su CPU |
+| Angolo gomito | Trigonometria (`arctan2`), range [0,180] | Deterministico |
+| Conteggio bracciate | Rilevamento picchi con dead-band, gate spalla, debounce 0,6 s | Deterministico |
+| Fluidity Score | `max(0, 100 - std(intervalli) * K)`, K=50 euristico, indice RELATIVO | Deterministico |
+
+Nessun LLM, nessun servizio generativo, nessuna API key, nessuna chiamata di
+rete a runtime (RF-012).
+
+## Installazione
+
+Prerequisito: Python 3.12 (validato su 3.12.10; la spec indica 3.11 come
+riferimento, vedi SPEC_ERRATA).
+
+```powershell
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Le versioni sono pinnate (MediaPipe 0.10.21 legacy, OpenCV contrib 4.11,
+NumPy 1.26.4, protobuf 4.25.9). Non installare `opencv-python` in parallelo a
+`opencv-contrib-python`: condividono il namespace `cv2`.
+
+## Validazione
+
+```powershell
+.\venv\Scripts\python.exe scripts\test_metrics.py          # 23/23 unit test motore
+.\venv\Scripts\python.exe scripts\analyze_video.py         # pipeline CLI su video ufficiale
+.\venv\Scripts\python.exe vision_tracker.py --source test_videos\profilo_test.mp4
+```
+
+Esiti sul video ufficiale (dettagli in `breakdown_status.md` e `incidents.md`):
+
+| Criterio (spec sez. 1.2) | Esito |
+| --- | --- |
+| Pipeline end-to-end senza crash | OK (175/175 frame) |
+| Conteggio bracciate entro +-1 dal manuale | OK (manuale 10, automatico 10, diff 0) |
+| Nessun picco spurio su occlusione | OK (verifica T26; limite documentato INC-011) |
+| Riproducibilita' | OK (KPI e serie identiche tra run) |
+| Export CSV con timestamp | OK |
+| Costo operativo | 0 euro |
+
+## Video di riferimento
+
+`test_videos/profilo_test.mp4` e' una clip stock con **licenza Pexels** (uso
+libero, attribuzione non richiesta), adottata in deroga documentata al posto
+della registrazione in proprio (DA-05; fonte, hash e motivazioni in
+`SPEC_ERRATA.md`): un soggetto in piedi, di profilo, che esegue 10 mulinelli
+ritmici del braccio in 7 secondi. La simulazione a secco in piedi e'
+espressamente prevista dalla spec (sez. 14.2).
+
+## Limiti noti (onesti)
+
+- Il Fluidity Score e' un **indice relativo** (K=50 euristico), non una misura
+  assoluta (DA-04).
+- Dopo occlusioni prolungate il tracking MediaPipe puo' perdere un picco
+  reale: possibile sottostima conservativa, mai sovrastima (INC-011).
+- La misura e' 2D monoculare su vista laterale: l'arto lontano non e'
+  affidabile, per questo il Symmetry Score e' fuori scope MVP (DA-01).
+- Webcam in Streamlit: percorso sperimentale a durata limitata (RF-014).
+
+## Roadmap (fase finanziata)
+
+Sandbox di ripresa proprietario, telecamere subacquee, mini-PC edge, sensor
+fusion/LiDAR, analisi multi-atleta, validazione biomeccanica in acqua con
+protocollo scientifico.
+
+## Struttura
 
 ```text
 .
-+-- app.py
-+-- vision_tracker.py
-+-- metrics_engine.py
-+-- scripts/test_metrics.py
-+-- scripts/analyze_video.py
-+-- requirements.txt
-+-- spec.txt
-+-- SPEC_ERRATA.md
-+-- data/
-+-- test_videos/
-+-- breakdown_status.md
-+-- prompt_log.md
-+-- incidents.md
-+-- HANDOFF.md
++-- app.py                  # dashboard Streamlit (input, rendering, KPI, export)
++-- vision_tracker.py       # ingestione video + MediaPipe Pose + overlay
++-- metrics_engine.py       # motore metriche deterministico + analyze_frame
++-- scripts/test_metrics.py # validatore unit (23 test)
++-- scripts/analyze_video.py# validazione CLI su video reale
++-- test_videos/profilo_test.mp4  # video ufficiale (licenza Pexels)
++-- data/                   # sessions.csv (generato a runtime, gitignored)
++-- spec.txt / SPEC_ERRATA.md
++-- breakdown_status.md / prompt_log.md / incidents.md / HANDOFF.md
 ```
 
-## Privacy e disclaimer
+## Privacy
 
-I frame e i video non vengono persistiti dall'MVP; vengono salvate solo
-metriche aggregate nel CSV locale. Eventuali persone riprese devono essere
-consenzienti e i video di terzi richiedono una licenza/base d'uso adeguata.
+I frame video non vengono mai persistiti: si salvano solo metriche aggregate
+anonime in `data/sessions.csv` (verifica T25). L'upload della dashboard usa
+una cache locale transitoria gitignored. Eventuali persone riprese devono
+essere consenzienti; i video di terzi richiedono una licenza adeguata.
 
-**Questo progetto non e' un dispositivo medico e non fornisce consigli clinici
-o di prevenzione degli infortuni.**
+**Questo progetto non e' un dispositivo medico e non fornisce consigli
+clinici o di prevenzione degli infortuni.** L'interpretazione dei numeri
+spetta a un umano: il sistema e' un supporto alla decisione, non un decisore.
 
-## Governance operativa
+## Governance
 
-- `breakdown_status.md`: avanzamento rispetto alle task T01-T41.
-- `prompt_log.md`: iterazioni, richieste, azioni ed esiti.
-- `incidents.md`: incidenti reali, impatto, mitigazioni e stato.
-- `SPEC_ERRATA.md`: modifiche successive al congelamento della specifica.
+- `breakdown_status.md`: avanzamento task T01-T41 con evidenze.
+- `prompt_log.md`: registro delle iterazioni di lavoro.
+- `incidents.md`: incidenti reali, finding e limiti documentati.
+- `SPEC_ERRATA.md`: modifiche tracciate dopo il congelamento della spec.
 
-Questo e' un aggiornamento intermedio di coerenza. La revisione conclusiva del
-README resta prevista nel task T37, dopo la validazione end-to-end.
+---
+
+*Progetto per il corso AI Projects Development - ITS ICT Academy Roma.*
