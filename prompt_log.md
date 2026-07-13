@@ -1116,6 +1116,16 @@
   coordinate del progetto e le regole di lavoro concordate, per ripartire
   senza ricostruire il contesto.
 
+### Follow-up: portabilita' del video sul PC ufficio
+- Domanda utente: come portare il video sul PC di lavoro, "non lo hai
+  pushato".
+- Chiarimento (con verifica `git ls-tree origin/main`): il video UFFICIALE
+  `test_videos/profilo_test.mp4` E' versionato e pushato (commit 6adac64):
+  sul PC ufficio basta `git pull`. Il file non tracciato visibile nei
+  `git status` e' il VECCHIO provvisorio `profilo_provvisorio.mp4`,
+  escluso da Git di proposito (terzi, INC-009) e ormai non piu'
+  necessario: demo e validazione girano sul video ufficiale.
+
 ### Follow-up utente (stessa iterazione)
 - Commit dell'entry rifiutato dall'utente con due domande: perche' non si
   puo' usare il video in Downloads? e il tutto necessita di una demo il

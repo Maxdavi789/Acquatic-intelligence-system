@@ -7,6 +7,10 @@ __pycache__/
 .cache/
 data/sessions.csv
 
+# Video storico di terzi, mai da pubblicare (INC-009); superato dal
+# video ufficiale profilo_test.mp4 che invece E' versionato.
+test_videos/profilo_provvisorio.mp4
+
 # Editor and OS noise
 .vscode/
 .idea/
