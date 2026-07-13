@@ -278,6 +278,28 @@
   viene versionato. Comportamento dichiarato nel docstring di
   `persist_uploaded_video` (T16).
 
+### INC-2026-07-13-011 - Occlusione prolungata: falso negativo post-occlusione (limite documentato)
+- Tipo: comportamento del tracking / limite del modello upstream.
+- Evidenza (test T26): su un MP4 con la zona del braccio coperta da un box
+  nero per 100 frame (3,3 s), la pipeline NON crasha, NON genera picchi
+  spuri e il forward-fill scarta correttamente i dati inaffidabili
+  (wrist_y=None su 100/100 frame occlusi). Pero' il tracking MediaPipe
+  successivo all'occlusione resta degradato e il secondo picco reale non
+  viene rilevato: conteggio finale 1 invece di 2.
+- Isolamento della causa: (a) baseline ri-encodata identica senza box ->
+  2 picchi come l'originale (il re-encoding non c'entra); (b) iniezione
+  deterministica di visibility<0.5 sugli stessi 100 frame con video
+  originale -> forward-fill esatto e conteggio finale 2 (il motore
+  metriche e' corretto). Il degrado sta nei landmark prodotti da MediaPipe
+  dopo un'occlusione lunga, fuori dal controllo della pipeline.
+- Impatto: possibile sottostima conservativa delle bracciate dopo
+  occlusioni prolungate. Nessuna sovrastima: i picchi spuri restano
+  esclusi (RF-008 rispettato).
+- Stato: chiuso come limite documentato (coerente con il rischio "falsi
+  positivi/negativi dello stroke counter" gia' dichiarato, spec sez. 14.2).
+  Mitigazione gia' prevista: sandbox controllato T34-T35 senza occlusioni
+  per la validazione ufficiale; conteggio manuale di confronto in T30.
+
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
 - Evidenza: `cv2.VideoCapture(0)` restituisce `isOpened() == False` e OpenCV
