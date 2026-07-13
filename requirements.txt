@@ -1,9 +1,13 @@
-opencv-python
-mediapipe==0.10.35
+opencv-contrib-python==4.11.0.86
+mediapipe==0.10.21
 streamlit
-numpy
+numpy==1.26.4
 pandas
+protobuf==4.25.9
 # matplotlib rimosso da requirements: non usato per i grafici (si usa
 # st.line_chart). Arriva comunque come dipendenza transitiva di mediapipe, che
 # lo richiede; la cache e' gestita via MPLCONFIGDIR in vision_tracker.py
 # (DA-07, task T04).
+# opencv-contrib-python include il namespace cv2 completo ed e' richiesto da
+# MediaPipe. Non installare in parallelo opencv-python: i due pacchetti
+# condividono lo stesso namespace e possono sovrascriversi a vicenda.

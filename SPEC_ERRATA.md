@@ -45,4 +45,18 @@ Qui si annotano baseline, delta e correzioni successive, con data e task ID.
 
 ## Errata successivi
 
-(nessuno al momento)
+### 2026-07-13 - Correzione DA-06 / T02: runtime MediaPipe legacy
+
+- `mediapipe==0.10.35` importa su Python 3.12 ma non distribuisce l'API legacy
+  `mp.solutions` usata da `vision_tracker.py`; il semplice import check iniziale
+  non esercitava la funzionalita' richiesta.
+- Il pin funzionante e' corretto a `mediapipe==0.10.21`, ultima versione
+  verificata in questo progetto con `mp.solutions.pose` su Python 3.12.10.
+- Per rendere riproducibile la combinazione verificata sono fissati anche
+  `opencv-contrib-python==4.11.0.86`, `numpy==1.26.4` e
+  `protobuf==4.25.9`.
+- `opencv-python` non e' piu' una dipendenza diretta: il pacchetto contrib
+  include l'intero namespace `cv2` e MediaPipe lo richiede. Installare entrambi
+  nello stesso ambiente puo' produrre sovrascritture non deterministiche.
+- Nessun cambio architetturale: resta in uso MediaPipe Pose legacy come da spec;
+  questa errata corregge soltanto il set di dipendenze della decisione DA-06.
