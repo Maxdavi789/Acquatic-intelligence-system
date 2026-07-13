@@ -20,6 +20,7 @@ from metrics_engine import (  # noqa: E402
     ElbowAngleSmoother,
     LEFT_ARM_LANDMARK_IDS,
     RIGHT_ARM_LANDMARK_IDS,
+    StrokeCounter,
     calculate_elbow_angle,
     select_camera_side_arm,
 )
@@ -133,6 +134,63 @@ def test_elbow_angle_within_bounds() -> None:
         assert 0.0 <= angle <= 180.0, (shoulder, elbow, wrist, angle)
 
 
+# --- T10: conteggio bracciate (StrokeCounter) ----------------------------------------
+
+def _triangle_wave(cycles: int, dt: float = 0.1, top: float = 0.5,
+                   bottom: float = 0.1, steps_half: int = 4) -> list[tuple[float, float]]:
+    """Onda triangolare di Y del polso: un minimo (punto 'alto') per ciclo.
+
+    In MediaPipe Y cresce verso il basso, quindi il minimo di Y e' il punto piu'
+    alto del polso. Con steps_half=4 e dt=0.1 il ciclo dura 0.8 s (> debounce).
+    """
+    step = (top - bottom) / steps_half
+    series = [(top, 0.0)]
+    t, y = 0.0, top
+    for _ in range(cycles):
+        for _ in range(steps_half):  # discesa fisica: Y decresce
+            t += dt
+            y = round(y - step, 4)
+            series.append((y, t))
+        for _ in range(steps_half):  # risalita fisica: Y cresce
+            t += dt
+            y = round(y + step, 4)
+            series.append((y, t))
+    return series
+
+
+def test_stroke_counter_counts_regular_rhythm() -> None:
+    counter = StrokeCounter()
+    for wrist_y, timestamp in _triangle_wave(cycles=3):
+        counter.update(wrist_y, timestamp, shoulder_y=0.3)
+    assert counter.stroke_count == 3, counter.stroke_count
+
+
+def test_stroke_counter_deadband_ignores_jitter() -> None:
+    counter = StrokeCounter()
+    timestamp = 0.0
+    for i in range(50):
+        timestamp += 0.1
+        wrist_y = 0.199 if i % 2 == 0 else 0.201  # |delta| = 0.002 < min_delta 0.003
+        counter.update(wrist_y, timestamp, shoulder_y=0.5)
+    assert counter.stroke_count == 0, counter.stroke_count
+
+
+def test_stroke_counter_debounce_blocks_fast_second_peak() -> None:
+    counter = StrokeCounter()
+    # Due minimi a 0.2 s di distanza: sotto il debounce di 0.6 s -> conta 1 solo.
+    for wrist_y, timestamp in [(0.5, 0.0), (0.1, 0.1), (0.5, 0.2), (0.1, 0.3), (0.5, 0.4)]:
+        counter.update(wrist_y, timestamp, shoulder_y=0.3)
+    assert counter.stroke_count == 1, counter.stroke_count
+
+
+def test_stroke_counter_shoulder_gate_blocks_low_wrist() -> None:
+    counter = StrokeCounter()
+    # Minimo del polso a y=0.4 con spalla a y=0.3: polso SOTTO la spalla -> non conta.
+    for wrist_y, timestamp in [(0.6, 0.0), (0.4, 0.1), (0.6, 0.2)]:
+        counter.update(wrist_y, timestamp, shoulder_y=0.3)
+    assert counter.stroke_count == 0, counter.stroke_count
+
+
 TESTS = [
     test_select_camera_side_arm_picks_more_visible_side,
     test_select_camera_side_arm_left_side,
@@ -144,6 +202,10 @@ TESTS = [
     test_elbow_angle_right_angle,
     test_elbow_angle_acute_45,
     test_elbow_angle_within_bounds,
+    test_stroke_counter_counts_regular_rhythm,
+    test_stroke_counter_deadband_ignores_jitter,
+    test_stroke_counter_debounce_blocks_fast_second_peak,
+    test_stroke_counter_shoulder_gate_blocks_low_wrist,
 ]
 
 
