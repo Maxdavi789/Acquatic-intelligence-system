@@ -17,8 +17,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from metrics_engine import (  # noqa: E402
+    ElbowAngleSmoother,
     LEFT_ARM_LANDMARK_IDS,
     RIGHT_ARM_LANDMARK_IDS,
+    calculate_elbow_angle,
     select_camera_side_arm,
 )
 
@@ -71,10 +73,45 @@ def test_select_camera_side_arm_empty_returns_none() -> None:
     assert select_camera_side_arm(None) is None
 
 
+# --- T08: forward-fill occlusioni sull'angolo del gomito ------------------------------
+
+def test_elbow_smoother_forward_fill_on_occlusion() -> None:
+    smoother = ElbowAngleSmoother()
+
+    # Braccio disteso ~180 gradi, landmark ben visibili.
+    a1 = smoother.update((0, 0), (1, 0), (2, 0), min_visibility=0.9)
+    assert a1 is not None and abs(a1 - 180.0) < 1e-6, a1
+
+    # Frame occluso: coordinate "sporche" ma visibility sotto soglia -> forward-fill.
+    a2 = smoother.update((0, 0), (1, 0), (0, 10), min_visibility=0.2)
+    assert a2 == a1, f"forward-fill fallito: {a2} != {a1}"
+
+    # Ritorno alla visibilita': gomito a ~90 gradi, valore ricalcolato.
+    a3 = smoother.update((0, 1), (0, 0), (1, 0), min_visibility=0.8)
+    assert abs(a3 - 90.0) < 1e-6, a3
+
+
+def test_elbow_smoother_none_before_first_valid() -> None:
+    smoother = ElbowAngleSmoother()
+    # Prima misura gia' occlusa: nessun angolo valido da mantenere.
+    assert smoother.update((0, 0), (1, 0), (2, 0), min_visibility=0.1) is None
+
+
+def test_elbow_smoother_no_exception_on_repeated_occlusion() -> None:
+    smoother = ElbowAngleSmoother()
+    smoother.update((0, 0), (1, 0), (2, 0), min_visibility=0.9)
+    for _ in range(5):
+        angle = smoother.update((0, 0), (1, 0), (0, 5), min_visibility=0.0)
+        assert abs(angle - 180.0) < 1e-6, angle  # resta sull'ultimo valido
+
+
 TESTS = [
     test_select_camera_side_arm_picks_more_visible_side,
     test_select_camera_side_arm_left_side,
     test_select_camera_side_arm_empty_returns_none,
+    test_elbow_smoother_forward_fill_on_occlusion,
+    test_elbow_smoother_none_before_first_valid,
+    test_elbow_smoother_no_exception_on_repeated_occlusion,
 ]
 
 

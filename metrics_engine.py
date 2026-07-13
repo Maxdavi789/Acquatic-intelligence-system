@@ -93,6 +93,41 @@ def select_camera_side_arm(landmarks: Any) -> dict | None:
     }
 
 
+@dataclass
+class ElbowAngleSmoother:
+    """Calcola l'angolo del gomito con forward-fill sulle occlusioni.
+
+    Se la visibility dei landmark scelti scende sotto la soglia, mantiene
+    l'ultimo angolo valido invece di ricalcolare su coordinate inaffidabili,
+    evitando picchi spuri e crash (spec sez. 9.3, RF-008, MVP-006).
+    """
+
+    visibility_threshold: float = 0.5
+    _last_angle: float | None = None
+
+    def update(
+        self,
+        shoulder: Point2D,
+        elbow: Point2D,
+        wrist: Point2D,
+        min_visibility: float,
+    ) -> float | None:
+        """Aggiorna con un frame e restituisce l'angolo (o l'ultimo valido).
+
+        Se min_visibility < soglia -> forward-fill dell'ultimo angolo valido
+        (None finche' non se ne e' calcolato almeno uno affidabile).
+        """
+        if min_visibility < self.visibility_threshold:
+            return self._last_angle
+
+        self._last_angle = calculate_elbow_angle(shoulder, elbow, wrist)
+        return self._last_angle
+
+    @property
+    def last_angle(self) -> float | None:
+        return self._last_angle
+
+
 def calculate_fluidity_score(peak_timestamps: list[float]) -> float:
     """Stima la regolarita' del ritmo dalle distanze temporali tra picchi."""
     if len(peak_timestamps) < 3:
