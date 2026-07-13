@@ -38,8 +38,18 @@ def calculate_fluidity_score(peak_timestamps: list[float]) -> float:
     return max(0.0, 100.0 - (standard_deviation * 50.0))
 
 
+# FUORI MVP v1 - vedi spec sez. 4.2: il Symmetry Score bilaterale contraddice la
+# vista laterale (l'arto lontano e' strutturalmente occluso), quindi e' escluso
+# dalla pipeline e dai KPI dell'MVP. Funzione conservata come AIRBAG, NON
+# invocata da alcun modulo. Riattivabile in v2 con cambio di protocollo di
+# ripresa (frontale/45 gradi) o misura in due passaggi. Vedi decisione DA-01 = A
+# e breakdown task T05.
 def calculate_symmetry_score(right_angles: list[float], left_angles: list[float]) -> float:
-    """Confronta le medie degli angoli massimi destro/sinistro."""
+    """Confronta le medie degli angoli massimi destro/sinistro.
+
+    FUORI MVP v1 (airbag): non collegata alla pipeline, conservata per una
+    futura v2. Vedi il commento sopra e spec sez. 4.2 / DA-01 = A.
+    """
     if not right_angles or not left_angles:
         return 0.0
 
