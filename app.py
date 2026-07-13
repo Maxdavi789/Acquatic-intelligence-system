@@ -123,17 +123,22 @@ def render_video_stream(
     source: str | int,
     placeholder: Any,
     chart_slot: Any = None,
-) -> int:
-    """Loop di rendering delle task T17/T18/T20 (RF-003, RF-005, RF-010).
+    stroke_slot: Any = None,
+    fluidity_slot: Any = None,
+) -> dict[str, Any]:
+    """Loop di rendering delle task T17/T18/T20/T21.
 
     Legge i frame dalla sorgente, esegue MediaPipe Pose con overlay scheletro
     (riuso delle funzioni di `vision_tracker`) e aggiorna il placeholder
     Streamlit: e' il sostituto di `cv2.imshow`, non utilizzabile qui (spec
-    sez. 14.2). Ogni frame passa da `analyze_frame` (stato persistente T13),
-    l'angolo del gomito viene sovrimpresso live (T18) e l'onda Y del polso
-    popola il grafico ogni `CHART_UPDATE_EVERY` frame (T20). Restituisce il
-    numero di frame renderizzati; le risorse vengono sempre rilasciate a fine
-    stream (RF-013).
+    sez. 14.2). Ogni frame passa da `analyze_frame` (stato persistente T13);
+    l'angolo del gomito viene sovrimpresso live (T18), l'onda Y del polso
+    popola il grafico (T20) e i KPI vengono aggiornati con i valori reali sul
+    picco rilevato e periodicamente (T21). Le risorse vengono sempre
+    rilasciate a fine stream (RF-013).
+
+    Restituisce il riepilogo della sessione di elaborazione:
+    `frames_rendered`, `stroke_count`, `fluidity_score`, `wrist_series`.
     """
     capture = open_video_capture(source)
     frames_rendered = 0
@@ -144,6 +149,16 @@ def render_video_stream(
 
     state = FrameAnalysisState()
     wrist_series: list[dict[str, float]] = []
+    result: dict[str, Any] = {}
+
+    def update_kpis() -> None:
+        if stroke_slot is not None and fluidity_slot is not None and result:
+            render_kpis(
+                stroke_slot,
+                fluidity_slot,
+                result["stroke_count"],
+                result["fluidity_score"],
+            )
 
     try:
         with create_pose_estimator() as pose:
@@ -166,12 +181,12 @@ def render_video_stream(
                             WRIST_CHART_COLUMNS[1]: result["wrist_y"],
                         }
                     )
-                if (
-                    chart_slot is not None
-                    and wrist_series
-                    and frames_rendered % CHART_UPDATE_EVERY == 0
-                ):
+
+                periodic_update = frames_rendered % CHART_UPDATE_EVERY == 0
+                if chart_slot is not None and wrist_series and periodic_update:
                     _update_wrist_chart(chart_slot, wrist_series)
+                if result["peak_detected"] or periodic_update:
+                    update_kpis()
 
                 placeholder.image(
                     cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB),
@@ -184,8 +199,14 @@ def render_video_stream(
 
     if chart_slot is not None and wrist_series:
         _update_wrist_chart(chart_slot, wrist_series)
+    update_kpis()
 
-    return frames_rendered
+    return {
+        "frames_rendered": frames_rendered,
+        "stroke_count": result.get("stroke_count", 0) if result else 0,
+        "fluidity_score": result.get("fluidity_score", 0.0) if result else 0.0,
+        "wrist_series": wrist_series,
+    }
 
 
 def render_kpis(
@@ -203,7 +224,11 @@ def render_kpis(
     fluidity_slot.metric("Fluidity Score", f"{fluidity_score:.1f}")
 
 
-def render_video_section(chart_slot: Any = None) -> None:
+def render_video_section(
+    chart_slot: Any = None,
+    stroke_slot: Any = None,
+    fluidity_slot: Any = None,
+) -> None:
     """Colonna video: selettore input (T16) + rendering annotato (T17/T18)."""
     render_input_selector()
     source = st.session_state.get("video_source")
@@ -211,8 +236,13 @@ def render_video_section(chart_slot: Any = None) -> None:
     if isinstance(source, str):
         if st.button("Avvia elaborazione video", type="primary"):
             placeholder = st.empty()
-            frames_rendered = render_video_stream(source, placeholder, chart_slot)
-            st.caption(f"Elaborazione terminata: {frames_rendered} frame renderizzati.")
+            summary = render_video_stream(
+                source, placeholder, chart_slot, stroke_slot, fluidity_slot
+            )
+            st.caption(
+                f"Elaborazione terminata: {summary['frames_rendered']} frame "
+                "renderizzati."
+            )
     elif source == WEBCAM_DEVICE_INDEX:
         st.info(
             "L'elaborazione live della webcam verrà collegata nella task T28 "
@@ -249,7 +279,7 @@ def main() -> None:
 
     with video_column:
         st.subheader("Video")
-        render_video_section(chart_slot)
+        render_video_section(chart_slot, stroke_slot, fluidity_slot)
 
     st.divider()
     st.caption(
