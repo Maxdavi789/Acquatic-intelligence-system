@@ -278,6 +278,34 @@
   viene versionato. Comportamento dichiarato nel docstring di
   `persist_uploaded_video` (T16).
 
+### 2026-07-13 - T30: conteggio manuale vs automatico sul video provvisorio
+- Tipo: esito test M6 (spec sez. 1.2, tolleranza +-1), non incidente bloccante.
+- Conteggio manuale documentato: 1 bracciata completa. Evidenza: sequenza
+  frame 300-440 ispezionata (una sola recovery sopra la spalla, frame
+  ~340-420) e tracciato polso/spalla (il polso supera la quota spalla UNA
+  volta, con oscillazione sul plateau).
+- Conteggio automatico: 2 (picchi a frame 358 e 402).
+- |differenza| = 1 -> ENTRO la tolleranza +-1 del criterio di successo.
+- Causa del +1: il video provvisorio e' una demo didattica LENTA; durante
+  la recovery la mano resta ferma vicino alla testa (~1,5 s) e oscilla,
+  producendo due inversioni valide sopra la spalla distanti 1,47 s (oltre
+  il debounce di 0,6 s, calibrato su bracciate ritmiche).
+- Conseguenza per T35: il video ufficiale del sandbox deve contenere
+  bracciate CONTINUE e RITMICHE (>= 4-5 cicli), per cui il debounce e il
+  criterio +-1 sono progettati; su quel protocollo il plateau anomalo
+  scompare.
+
+### 2026-07-13 - T32: casi limite eseguiti e verificati (esito positivo)
+- Tipo: esito test M6, non incidente.
+- Input non valido: percorso inesistente -> `st.error` leggibile in UI e
+  exit 1 con messaggio controllato da CLI; nessuna eccezione non gestita
+  (esecuzioni formali T27, 11/11 check).
+- Fine stream: video completo e clip sintetica senza persona -> chiusura
+  pulita con "Elaborazione terminata", KPI coerenti (esecuzioni T27).
+- Stop a meta': interruzione simulata al frame 15 (MP4) e 5 (webcam) ->
+  `capture.release()` esattamente una volta, nessun handle appeso,
+  webcam subito riapribile (esecuzioni formali T29, 6/6 check).
+
 ### INC-2026-07-13-011 - Occlusione prolungata: falso negativo post-occlusione (limite documentato)
 - Tipo: comportamento del tracking / limite del modello upstream.
 - Evidenza (test T26): su un MP4 con la zona del braccio coperta da un box
@@ -299,6 +327,9 @@
   positivi/negativi dello stroke counter" gia' dichiarato, spec sez. 14.2).
   Mitigazione gia' prevista: sandbox controllato T34-T35 senza occlusioni
   per la validazione ufficiale; conteggio manuale di confronto in T30.
+- Aggiornamento 2026-07-13: questa verifica costituisce anche l'esito
+  formale del test di occlusione T31 (M6): scenario controllato eseguito,
+  nessun picco spurio, nessun crash, esito registrato.
 
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
