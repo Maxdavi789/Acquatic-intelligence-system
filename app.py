@@ -285,6 +285,28 @@ def render_kpis(
     fluidity_slot.metric("Fluidity Score", f"{fluidity_score:.1f}")
 
 
+def _execute_processing(
+    source: str | int,
+    chart_slot: Any,
+    stroke_slot: Any,
+    fluidity_slot: Any,
+) -> dict[str, Any] | None:
+    """Avvia il loop gestendo gli errori di sorgente in UI (T27, RF-001).
+
+    Sorgente non apribile -> `st.error` leggibile, nessuna eccezione non
+    gestita (spec sez. 12). Restituisce il riepilogo, o None in caso di
+    errore.
+    """
+    placeholder = st.empty()
+    try:
+        return render_video_stream(
+            source, placeholder, chart_slot, stroke_slot, fluidity_slot
+        )
+    except RuntimeError as error:
+        st.error(str(error))
+        return None
+
+
 def render_video_section(
     chart_slot: Any = None,
     stroke_slot: Any = None,
@@ -296,10 +318,11 @@ def render_video_section(
 
     if isinstance(source, str):
         if st.button("Avvia elaborazione video", type="primary"):
-            placeholder = st.empty()
-            summary = render_video_stream(
-                source, placeholder, chart_slot, stroke_slot, fluidity_slot
+            summary = _execute_processing(
+                source, chart_slot, stroke_slot, fluidity_slot
             )
+            if summary is None:
+                return
             # T22: i risultati sopravvivono ai rerun di Streamlit (interazioni
             # con i widget) finche' non parte una nuova elaborazione.
             st.session_state["last_kpi"] = {
