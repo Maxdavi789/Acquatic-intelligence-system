@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import cv2
+import pandas as pd
 import streamlit as st
 
 # vision_tracker configura MPLCONFIGDIR prima di importare mediapipe.
@@ -17,6 +18,8 @@ from vision_tracker import (
 from metrics_engine import FrameAnalysisState, analyze_frame
 
 FALLBACK_FPS = 30.0
+CHART_UPDATE_EVERY = 10  # frame tra due aggiornamenti del grafico (T20)
+WRIST_CHART_COLUMNS = ("tempo (s)", "polso Y")
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 UPLOAD_CACHE_DIR = PROJECT_ROOT / ".cache"
@@ -105,16 +108,32 @@ def draw_elbow_angle(frame: Any, angle: float | None) -> Any:
     return frame
 
 
-def render_video_stream(source: str | int, placeholder: Any) -> int:
-    """Loop di rendering delle task T17/T18 (RF-003, RF-005).
+def _update_wrist_chart(chart_slot: Any, wrist_series: list[dict[str, float]]) -> None:
+    """Aggiorna il grafico dell'onda Y del polso (T20, RF-010)."""
+    frame_data = pd.DataFrame(wrist_series, columns=list(WRIST_CHART_COLUMNS))
+    chart_slot.line_chart(
+        frame_data,
+        x=WRIST_CHART_COLUMNS[0],
+        y=WRIST_CHART_COLUMNS[1],
+        height=260,
+    )
+
+
+def render_video_stream(
+    source: str | int,
+    placeholder: Any,
+    chart_slot: Any = None,
+) -> int:
+    """Loop di rendering delle task T17/T18/T20 (RF-003, RF-005, RF-010).
 
     Legge i frame dalla sorgente, esegue MediaPipe Pose con overlay scheletro
     (riuso delle funzioni di `vision_tracker`) e aggiorna il placeholder
     Streamlit: e' il sostituto di `cv2.imshow`, non utilizzabile qui (spec
-    sez. 14.2). Ogni frame passa da `analyze_frame` (stato persistente T13) e
-    l'angolo del gomito viene sovrimpresso live (T18). Restituisce il numero
-    di frame renderizzati; le risorse vengono sempre rilasciate a fine stream
-    (RF-013).
+    sez. 14.2). Ogni frame passa da `analyze_frame` (stato persistente T13),
+    l'angolo del gomito viene sovrimpresso live (T18) e l'onda Y del polso
+    popola il grafico ogni `CHART_UPDATE_EVERY` frame (T20). Restituisce il
+    numero di frame renderizzati; le risorse vengono sempre rilasciate a fine
+    stream (RF-013).
     """
     capture = open_video_capture(source)
     frames_rendered = 0
@@ -124,6 +143,7 @@ def render_video_stream(source: str | int, placeholder: Any) -> int:
         fps = FALLBACK_FPS
 
     state = FrameAnalysisState()
+    wrist_series: list[dict[str, float]] = []
 
     try:
         with create_pose_estimator() as pose:
@@ -135,8 +155,23 @@ def render_video_stream(source: str | int, placeholder: Any) -> int:
                 frame = resize_frame(frame)
                 annotated_frame, landmarks = process_pose_frame(frame, pose)
 
-                result = analyze_frame(landmarks, frames_rendered / fps, state)
+                timestamp = frames_rendered / fps
+                result = analyze_frame(landmarks, timestamp, state)
                 draw_elbow_angle(annotated_frame, result["elbow_angle"])
+
+                if result["wrist_y"] is not None:
+                    wrist_series.append(
+                        {
+                            WRIST_CHART_COLUMNS[0]: round(timestamp, 3),
+                            WRIST_CHART_COLUMNS[1]: result["wrist_y"],
+                        }
+                    )
+                if (
+                    chart_slot is not None
+                    and wrist_series
+                    and frames_rendered % CHART_UPDATE_EVERY == 0
+                ):
+                    _update_wrist_chart(chart_slot, wrist_series)
 
                 placeholder.image(
                     cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB),
@@ -146,6 +181,9 @@ def render_video_stream(source: str | int, placeholder: Any) -> int:
                 frames_rendered += 1
     finally:
         capture.release()
+
+    if chart_slot is not None and wrist_series:
+        _update_wrist_chart(chart_slot, wrist_series)
 
     return frames_rendered
 
@@ -165,15 +203,15 @@ def render_kpis(
     fluidity_slot.metric("Fluidity Score", f"{fluidity_score:.1f}")
 
 
-def render_video_section() -> None:
-    """Colonna video: selettore input (T16) + rendering annotato (T17)."""
+def render_video_section(chart_slot: Any = None) -> None:
+    """Colonna video: selettore input (T16) + rendering annotato (T17/T18)."""
     render_input_selector()
     source = st.session_state.get("video_source")
 
     if isinstance(source, str):
         if st.button("Avvia elaborazione video", type="primary"):
             placeholder = st.empty()
-            frames_rendered = render_video_stream(source, placeholder)
+            frames_rendered = render_video_stream(source, placeholder, chart_slot)
             st.caption(f"Elaborazione terminata: {frames_rendered} frame renderizzati.")
     elif source == WEBCAM_DEVICE_INDEX:
         st.info(
@@ -189,14 +227,13 @@ def main() -> None:
 
     video_column, metrics_column = st.columns([2, 1], gap="large")
 
-    with video_column:
-        st.subheader("Video")
-        render_video_section()
-
+    # La colonna metriche viene costruita per prima cosi' che i suoi slot
+    # esistano gia' quando il loop di elaborazione (colonna video) li aggiorna.
     with metrics_column:
         st.subheader("Metriche")
         stroke_slot = st.empty()
         fluidity_slot = st.empty()
+        chart_slot = st.empty()
         last_kpi = st.session_state.get(
             "last_kpi", {"stroke_count": 0, "fluidity_score": 0.0}
         )
@@ -206,7 +243,13 @@ def main() -> None:
             last_kpi["stroke_count"],
             last_kpi["fluidity_score"],
         )
-        st.info("Il grafico dell'onda Y del polso verrà aggiunto nella task T20.")
+        chart_slot.caption(
+            "Il grafico dell'onda Y del polso si popola durante l'elaborazione."
+        )
+
+    with video_column:
+        st.subheader("Video")
+        render_video_section(chart_slot)
 
     st.divider()
     st.caption(
