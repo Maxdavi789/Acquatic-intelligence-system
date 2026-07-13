@@ -204,3 +204,24 @@
 - Prossima task: M2/T13 (`analyze_frame`).
 - Commit locali non ancora pushati: push bloccato da INC-2026-07-13-006, in
   attesa che l'utente dia a MrChuck118 il permesso di scrittura sul repo.
+
+## 2026-07-13 - Push sbloccato e handoff a Codex
+
+### Messaggio utente
+- "fai push di tutto"; poi ha incollato username/password dell'account GitHub.
+- Dopo il rifiuto password, ha aggiunto MrChuck118 come collaboratore del repo.
+- Infine: "continuo il lavoro con Codex, crea un log finale che gli faccia capire
+  da dove riprendere".
+
+### Messaggi/azioni assistente
+- Tentato push con password: rifiutato (password auth non supportata). Avviso di
+  sicurezza dato; credenziale non salvata (INC-2026-07-13-006 aggiornato).
+- Dopo l'aggiunta di MrChuck118 come collaboratore: `git push origin main`
+  riuscito (ff016b8..9718657, poi ..8d7f8c2). Locale e origin allineati (0/0).
+- Aggiornati incidents.md e breakdown_status.md: blocco push risolto.
+- Creato `HANDOFF.md` per la ripresa del lavoro con Codex (stato, prossima task
+  M2/T13, ambiente, git/auth, blocchi, trappole, file chiave).
+
+### Stato iterazione (fine)
+- Tutto pushato su origin/main. M0 e M1 completate; T03/T14 bloccate (manca MP4).
+- Prossima task per Codex: M2/T13 `analyze_frame`. Vedi HANDOFF.md.
