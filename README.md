@@ -59,10 +59,15 @@ Aggiornato al 2026-07-13.
   un DataFrame con preview e lo accoda a `data/sessions.csv` (header alla
   prima scrittura, append mai distruttivo). Verifica privacy passata: in
   `data/` restano solo metriche aggregate anonime, nessun frame o video.
-- M5-M8: non iniziate.
+- M5/T26-T29: completata. Robustezza verificata: occlusioni senza picchi
+  spuri ne' crash (limite documentato INC-011: possibile sottostima dopo
+  occlusioni prolungate, mai sovrastima), errori di sorgente gestiti con
+  messaggi leggibili, anteprima webcam sperimentale a durata limitata con
+  degrado documentato, risorse rilasciate anche su stop a meta'.
+- M6-M8: non iniziate.
 
-La prossima task in ordine e' T26 (modulo M5, robustezza): verifica formale
-dell'occlusion smoothing nel loop della dashboard.
+La prossima task in ordine e' T30 (modulo M6, test): confronto del conteggio
+bracciate con il conteggio manuale documentato.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -80,8 +85,8 @@ Lo scaffold della dashboard e' avviabile con:
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-La gestione formale degli errori in UI e la modalita' webcam verranno
-rifinite nelle task T26-T29 (modulo M5).
+I test formali di validazione (conteggio manuale, riproducibilita') sono
+previsti nelle task T30-T33 (modulo M6).
 
 Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
 non viene versionato o pubblicato finche' non e' chiarita la licenza del video.

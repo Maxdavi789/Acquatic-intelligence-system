@@ -849,3 +849,54 @@
 
 ### Stato iterazione
 - M0-M4 COMPLETATI (T01-T25, 25/41 task). Prossima task: M5/T26.
+
+## 2026-07-13 23:55 +02:00 - Prosecuzione approvata: modulo M5 completato (T26-T29)
+
+### Messaggio utente
+- "bene procediamo". Autorizzazione push di sessione ancora attiva.
+
+### T26 - Verifica occlusioni nel loop app (commit b4df5f2)
+- Verifica doppia: (A) creato un MP4 reale con box nero sulla zona del
+  braccio per 100 frame -> nessun crash, nessun picco spurio, wrist_y=None
+  su 100/100 frame occlusi; (B) iniezione deterministica visibility<0.5 ->
+  forward-fill ESATTO (angolo congelato a 137,41 deg), counter congelato,
+  ripresa corretta dopo la finestra, conteggio finale 2. 13/13 check.
+- FINDING (INC-011): dopo l'occlusione fisica prolungata il tracking
+  MediaPipe resta degradato e il secondo picco reale viene mancato
+  (conteggio 1 invece di 2). Causa isolata con baseline ri-encodata
+  (2 picchi -> il re-encoding non c'entra) e con (B) (il motore e'
+  corretto). Chiuso come limite documentato coerente con spec sez. 14.2:
+  possibile sottostima conservativa, MAI sovrastima.
+
+### T27 - Errori gestiti in UI (commit cd704e0)
+- `_execute_processing`: sorgente non apribile -> `st.error` leggibile,
+  nessuna eccezione non gestita; successo -> session_state + caption
+  "Elaborazione terminata".
+- Clip sintetica di 30 frame senza persona: fine stream pulita, KPI a 0,
+  serie polso vuota, grafico mai disegnato, frame renderizzati senza
+  overlay. 11/11 check.
+
+### T28 - Webcam sperimentale (commit c4dc9a3)
+- Bottone "Avvia anteprima webcam (sperimentale)": stesso loop con
+  `max_frames=300`, cosi' termina sempre da solo; su errore st.error +
+  rimando documentato al percorso MP4 primario (RF-014).
+- Validata con la webcam REALE della macchina di casa: 60 frame diretti,
+  click end-to-end via AppTest (300 frame, sessione salvata, caption
+  finale), device inesistente -> degrado documentato. 13/13 check.
+
+### T29 - Cleanup risorse (commit 447991f, nessuna modifica al codice)
+- Stop simulato a meta' elaborazione (MP4 al frame 15, webcam al frame 5):
+  `capture.release()` chiamata ESATTAMENTE una volta dal `finally`,
+  interruzione propagata a Streamlit, webcam subito riapribile. 6/6 check.
+
+### Governance e chiusura
+- breakdown_status: M5 completata 4/4 con dettaglio; prossima M6/T30 con
+  avvertenza sul conteggio manuale del video provvisorio (un ciclo lento
+  ma 2 picchi rilevati: confronto da documentare con cura).
+- HANDOFF: punto di ripresa T30; README: stato M5 e limite INC-011.
+- Suite finale 23/23; server health 200. Push di chiusura eseguito.
+
+### Stato iterazione
+- M0-M5 COMPLETATI (T01-T29, 29/41 task). Prossima task: M6/T30.
+- Restano: M6 (test formali T30-T33), M7 (sandbox e video ufficiale
+  T34-T36), M8 (README finale, screenshot, pitch, rehearsal, chiusura).
