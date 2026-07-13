@@ -985,6 +985,54 @@
   tra A/B/C/D. Preparazione script di cattura (B) o ricerca clip (C)
   pronte a partire su approvazione.
 
+## 2026-07-14 01:00 +02:00 - Video ufficiale in deroga: ricerca, adozione e validazione completa (T35/T36 + T30/T33)
+
+### Messaggi utente (sequenza della stessa conversazione)
+- Chiarimento: progetto didattico, i diritti non sono percepiti come
+  problema; il video non e' registrabile IN GENERALE (non solo il giorno
+  della demo). Domanda: si puo' trovare su internet?
+- Domanda successiva: seguendo questa strada, cosa si presenta il giorno
+  della presentazione oltre al pitch deck?
+- Approvazione finale: "allora procediamo cosi poi capiamo se aggiungere
+  un video live".
+
+### Ricerca e selezione (DA-05, opzione footage con licenza)
+- Cercati candidati su Pexels (stock, licenza libera, niente watermark).
+  Valutati con contact sheet 4 candidati: 3 scartati (stretching statico
+  6539612, vista posteriore 6011930, seduta 6012316).
+- ADOTTATO Pexels 37264420 "Workout warm up arm stretch routine
+  outdoors": uomo in piedi prevalentemente di profilo, camera fissa,
+  sfondo pulito, MULINELLI RITMICI del braccio sopra la testa.
+- Test pipeline su variante UHD: 175/175 posa, 10 bracciate, Fluidity
+  93,2. Scaricata la variante HD 720x1280 (1,9 MB): risultati identici
+  (10 bracciate, Fluidity 93,1) -> scelta come file ufficiale.
+
+### T35 in deroga (commit 6adac64)
+- `test_videos/profilo_test.mp4` VERSIONATO nella repo (licenza Pexels);
+  SHA256 e fonte in SPEC_ERRATA (deroga T34/T35 via DA-05/DA-08);
+  INC dedicata in incidents.md con limiti onesti (7 s, mulinello in piedi
+  stile dorso, vista 3/4 nei primi istanti).
+
+### T36 + T30/T33 sul video ufficiale (commit 1e315e9)
+- T36 end-to-end: 175/175 frame, 10 bracciate, Fluidity 93,1, angoli
+  [58,49; 179,92], grafico e KPI live, CSV esportato
+  (10 / 93,1 / 163,17 / 179,92). Nessun picco spurio: intervalli >= 0,6 s
+  e oscillazione bassa a f100 correttamente scartata dal gate spalla.
+  11/11 check. Contact sheet con overlay e grafico onda ispezionati.
+- T30 ripetuto: conteggio manuale (creste sopra la spalla nel tracciato +
+  sequenza frame) = 10; automatico = 10; DIFFERENZA 0.
+- T33 ripetuto: due run -> KPI e serie angoli identici frame per frame.
+
+### Scaletta demo concordata (per T40)
+- Elaborazione LIVE del video ufficiale nella dashboard (KPI 1->10,
+  Fluidity 93, grafico, export CSV), ripetibile con numeri identici.
+- Eventuale momento webcam live best-effort: DA DECIDERE ("poi capiamo
+  se aggiungere un video live").
+
+### Stato iterazione
+- M0-M7 COMPLETATI (T01-T36, 36/41). Prossima task: M8/T37 (README
+  finale), poi T38-T41. Push di chiusura eseguito.
+
 ### Follow-up utente (stessa iterazione)
 - Commit dell'entry rifiutato dall'utente con due domande: perche' non si
   puo' usare il video in Downloads? e il tutto necessita di una demo il

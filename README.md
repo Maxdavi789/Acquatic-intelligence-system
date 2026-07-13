@@ -64,16 +64,15 @@ Aggiornato al 2026-07-13.
   occlusioni prolungate, mai sovrastima), errori di sorgente gestiti con
   messaggi leggibili, anteprima webcam sperimentale a durata limitata con
   degrado documentato, risorse rilasciate anche su stop a meta'.
-- M6/T30-T33: completata sul video provvisorio. Conteggio: manuale 1 vs
-  automatico 2, entro la tolleranza +-1 del criterio di successo (causa e
-  dettagli in incidents.md). Riproducibilita': due esecuzioni sullo stesso
-  MP4 producono KPI e serie IDENTICHE. T30/T33 verranno ripetuti sul video
-  ufficiale del sandbox (T35).
-- M7-M8: da iniziare. M7 e' fisico: sandbox controllato e registrazione del
-  video ufficiale con bracciate ritmiche continue.
+- M6/T30-T33: completata. Sul video ufficiale: conteggio manuale 10 vs
+  automatico 10 (differenza 0) e riproducibilita' bit-identica tra run.
+- M7/T34-T36: completata in deroga DA-05 (dettagli in SPEC_ERRATA.md):
+  il video ufficiale e' una clip stock con licenza Pexels, versionata come
+  `test_videos/profilo_test.mp4`. Validazione completa: 175/175 frame con
+  posa, 10 bracciate ritmiche, Fluidity Score 93,1, export CSV verificato.
+- M8: da iniziare (README finale, screenshot, slide pitch, rehearsal).
 
-La prossima task in ordine e' T34 (modulo M7): montaggio del sandbox
-controllato a costo zero.
+La prossima task in ordine e' T37 (modulo M8): revisione finale del README.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 
@@ -95,9 +94,11 @@ I test formali di validazione sul video provvisorio sono documentati in
 `incidents.md` e `breakdown_status.md` (modulo M6); la validazione finale
 avverra' sul video ufficiale del sandbox (T35-T36).
 
-Il campione `test_videos/profilo_provvisorio.mp4` e' presente solo localmente e
-non viene versionato o pubblicato finche' non e' chiarita la licenza del video.
-Il riferimento ufficiale verra' registrato nel sandbox T35.
+Il video ufficiale di riferimento e' `test_videos/profilo_test.mp4` (clip con
+licenza Pexels, fonte e hash in `SPEC_ERRATA.md`), versionato nella repo: dopo
+il clone la demo funziona subito. Il vecchio campione provvisorio
+`profilo_provvisorio.mp4` (terzi, non licenziato) resta solo locale e non
+tracciato.
 
 ## Struttura principale
 

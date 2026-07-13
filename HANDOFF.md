@@ -41,17 +41,20 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
     sorgente gestiti in UI (`_execute_processing`); anteprima webcam
     sperimentale a frame limitati validata con hardware reale; cleanup
     risorse garantito anche su stop a meta'.
-  - M6 (T30-T33): COMPLETATA sul video provvisorio. T30: manuale 1 vs auto
-    2, entro tolleranza +-1 (dettagli in incidents). T33: riproducibilita'
-    PERFETTA (KPI e serie identiche tra due run). T30/T33 da ripetere sul
-    video ufficiale T35. Prossimo modulo: M7 (sandbox, FISICO).
+  - M6 (T30-T33): COMPLETATA. Sul VIDEO UFFICIALE: T30 manuale 10 vs auto
+    10 (diff 0); T33 due run bit-identici.
+  - M7 (T34-T36): COMPLETATA in deroga DA-05 (SPEC_ERRATA 2026-07-14):
+    video ufficiale = clip Pexels licenziata `test_videos/profilo_test.mp4`
+    VERSIONATA in repo (HD 720x1280, 7 s, 10 mulinelli ritmici). T36:
+    175/175 frame, 10 bracciate, Fluidity 93,1, CSV esportato, nessun
+    picco spurio. Prossimo modulo: M8 (demo e pitch).
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PUNTO DI RIPRESA -> T34/T35 (sandbox: serve l'utente)
+## 2. PUNTO DI RIPRESA -> T37 (inizio M8, demo e pitch)
 
 - M2 e' completata (T13-T14: `analyze_frame` + script CLI
   `scripts/analyze_video.py`, validati sul video provvisorio).
@@ -70,21 +73,23 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
     `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
     valori persistiti.
-- M6 e' completata sul video provvisorio (T30-T32 in 38b29ac, esiti in
-  incidents.md; T33: due run -> KPI e serie IDENTICHE, 7/7).
-- Le prossime task in ordine sono FISICHE e richiedono l'utente:
-  - T34: montare il sandbox controllato (spec sez. 3.4, DA-08): camera su
-    supporto fisso a 90 gradi, sfondo neutro, luci uniformi, marker a
-    terra, costo 0, foto del setup da salvare.
-  - T35: registrare nel sandbox il video ufficiale
-    `test_videos/profilo_test.mp4`: dryland di profilo, un solo soggetto
-    interamente visibile, continuo, con BRACCIATE RITMICHE (>= 4-5 cicli):
-    requisito emerso dal T30 (il debounce 0,6 s e' calibrato su gesto
-    ritmico, non su demo lente con pause).
-- Dopo T35 il software riprende con: T36 (pipeline completa sul video
-  ufficiale: KPI plausibili, niente picchi spuri, CSV), ripetizione
-  T30/T33 sul video ufficiale, poi M8 (T37 README finale, T38 screenshot,
-  T39 slide pitch, T40 rehearsal x2, T41 chiusura governance).
+- M7 risolta in deroga DA-05: il video ufficiale e' la clip Pexels
+  37264420 (HD 720x1280 25fps, licenza Pexels, versionata in repo come
+  `test_videos/profilo_test.mp4`, SHA256 in SPEC_ERRATA). Validazione T36
+  completa: 175/175 posa, 10 bracciate (manuale 10, diff 0), Fluidity
+  93,1, CSV ok, riproducibilita' bit-identica.
+- Demo della presentazione (concordata con l'utente): elaborazione LIVE
+  del video ufficiale nella dashboard (KPI che salgono, grafico che si
+  disegna, export CSV) + EVENTUALE momento webcam live best-effort, da
+  decidere ("poi capiamo se aggiungere un video live").
+- T37 e' la prossima task (M8): README finale con descrizione onesta,
+  "come funziona", disclaimer non-medicale, vincolo 0 euro, roadmap con
+  sensori, link a spec v1.1 e alla deroga video in SPEC_ERRATA.
+- Poi: T38 (screenshot per slide: gia' disponibili come base la contact
+  sheet annotata e il grafico dell'onda del video ufficiale), T39 (slide
+  pitch 8-12 con richiesta fondi, inquadrando il dry-run onestamente),
+  T40 (rehearsal demo x2 cronometrata), T41 (chiusura governance, >= 5
+  entry in incidents: ampiamente superato).
 - Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
   `wrist_y=None`; frame senza persona: stato invariato.
 - Suite sintetica: 23/23 test passati anche sulla macchina di casa.
