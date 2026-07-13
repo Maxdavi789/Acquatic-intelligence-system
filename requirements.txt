@@ -3,4 +3,7 @@ mediapipe==0.10.35
 streamlit
 numpy
 pandas
-matplotlib
+# matplotlib rimosso da requirements: non usato per i grafici (si usa
+# st.line_chart). Arriva comunque come dipendenza transitiva di mediapipe, che
+# lo richiede; la cache e' gestita via MPLCONFIGDIR in vision_tracker.py
+# (DA-07, task T04).
