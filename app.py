@@ -150,6 +150,21 @@ def render_video_stream(source: str | int, placeholder: Any) -> int:
     return frames_rendered
 
 
+def render_kpis(
+    stroke_slot: Any,
+    fluidity_slot: Any,
+    stroke_count: int,
+    fluidity_score: float,
+) -> None:
+    """KPI della task T19 (MVP-004/005, RF-006/007).
+
+    Due soli blocchi: bracciate totali e Fluidity Score. Nessun KPI di
+    simmetria: fuori scope MVP (spec sez. 4.2, DA-01 = A).
+    """
+    stroke_slot.metric("Bracciate totali", int(stroke_count))
+    fluidity_slot.metric("Fluidity Score", f"{fluidity_score:.1f}")
+
+
 def render_video_section() -> None:
     """Colonna video: selettore input (T16) + rendering annotato (T17)."""
     render_input_selector()
@@ -180,7 +195,18 @@ def main() -> None:
 
     with metrics_column:
         st.subheader("Metriche")
-        st.info("KPI e grafico verranno collegati nelle task T19-T21.")
+        stroke_slot = st.empty()
+        fluidity_slot = st.empty()
+        last_kpi = st.session_state.get(
+            "last_kpi", {"stroke_count": 0, "fluidity_score": 0.0}
+        )
+        render_kpis(
+            stroke_slot,
+            fluidity_slot,
+            last_kpi["stroke_count"],
+            last_kpi["fluidity_score"],
+        )
+        st.info("Il grafico dell'onda Y del polso verrà aggiunto nella task T20.")
 
     st.divider()
     st.caption(
