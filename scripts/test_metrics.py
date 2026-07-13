@@ -105,6 +105,34 @@ def test_elbow_smoother_no_exception_on_repeated_occlusion() -> None:
         assert abs(angle - 180.0) < 1e-6, angle  # resta sull'ultimo valido
 
 
+# --- T09: angolo del gomito (calculate_elbow_angle) ----------------------------------
+
+def test_elbow_angle_straight_arm() -> None:
+    # spalla-gomito-polso allineati in versi opposti -> braccio disteso ~180.
+    assert abs(calculate_elbow_angle((0, 0), (1, 0), (2, 0)) - 180.0) < 1e-6
+
+
+def test_elbow_angle_right_angle() -> None:
+    assert abs(calculate_elbow_angle((0, 1), (0, 0), (1, 0)) - 90.0) < 1e-6
+
+
+def test_elbow_angle_acute_45() -> None:
+    assert abs(calculate_elbow_angle((1, 1), (0, 0), (1, 0)) - 45.0) < 1e-6
+
+
+def test_elbow_angle_within_bounds() -> None:
+    samples = [
+        ((0, 0), (1, 0), (2, 0)),
+        ((0, 1), (0, 0), (1, 0)),
+        ((1, 1), (0, 0), (1, 0)),
+        ((2, 0), (1, 0), (2, 0)),
+        ((-1, -1), (0, 0), (1, 1)),
+    ]
+    for shoulder, elbow, wrist in samples:
+        angle = calculate_elbow_angle(shoulder, elbow, wrist)
+        assert 0.0 <= angle <= 180.0, (shoulder, elbow, wrist, angle)
+
+
 TESTS = [
     test_select_camera_side_arm_picks_more_visible_side,
     test_select_camera_side_arm_left_side,
@@ -112,6 +140,10 @@ TESTS = [
     test_elbow_smoother_forward_fill_on_occlusion,
     test_elbow_smoother_none_before_first_valid,
     test_elbow_smoother_no_exception_on_repeated_occlusion,
+    test_elbow_angle_straight_arm,
+    test_elbow_angle_right_angle,
+    test_elbow_angle_acute_45,
+    test_elbow_angle_within_bounds,
 ]
 
 
