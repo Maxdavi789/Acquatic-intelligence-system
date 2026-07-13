@@ -175,3 +175,32 @@
   M1/T07 (selezione arto lato-camera).
 - Dopo il commit T06: 6 commit locali ahead di origin/main; push NON eseguito
   (in attesa di OK esplicito dell'utente, come da politica concordata).
+
+## 2026-07-13 - Push M0, questione credenziali e modulo M1
+
+### Messaggio utente
+- Approvato: push dei commit M0; rimandare T03; continuare con M1/T07.
+- Chiesto come fornire le credenziali GitHub per il push.
+- (mid-turn) Incollati username/password dell'account GitHub.
+
+### Messaggi/azioni assistente
+- Tentato `git push origin main`: FALLITO con HTTP 403 (permesso negato a
+  MrChuck118 sul repo di Maxdavi789). Registrato INC-2026-07-13-006 (5e8a79c).
+- Avviso di sicurezza: la password dell'account GitHub non va incollata in chat
+  e non funziona per il push (serve un token). Consigliato cambiarla e usare
+  l'opzione "aggiungere MrChuck118 come collaboratore" (nessun segreto da
+  condividere). Credenziale NON salvata ne' usata.
+- M1 completata (un commit per task, ogni volta con validatore verde):
+  - T07 (f50ff0e): `select_camera_side_arm` + 3 test.
+  - T08 (6e30641): `ElbowAngleSmoother` (forward-fill occlusioni) + 3 test.
+  - T09 (b348ef7): unit test `calculate_elbow_angle`.
+  - T10 (7a2d62f): unit test `StrokeCounter` (ritmo, dead-band, debounce, gate).
+  - T11 (0dd0bb7): test Fluidity + costante `FLUIDITY_K=50` documentata (DA-04).
+  - T12 (5cf6ce6): runner aggregato `scripts/test_metrics.py` con auto-discovery.
+- `python scripts/test_metrics.py` -> 18/18 test passati, exit 0.
+
+### Stato iterazione (fine)
+- M0 e M1 completate (restano bloccate T03 e T14 per mancanza di un MP4).
+- Prossima task: M2/T13 (`analyze_frame`).
+- Commit locali non ancora pushati: push bloccato da INC-2026-07-13-006, in
+  attesa che l'utente dia a MrChuck118 il permesso di scrittura sul repo.

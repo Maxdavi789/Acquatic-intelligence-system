@@ -5,24 +5,22 @@ Data aggiornamento: 2026-07-13
 ## Stato Generale
 
 Repository: `https://github.com/Maxdavi789/Acquatic-intelligence-system.git`,
-branch `main`, locale AVANTI di 6 commit rispetto a `origin/main` (push non
-ancora eseguito, in attesa di OK utente).
+branch `main`. Il locale e' AVANTI di diversi commit rispetto a `origin/main`:
+il push e' attualmente bloccato (vedi `incidents.md` INC-2026-07-13-006, la
+macchina e' autenticata come MrChuck118 senza permesso di scrittura).
 
-Questo file e' allineato al documento `breakdown_tasks_v1` (task T01-T41) e alla
-specifica congelata v1.1. La root della repo resta la root logica del progetto.
+Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 
-> Correzione storica: la versione 2026-05-28 di questo status indicava come
-> prossima task "FASE 3 dashboard con KPI Simmetria". Indicazione SUPERATA:
-> nella spec v1.1 il Symmetry Score e' fuori scope MVP (DA-01 = A). Dettagli in
-> `incidents.md` (INC-2026-07-13-003) e `SPEC_ERRATA.md`.
+> Correzione storica: la versione 2026-05-28 indicava "FASE 3 con KPI Simmetria".
+> Superata: la simmetria e' fuori scope MVP (DA-01 = A). Vedi SPEC_ERRATA.md.
 
 ## Stato base esistente
 
 | Elemento | Stato | Note |
 | --- | --- | --- |
-| FASE 0 - scaffold e ambiente | Completata | File progetto e struttura presenti; venv 3.12 ricreato in questo percorso. |
+| FASE 0 - scaffold e ambiente | Completata | Struttura presente; venv 3.12 ricreato in questo percorso. |
 | FASE 1 - `vision_tracker.py` | Implementata | Webcam/MP4, resize, MediaPipe Pose, overlay. Test reale ancora da fare (T03). |
-| FASE 2 - `metrics_engine.py` | Implementata + allineata | Angolo gomito, StrokeCounter, Fluidity. Symmetry ora airbag (T05). Mancano ancora selezione arto lato-camera, forward-fill, `analyze_frame` e i test (M1/M2). |
+| FASE 2 - `metrics_engine.py` | Implementata + hardening M1 | Angolo gomito, StrokeCounter, Fluidity (K documentata). Symmetry airbag (T05). Aggiunti select_camera_side_arm (T07) e ElbowAngleSmoother (T08). Manca solo `analyze_frame` (M2/T13). |
 | FASE 3 - `app.py` | Non iniziata | File vuoto (M3). |
 | FASE 4 - persistenza/robustezza/demo | Non iniziata | Dipende da M2-M3. |
 
@@ -31,8 +29,8 @@ specifica congelata v1.1. La root della repo resta la root logica del progetto.
 | Modulo | Descrizione | Task | Stato |
 | --- | --- | --- | --- |
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Completata (T03 bloccata) |
-| M1 | Hardening motore metriche | T07-T12 | Prossima |
-| M2 | Step di analisi per-frame (glue) | T13-T14 | Da iniziare |
+| M1 | Hardening motore metriche | T07-T12 | Completata |
+| M2 | Step di analisi per-frame (glue) | T13-T14 | Prossima |
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Da iniziare |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
@@ -42,34 +40,45 @@ specifica congelata v1.1. La root della repo resta la root logica del progetto.
 
 ## Dettaglio M0
 
-| Task | Descrizione | Stato | Note |
-| --- | --- | --- | --- |
-| T01 | Congelare spec e sostituire `spec.txt` con v1.1 | Completata | spec.txt = v1.1 ASCII, stato CONGELATA (commit ca30745). |
-| T02 | Pin versione MediaPipe (DA-06) | Completata | `mediapipe==0.10.35` pinnato; import OK su venv 3.12 (commit 4c9e0bf). |
-| T03 | Test reale FASE 1 su MP4 provvisorio + webcam | Bloccata | venv pronto; manca un MP4 laterale provvisorio in `test_videos/`. |
-| T04 | Decisione `matplotlib` (DA-07) | Completata | Rimosso da requirements; resta transitivo via mediapipe (commit 61a96ea). |
-| T05 | Demossione Symmetry Score ad airbag (DA-01=A) | Completata | `calculate_symmetry_score` marcata airbag, 0 chiamate attive (commit a7d399a). |
-| T06 | Aggiornare governance con la nuova baseline | Completata | Baseline registrata in prompt_log/incidents/questo file. |
+| Task | Stato | Note |
+| --- | --- | --- |
+| T01 | Completata | spec.txt = v1.1 ASCII, CONGELATA (ca30745). |
+| T02 | Completata | `mediapipe==0.10.35` pinnato; import OK venv 3.12 (4c9e0bf). |
+| T03 | Bloccata | Serve un MP4 laterale provvisorio in `test_videos/`. |
+| T04 | Completata | matplotlib rimosso; transitivo via mediapipe (61a96ea). |
+| T05 | Completata | `calculate_symmetry_score` airbag, 0 chiamate (a7d399a). |
+| T06 | Completata | Baseline registrata nei file di governance (9f4a085). |
+
+## Dettaglio M1
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T07 | Completata | `select_camera_side_arm` + test (f50ff0e). |
+| T08 | Completata | `ElbowAngleSmoother` forward-fill + test (6e30641). |
+| T09 | Completata | Unit test `calculate_elbow_angle` (b348ef7). |
+| T10 | Completata | Unit test `StrokeCounter` (7a2d62f). |
+| T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
+| T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
+
+Validatore: `python scripts/test_metrics.py` -> 18/18 test, exit 0.
 
 ## Governance
 
-- Step 0 (scaffolding): creato `SPEC_ERRATA.md`; aggiornati `prompt_log.md`,
-  `incidents.md` e questo file; riallineamento a T01-T41 (commit 05f13d7).
-- Ambiente: creato `venv` (Python 3.12), dipendenze installate; mediapipe
-  0.10.35 importa senza fallback a 3.11.
+- Step 0 (05f13d7): SPEC_ERRATA.md + riallineamento a T01-T41.
+- Ambiente: venv Python 3.12, dipendenze installate, mediapipe 0.10.35.
 - Commit locali per task (prefisso task ID). Push su `origin` solo dopo OK
-  esplicito dell'utente.
+  utente; attualmente bloccato da INC-2026-07-13-006.
 
 ## Prossima Task
 
-M1 / T07 - selezione arto lato-camera in `metrics_engine.py` (hardening motore
-metriche, non richiede video reale). In alternativa, appena disponibile un MP4
-laterale provvisorio, sbloccare T03 (test reale FASE 1).
+M2 / T13 - `analyze_frame(landmarks, timestamp, state)`: orchestrare per-frame
+selezione arto (T07) + angolo con forward-fill (T08) + StrokeCounter, restituendo
+un dict senza campo simmetria. Non richiede video reale.
 
 ## Task Arretrate o Bloccate
 
-- T03 (test reale FASE 1): venv pronto; manca un MP4 laterale provvisorio da
-  mettere in `test_videos/`. Sblocca anche la validazione T14/T30.
-- `data/sessions.csv` non creato: verra' generato dal modulo di export (M4).
-- GitHub CLI (`gh`) non installato/autenticato: non blocca il push via Git HTTPS.
-- 6 commit locali non ancora pushati su `origin/main` (in attesa di OK utente).
+- T03 (test reale FASE 1) e T14 (validazione CLI): servono un MP4 laterale
+  provvisorio in `test_videos/`.
+- Push su `origin` bloccato: INC-2026-07-13-006 (credenziali GitHub di un altro
+  account). I commit restano al sicuro in locale.
+- `data/sessions.csv` non creato: generato dal modulo di export (M4).
