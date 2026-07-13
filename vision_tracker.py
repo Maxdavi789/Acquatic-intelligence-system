@@ -110,24 +110,32 @@ def process_pose_frame(
     return frame, landmarks
 
 
+def create_pose_estimator() -> Any:
+    """Crea l'estimatore MediaPipe Pose con i parametri della spec (sez. 9.2).
+
+    Unico punto di configurazione del modello: riusato dal loop CLI, dallo
+    script di validazione T14 e dalla dashboard Streamlit (T17+).
+    """
+    return mp.solutions.pose.Pose(
+        static_image_mode=False,
+        model_complexity=1,
+        smooth_landmarks=True,
+        enable_segmentation=False,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
+    )
+
+
 def run_pose_tracking(
     source: str | int = 0,
     max_width: int = DEFAULT_MAX_WIDTH,
     window_name: str = DEFAULT_WINDOW_NAME,
 ) -> None:
     """Avvia il loop OpenCV + MediaPipe e chiude tutto premendo q."""
-    mp_pose = mp.solutions.pose
     capture = open_video_capture(source)
 
     try:
-        with mp_pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            smooth_landmarks=True,
-            enable_segmentation=False,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
-        ) as pose:
+        with create_pose_estimator() as pose:
             while True:
                 ok, frame = capture.read()
                 if not ok:

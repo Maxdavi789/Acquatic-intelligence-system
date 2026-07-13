@@ -30,11 +30,11 @@ import cv2  # noqa: E402
 # vision_tracker configura MPLCONFIGDIR prima di importare mediapipe.
 from vision_tracker import (  # noqa: E402
     DEFAULT_MAX_WIDTH,
+    create_pose_estimator,
     open_video_capture,
     process_pose_frame,
     resize_frame,
 )
-import mediapipe as mp  # noqa: E402
 
 from metrics_engine import FrameAnalysisState, analyze_frame  # noqa: E402
 
@@ -66,16 +66,8 @@ def analyze_video(
     max_angle: float | None = None
     result: dict = {}
 
-    mp_pose = mp.solutions.pose
     try:
-        with mp_pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            smooth_landmarks=True,
-            enable_segmentation=False,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
-        ) as pose:
+        with create_pose_estimator() as pose:
             while True:
                 ok, frame = capture.read()
                 if not ok:

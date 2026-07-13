@@ -3,7 +3,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import cv2
 import streamlit as st
+
+# vision_tracker configura MPLCONFIGDIR prima di importare mediapipe.
+from vision_tracker import (
+    create_pose_estimator,
+    open_video_capture,
+    process_pose_frame,
+    resize_frame,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 UPLOAD_CACHE_DIR = PROJECT_ROOT / ".cache"
@@ -74,8 +83,58 @@ def render_input_selector() -> None:
         )
 
 
+def render_video_stream(source: str | int, placeholder: Any) -> int:
+    """Loop di rendering della task T17 (RF-003).
+
+    Legge i frame dalla sorgente, esegue MediaPipe Pose con overlay scheletro
+    (riuso delle funzioni di `vision_tracker`) e aggiorna il placeholder
+    Streamlit: e' il sostituto di `cv2.imshow`, non utilizzabile qui (spec
+    sez. 14.2). Restituisce il numero di frame renderizzati; le risorse
+    vengono sempre rilasciate a fine stream (RF-013).
+    """
+    capture = open_video_capture(source)
+    frames_rendered = 0
+
+    try:
+        with create_pose_estimator() as pose:
+            while True:
+                ok, frame = capture.read()
+                if not ok:
+                    break
+
+                frame = resize_frame(frame)
+                annotated_frame, _landmarks = process_pose_frame(frame, pose)
+                placeholder.image(
+                    cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB),
+                    channels="RGB",
+                    use_container_width=True,
+                )
+                frames_rendered += 1
+    finally:
+        capture.release()
+
+    return frames_rendered
+
+
+def render_video_section() -> None:
+    """Colonna video: selettore input (T16) + rendering annotato (T17)."""
+    render_input_selector()
+    source = st.session_state.get("video_source")
+
+    if isinstance(source, str):
+        if st.button("Avvia elaborazione video", type="primary"):
+            placeholder = st.empty()
+            frames_rendered = render_video_stream(source, placeholder)
+            st.caption(f"Elaborazione terminata: {frames_rendered} frame renderizzati.")
+    elif source == WEBCAM_DEVICE_INDEX:
+        st.info(
+            "L'elaborazione live della webcam verrà collegata nella task T28 "
+            "(percorso best-effort)."
+        )
+
+
 def main() -> None:
-    """Renderizza la dashboard: layout T15 + selettore input T16."""
+    """Renderizza la dashboard: layout T15 + input T16 + rendering video T17."""
     st.title("AI Swimming Motion Analyzer")
     st.caption("Proof of Concept locale per l'analisi di movimenti natatori a secco")
 
@@ -83,7 +142,7 @@ def main() -> None:
 
     with video_column:
         st.subheader("Video")
-        render_input_selector()
+        render_video_section()
 
     with metrics_column:
         st.subheader("Metriche")
