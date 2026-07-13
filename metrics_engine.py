@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from statistics import mean
+from typing import Any
 
 import numpy as np
 
@@ -26,6 +27,70 @@ def calculate_elbow_angle(shoulder: Point2D, elbow: Point2D, wrist: Point2D) -> 
         angle = 360.0 - angle
 
     return float(angle)
+
+
+# Indici MediaPipe Pose per gli arti (spalla, gomito, polso).
+LEFT_ARM_LANDMARK_IDS = (11, 13, 15)   # lato sinistro
+RIGHT_ARM_LANDMARK_IDS = (12, 14, 16)  # lato destro
+
+
+def _landmark_field(landmark: Any, field_name: str) -> float:
+    """Legge un campo (x/y/visibility) da un landmark dict o oggetto."""
+    if isinstance(landmark, dict):
+        return float(landmark[field_name])
+    return float(getattr(landmark, field_name))
+
+
+def select_camera_side_arm(landmarks: Any) -> dict | None:
+    """Seleziona l'arto lato-camera (visibility media piu' alta) e ne restituisce
+    spalla, gomito e polso come punti (x, y).
+
+    landmarks: sequenza indicizzabile dei 33 landmark MediaPipe, dove ogni
+    elemento e' un dict con chiavi 'x','y','visibility' (come prodotto da
+    vision_tracker.extract_pose_landmarks) oppure un oggetto con gli stessi
+    attributi.
+
+    Coerente con la vista laterale (spec sez. 9.3, RF-004): tra arto sinistro
+    (11/13/15) e destro (12/14/16) sceglie quello con visibility media piu' alta.
+
+    Ritorna un dict con: arm_side ('left'/'right'), shoulder, elbow, wrist come
+    tuple (x, y), mean_visibility (usata per la scelta del lato) e min_visibility
+    (usata dalla logica forward-fill in T08). Ritorna None se i landmark non sono
+    disponibili o insufficienti.
+    """
+    if not landmarks or len(landmarks) <= max(RIGHT_ARM_LANDMARK_IDS):
+        return None
+
+    def side_stats(ids: tuple[int, int, int]) -> tuple[float, float]:
+        vis = [_landmark_field(landmarks[i], "visibility") for i in ids]
+        return sum(vis) / len(vis), min(vis)
+
+    left_mean, left_min = side_stats(LEFT_ARM_LANDMARK_IDS)
+    right_mean, right_min = side_stats(RIGHT_ARM_LANDMARK_IDS)
+
+    if right_mean > left_mean:
+        side, ids, mean_vis, min_vis = "right", RIGHT_ARM_LANDMARK_IDS, right_mean, right_min
+    else:
+        side, ids, mean_vis, min_vis = "left", LEFT_ARM_LANDMARK_IDS, left_mean, left_min
+
+    shoulder_id, elbow_id, wrist_id = ids
+    return {
+        "arm_side": side,
+        "shoulder": (
+            _landmark_field(landmarks[shoulder_id], "x"),
+            _landmark_field(landmarks[shoulder_id], "y"),
+        ),
+        "elbow": (
+            _landmark_field(landmarks[elbow_id], "x"),
+            _landmark_field(landmarks[elbow_id], "y"),
+        ),
+        "wrist": (
+            _landmark_field(landmarks[wrist_id], "x"),
+            _landmark_field(landmarks[wrist_id], "y"),
+        ),
+        "mean_visibility": mean_vis,
+        "min_visibility": min_vis,
+    }
 
 
 def calculate_fluidity_score(peak_timestamps: list[float]) -> float:
