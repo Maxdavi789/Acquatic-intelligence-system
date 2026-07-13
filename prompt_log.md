@@ -365,3 +365,46 @@
 - Prossima task in ordine: T14 (bloccata). Prossima eseguibile: M3/T15.
 - Tutto il nuovo lavoro resta in commit locali; push non autorizzato ne'
   eseguito.
+
+## 2026-07-13 12:21 +02:00 - Valutazione del video candidato per T03/T14
+
+### Messaggio utente
+- Fornito `C:\Users\user\Downloads\videoplayback.mp4` e chiesto se il video e'
+  idoneo; in caso contrario, richiesta una descrizione piu' specifica del video
+  necessario.
+
+### Messaggi/azioni assistente
+- Comunicato che la valutazione avrebbe coperto integrita' tecnica,
+  inquadratura laterale 90 gradi e tracciabilita' MediaPipe, senza copiare il
+  file nella repo ne' modificare codice/dipendenze.
+- Verificato il file: 23.585.142 byte, SHA256
+  `F6A7E6959BE5826E3E1D0CB15C70B967EB27932E15A3866172D123F282D2F716`.
+- Estratti metadati con OpenCV: H.264, 640x360, 30 fps, 7.660 frame, durata
+  255,3 secondi.
+- Eseguita decodifica sequenziale completa: 7.660/7.660 frame letti; il file e'
+  tecnicamente integro.
+- Creata in `C:\tmp` una contact sheet diagnostica di 12 frame distribuiti nel
+  video e ispezionata visivamente.
+- Riscontro visivo comunicato: montaggio subacqueo lungo, intro, cambi scena e
+  prospettiva, soggetti diversi, bolle/occlusioni, tratti senza atleta e
+  inquadratura non costantemente laterale. Non rispetta il protocollo dryland
+  controllato della spec.
+- Tentato un campionamento MediaPipe a 1 fps per misurare detection/visibility.
+  Il test si e' fermato prima dell'analisi perche' `mediapipe==0.10.35` non
+  espone `mp.solutions`.
+- Verificato che non esistono `mediapipe.python` o
+  `mediapipe.python.solutions`; `vision_tracker.py` importa ma non puo' eseguire
+  `mp.solutions.pose` nell'ambiente corrente. Registrato INC-008.
+- Registrato INC-009 per il video candidato non idoneo. Nessun downgrade,
+  migrazione, modifica applicativa, commit o push eseguito.
+
+### Esito
+- Il file e' valido come MP4 ma NON idoneo a chiudere T03/T14 e non va copiato
+  in `test_videos/` come riferimento.
+- Puo' essere usato in futuro soltanto come stress test subacqueo/fuori
+  distribuzione, separato dalla validazione MVP.
+- Serve una clip propria a secco, continua, con camera fissa a 90 gradi, una
+  sola persona completamente visibile, sfondo semplice, luce uniforme e
+  ripetizioni chiare del gesto.
+- Prima di eseguire T03 va inoltre risolto separatamente INC-008 sull'API
+  MediaPipe legacy.

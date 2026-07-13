@@ -19,7 +19,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | Elemento | Stato | Note |
 | --- | --- | --- |
 | FASE 0 - scaffold e ambiente | Completata | Struttura presente; venv 3.12 ricreato in questo percorso. |
-| FASE 1 - `vision_tracker.py` | Implementata | Webcam/MP4, resize, MediaPipe Pose, overlay. Test reale ancora da fare (T03). |
+| FASE 1 - `vision_tracker.py` | Implementata, runtime bloccato | Webcam/MP4, resize, MediaPipe Pose, overlay. T03 bloccata da video non idoneo e da `mp.solutions` assente nell'ambiente (INC-008/009). |
 | FASE 2 - `metrics_engine.py` | Implementata + hardening M1 + T13 | Angolo gomito, StrokeCounter, Fluidity (K documentata), selezione arto, smoothing e `analyze_frame`. Symmetry resta airbag fuori pipeline. |
 | FASE 3 - `app.py` | Non iniziata | File vuoto (M3). |
 | FASE 4 - persistenza/robustezza/demo | Non iniziata | Dipende da M2-M3. |
@@ -44,7 +44,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | --- | --- | --- |
 | T01 | Completata | spec.txt = v1.1 ASCII, CONGELATA (ca30745). |
 | T02 | Completata | `mediapipe==0.10.35` pinnato; import OK venv 3.12 (4c9e0bf). |
-| T03 | Bloccata | Serve un MP4 laterale provvisorio in `test_videos/`. |
+| T03 | Bloccata | `videoplayback.mp4` rifiutato: montaggio subacqueo non controllato. Serve un MP4 dryland laterale; va inoltre risolto INC-008 (`mp.solutions` assente). |
 | T04 | Completata | matplotlib rimosso; transitivo via mediapipe (61a96ea). |
 | T05 | Completata | `calculate_symmetry_score` airbag, 0 chiamate (a7d399a). |
 | T06 | Completata | Baseline registrata nei file di governance (9f4a085). |
@@ -67,7 +67,7 @@ Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
 | Task | Stato | Note |
 | --- | --- | --- |
 | T13 | Completata | `FrameAnalysisState` + `analyze_frame`; contratto a sei chiavi, persistenza, occlusione e frame senza landmark coperti da test sintetici. |
-| T14 | Bloccata | Serve il test reale T03 e un MP4 laterale provvisorio. |
+| T14 | Bloccata | Serve il test reale T03, un MP4 laterale idoneo e la risoluzione di INC-008. |
 
 ## Governance
 
@@ -80,15 +80,16 @@ Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
 
 ## Prossima Task
 
-- Prossima task in ordine: M2/T14, attualmente bloccata dalla mancanza del video
-  richiesto anche da T03.
+- Prossima task in ordine: M2/T14, attualmente bloccata dalla mancanza di un
+  video idoneo e dall'assenza dell'API legacy MediaPipe (INC-008/009).
 - Prossima task eseguibile senza video: M3/T15, scaffold Streamlit e layout a
   due colonne. T17 restera' comunque bloccata finche' T03 non viene validata.
 
 ## Task Arretrate o Bloccate
 
-- T03 (test reale FASE 1) e T14 (validazione CLI): servono un MP4 laterale
-  provvisorio in `test_videos/`.
+- T03 (test reale FASE 1) e T14 (validazione CLI): il candidato
+  `videoplayback.mp4` non e' idoneo. Serve un MP4 dryland laterale controllato e
+  va risolto INC-008 prima di eseguire il tracking.
 - Push su `origin`: risolto (MrChuck118 aggiunto come collaboratore); locale e
   origin erano allineati all'inizio dell'audit; il nuovo lavoro Codex non e'
   ancora stato pushato.

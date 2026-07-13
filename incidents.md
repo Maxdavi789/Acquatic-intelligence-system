@@ -196,3 +196,35 @@
 - Azione eseguita: il confronto usa `peak_y >= shoulder_y` per rifiutare il
   picco; aggiunto il test `test_stroke_counter_shoulder_gate_blocks_equal_height`.
   Validatore completo: 19/19 test passati, exit code 0.
+
+### INC-2026-07-13-008 - MediaPipe 0.10.35 non espone l'API legacy solutions
+- Tipo: dipendenza/runtime.
+- Evidenza: nell'ambiente corrente `mediapipe==0.10.35` importa, ma
+  `hasattr(mediapipe, "solutions")` e' `False`; non esistono neppure i moduli
+  `mediapipe.python` / `mediapipe.python.solutions`. Il pacchetto installato
+  contiene solo `modules` e `tasks` al top level.
+- Impatto: `vision_tracker.py` usa `mp.solutions.pose` e quindi T03/T14 non
+  possono eseguire il pose tracking con l'ambiente attuale, indipendentemente
+  dalla qualita' del video. I precedenti import check non esercitavano questa
+  API runtime.
+- Stato: aperto.
+- Azione prevista: prima di T03 verificare una versione MediaPipe realmente
+  compatibile con l'API legacy richiesta dalla spec, oppure formalizzare una
+  diversa decisione tecnica. Nessun downgrade/migrazione eseguito durante la
+  sola valutazione del video.
+
+### INC-2026-07-13-009 - Video candidato non adatto a T03/T14
+- Tipo: input di validazione / protocollo di ripresa.
+- Evidenza: `videoplayback.mp4` e' un H.264 640x360 a 30 fps, durata 255,3 s,
+  tecnicamente integro (7.660/7.660 frame decodificati). Visivamente e' pero'
+  un montaggio subacqueo con intro, cambi scena/inquadratura, piu' soggetti,
+  bolle/occlusioni, tratti vuoti, watermark e prospettive non costantemente
+  laterali a 90 gradi.
+- Impatto: non consente una misura riproducibile ne' il confronto manuale del
+  conteggio; viola il protocollo dryland controllato della spec e non puo'
+  soddisfare il DoD T03/T14.
+- Stato: mitigato; candidato rifiutato come video di riferimento/provvisorio.
+- Azione prevista: richiedere una clip propria, continua e fissa, a secco, con
+  una sola persona interamente visibile di profilo e ripetizioni chiare del
+  movimento. Il file rifiutato puo' essere conservato solo come futuro stress
+  test fuori distribuzione, non come validazione ufficiale.
