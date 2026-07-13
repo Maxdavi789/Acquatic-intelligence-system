@@ -16,47 +16,31 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
   - M0: 5/6 task completate; T03 resta bloccata per mancanza MP4.
   - M1 (T07-T12): hardening del motore metriche + suite di test. Codex ha
     corretto anche il bordo T10 `peak_y == shoulder_y` con test di regressione.
+  - M2/T13: `FrameAnalysisState` e `analyze_frame` implementati e validati su
+    input sintetici; T14 resta bloccata dal video.
 - Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
   allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
   un OK esplicito per il push; usare `git status` per lo stato corrente.
 - Convenzione commit: UN commit per task, messaggio con prefisso task ID
   (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
 
-## 2. PROSSIMA TASK -> M2 / T13
+## 2. PUNTO DI RIPRESA -> T14 bloccata; T15 eseguibile
 
-`analyze_frame(landmarks, timestamp, state)` in `metrics_engine.py` (glue
-vision -> metrics).
-
-- Cosa fare: orchestrare un singolo frame:
-  1. selezionare l'arto lato-camera con `select_camera_side_arm(landmarks)` (T07);
-  2. calcolare l'angolo del gomito con forward-fill tramite `ElbowAngleSmoother`
-     (T08), usando `min_visibility` restituito dalla selezione;
-  3. aggiornare uno `StrokeCounter` con `wrist_y`, `timestamp`, `shoulder_y`;
-  4. restituire un dict:
-     `{arm_side, elbow_angle, stroke_count, fluidity_score, wrist_y, peak_detected}`.
-  - NESSUN campo di simmetria (vedi trappola al par. 6).
-- Design suggerito: introdurre uno `state` (dataclass o dict) che tiene le
-  istanze persistenti di `StrokeCounter` e `ElbowAngleSmoother` tra un frame e
-  l'altro, cosi' che `analyze_frame` sia chiamabile in un loop.
-- Input reale dei landmark: `vision_tracker.extract_pose_landmarks(results)`
-  restituisce una lista di 33 dict con chiavi `id,x,y,z,visibility` (formato gia'
-  gestito da `select_camera_side_arm`). `wrist_y`/`shoulder_y` sono le Y
-  normalizzate dei landmark scelti.
-- DoD: chiamata su landmark sintetici -> dict completo e coerente; `grep` conferma
-  assenza di simmetria. Aggiungere il/i test in `scripts/test_metrics.py` e far
-  restare verde `python scripts/test_metrics.py`.
-- Refs: spec sez. 8.1, MVP-003/004/005/006.
-
-Dopo T13: T14 (validazione CLI su MP4) e' BLOCCATA finche' non c'e' un MP4
-laterale provvisorio in `test_videos/` (vedi par. 5). Poi si passa a M3
-(dashboard Streamlit in `app.py`, ancora vuoto).
+- T13 e' completata. `analyze_frame` restituisce le sei chiavi richieste, usa
+  stato persistente e non contiene simmetria.
+- Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
+  `wrist_y=None`; frame senza persona: stato invariato.
+- Validazione sintetica: 23/23 test passati, compilazione Python OK.
+- T14 e' la prossima task in ordine, ma richiede un MP4 laterale e il test T03.
+- In attesa del video, la prossima task eseguibile e' M3/T15: scaffold Streamlit
+  e layout a due colonne. `app.py` e' ancora vuoto.
 
 ## 3. Ambiente
 
 - Python: la spec fissa 3.11; in locale c'e' 3.12.10, con cui e' stato creato il
   `venv/` (gitignored). MediaPipe 0.10.35 importa senza problemi su 3.12.
 - Eseguire i test del motore:
-  `.\venv\Scripts\python.exe scripts\test_metrics.py`  (atteso: 18/18, exit 0).
+  `.\venv\Scripts\python.exe scripts\test_metrics.py`  (atteso: 23/23, exit 0).
 - Eseguire il pose tracking CLI:
   `.\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4`
 - Se il `venv` non c'e' (altra macchina): `python -m venv venv` poi
@@ -97,7 +81,7 @@ laterale provvisorio in `test_videos/` (vedi par. 5). Poi si passa a M3
 
 - `spec.txt` - specifica v1.1 CONGELATA (contesto globale per l'editor AI).
 - `metrics_engine.py` - motore metriche (angolo, stroke, fluidity, selezione
-  arto, smoother; simmetria airbag). Qui va `analyze_frame` (T13).
+  arto, smoother e `analyze_frame`; simmetria airbag fuori pipeline).
 - `vision_tracker.py` - ingestione video + MediaPipe Pose + overlay (FASE 1).
 - `app.py` - VUOTO: qui va la dashboard Streamlit (M3).
 - `scripts/test_metrics.py` - runner di validazione del motore (auto-discovery,

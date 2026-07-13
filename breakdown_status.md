@@ -20,7 +20,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | --- | --- | --- |
 | FASE 0 - scaffold e ambiente | Completata | Struttura presente; venv 3.12 ricreato in questo percorso. |
 | FASE 1 - `vision_tracker.py` | Implementata | Webcam/MP4, resize, MediaPipe Pose, overlay. Test reale ancora da fare (T03). |
-| FASE 2 - `metrics_engine.py` | Implementata + hardening M1 | Angolo gomito, StrokeCounter, Fluidity (K documentata). Symmetry airbag (T05). Aggiunti select_camera_side_arm (T07) e ElbowAngleSmoother (T08). Manca solo `analyze_frame` (M2/T13). |
+| FASE 2 - `metrics_engine.py` | Implementata + hardening M1 + T13 | Angolo gomito, StrokeCounter, Fluidity (K documentata), selezione arto, smoothing e `analyze_frame`. Symmetry resta airbag fuori pipeline. |
 | FASE 3 - `app.py` | Non iniziata | File vuoto (M3). |
 | FASE 4 - persistenza/robustezza/demo | Non iniziata | Dipende da M2-M3. |
 
@@ -30,7 +30,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | --- | --- | --- | --- |
 | M0 | Allineamento base esistente -> spec v1.1 | T01-T06 | Parziale: 5/6, T03 bloccata |
 | M1 | Hardening motore metriche | T07-T12 | Completata, inclusa correzione stretta gate spalla T10 |
-| M2 | Step di analisi per-frame (glue) | T13-T14 | Prossima |
+| M2 | Step di analisi per-frame (glue) | T13-T14 | T13 completata; T14 bloccata dal video |
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Da iniziare |
 | M4 | Persistenza CSV | T23-T25 | Da iniziare |
 | M5 | Robustezza e gestione errori | T26-T29 | Da iniziare |
@@ -60,8 +60,14 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | T11 | Completata | Test Fluidity + `FLUIDITY_K` documentata (0dd0bb7). |
 | T12 | Completata | Runner aggregato `scripts/test_metrics.py`: 18/18 (5cf6ce6). |
 
-Validatore dopo la correzione T10: `python scripts/test_metrics.py` -> 19/19
-test, exit 0.
+Validatore dopo T13: `python scripts/test_metrics.py` -> 23/23 test, exit 0.
+
+## Dettaglio M2
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T13 | Completata | `FrameAnalysisState` + `analyze_frame`; contratto a sei chiavi, persistenza, occlusione e frame senza landmark coperti da test sintetici. |
+| T14 | Bloccata | Serve il test reale T03 e un MP4 laterale provvisorio. |
 
 ## Governance
 
@@ -74,9 +80,10 @@ test, exit 0.
 
 ## Prossima Task
 
-M2 / T13 - `analyze_frame(landmarks, timestamp, state)`: orchestrare per-frame
-selezione arto (T07) + angolo con forward-fill (T08) + StrokeCounter, restituendo
-un dict senza campo simmetria. Non richiede video reale.
+- Prossima task in ordine: M2/T14, attualmente bloccata dalla mancanza del video
+  richiesto anche da T03.
+- Prossima task eseguibile senza video: M3/T15, scaffold Streamlit e layout a
+  due colonne. T17 restera' comunque bloccata finche' T03 non viene validata.
 
 ## Task Arretrate o Bloccate
 

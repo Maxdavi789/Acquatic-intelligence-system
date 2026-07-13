@@ -313,3 +313,55 @@
 - Nessun codice applicativo, fix T10, README/status/incidents, commit, push o
   pull applicato in questa iterazione. Unica modifica: questa entry obbligatoria
   di `prompt_log.md`. Attesa approvazione o correzione del piano.
+
+## 2026-07-13 12:07 +02:00 - Piano approvato, chiusura T10 e implementazione T13
+
+### Messaggio utente
+- L'utente ha approvato integralmente il piano con il messaggio: "procedi".
+
+### Messaggi/azioni assistente
+- Confermato che l'esecuzione sarebbe rimasta locale, senza push remoto.
+- Riallineata la governance: M0 corretto a 5/6 con T03 bloccata; rimossa la
+  frase obsoleta sul push bloccato; HANDOFF aggiornato; INC-003 chiuso.
+- Aggiornato il README in modo intermedio con obiettivo onesto, MP4 primario,
+  webcam sperimentale, stack reale, stato corrente, privacy e disclaimer. T37
+  resta aperta per la revisione conclusiva dopo la demo.
+- Eliminato il file locale vuoto e non tracciato `readme`, distinto da
+  `README.md`.
+- Registrato INC-2026-07-13-007 per la non conformita' stretta del gate spalla
+  T10. Creato il commit locale `addf0ca` (`governance: reconcile Codex handoff
+  before T13`).
+- Corretto T10: un picco con `peak_y == shoulder_y` viene ora rifiutato tramite
+  il confronto `peak_y >= shoulder_y`; aggiunto il test di regressione dedicato.
+- Validazione dopo T10: 19/19 test passati, exit code 0. INC-007 chiuso.
+- Il primo tentativo di staging T10 e' stato bloccato dal sandbox sulla scrittura
+  di `.git/index.lock`; ripetuto con autorizzazione per il solo commit locale.
+  Non e' un incidente del progetto e nessun push e' stato eseguito.
+- Creato il commit locale `4877e80` (`T10: enforce strict shoulder gate
+  regression`).
+- Implementato T13 in `metrics_engine.py`: aggiunta la dataclass
+  `FrameAnalysisState` con `StrokeCounter` ed `ElbowAngleSmoother` persistenti;
+  aggiunta `analyze_frame(landmarks, timestamp, state)`.
+- Il risultato T13 contiene sempre le sei chiavi richieste: `arm_side`,
+  `elbow_angle`, `stroke_count`, `fluidity_score`, `wrist_y`, `peak_detected`;
+  nessun campo simmetria.
+- Su landmark occlusi l'angolo viene forward-filled, il counter non viene
+  modificato e `wrist_y` e' `None`. Su frame senza landmark lo stato resta
+  invariato.
+- Aggiunti quattro test T13: contratto del dict, persistenza del counter,
+  occlusione senza contaminazione e assenza landmark.
+- Validazione finale: 23/23 test passati, exit code 0; compilazione Python di
+  motore, tracker e test riuscita; `git diff --check` verde; grep conferma che
+  la simmetria resta solo nella funzione airbag e non nella nuova pipeline.
+- Aggiornati `breakdown_status.md`, `HANDOFF.md` e README: T13 completata, T14
+  bloccata dal video, prossima task eseguibile senza video M3/T15.
+- Preparato il commit locale T13 in chiusura della presente iterazione. Nessun
+  pull o push eseguito.
+
+### Stato iterazione
+- Governance riallineata, arretrata T10 chiusa e M2/T13 completata.
+- Suite corrente: 23/23 test verdi.
+- T03 e T14 restano bloccate finche' l'utente non fornisce un MP4 laterale.
+- Prossima task in ordine: T14 (bloccata). Prossima eseguibile: M3/T15.
+- Tutto il nuovo lavoro resta in commit locali; push non autorizzato ne'
+  eseguito.

@@ -43,8 +43,12 @@ Aggiornato al 2026-07-13.
   disponibile un MP4 laterale provvisorio per il test reale.
 - M1/T07-T12: completata; suite sintetica corrente 19/19 verde, inclusa la
   regressione sul gate spalla stretto di T10.
-- M2: prossima task T13, funzione `analyze_frame`; T14 dipende dal video di T03.
+- M2: T13 completata (`FrameAnalysisState` + `analyze_frame`); T14 dipende dal
+  video di T03 ed e' bloccata.
 - M3-M8: non iniziate.
+
+La prossima task in ordine e' T14 (bloccata); la prossima eseguibile senza video
+e' T15, scaffold della dashboard Streamlit.
 
 Lo stato task per task e' in [`breakdown_status.md`](breakdown_status.md).
 

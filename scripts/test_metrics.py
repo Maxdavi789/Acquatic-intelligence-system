@@ -18,9 +18,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from metrics_engine import (  # noqa: E402
     ElbowAngleSmoother,
+    FrameAnalysisState,
     LEFT_ARM_LANDMARK_IDS,
     RIGHT_ARM_LANDMARK_IDS,
     StrokeCounter,
+    analyze_frame,
     calculate_elbow_angle,
     calculate_fluidity_score,
     select_camera_side_arm,
@@ -39,6 +41,22 @@ def _make_landmarks(default_visibility: float = 0.5) -> list[dict]:
         }
         for i in range(33)
     ]
+
+
+def _set_arm_landmarks(
+    landmarks: list[dict],
+    side: str,
+    shoulder: tuple[float, float],
+    elbow: tuple[float, float],
+    wrist: tuple[float, float],
+    visibility: float,
+) -> None:
+    """Imposta geometria e visibility di un arto sintetico."""
+    ids = LEFT_ARM_LANDMARK_IDS if side == "left" else RIGHT_ARM_LANDMARK_IDS
+    for landmark_id, point in zip(ids, (shoulder, elbow, wrist), strict=True):
+        landmarks[landmark_id]["x"] = point[0]
+        landmarks[landmark_id]["y"] = point[1]
+        landmarks[landmark_id]["visibility"] = visibility
 
 
 # --- T07: selezione arto lato-camera -------------------------------------------------
@@ -225,6 +243,113 @@ def test_fluidity_never_negative() -> None:
     # Intervalli molto irregolari: il punteggio e' troncato a 0, mai negativo.
     score = calculate_fluidity_score([0.0, 0.01, 10.0, 10.01, 25.0])
     assert score >= 0.0, score
+
+
+# --- T13: analisi per-frame (glue vision -> metrics) ---------------------------------
+
+def test_analyze_frame_returns_complete_contract() -> None:
+    landmarks = _make_landmarks(default_visibility=0.1)
+    _set_arm_landmarks(
+        landmarks,
+        side="left",
+        shoulder=(0.0, 1.0),
+        elbow=(0.0, 0.0),
+        wrist=(1.0, 0.0),
+        visibility=0.9,
+    )
+
+    result = analyze_frame(landmarks, timestamp=0.0, state=FrameAnalysisState())
+
+    assert list(result) == [
+        "arm_side",
+        "elbow_angle",
+        "stroke_count",
+        "fluidity_score",
+        "wrist_y",
+        "peak_detected",
+    ], result
+    assert result["arm_side"] == "left", result
+    assert abs(result["elbow_angle"] - 90.0) < 1e-6, result
+    assert result["stroke_count"] == 0, result
+    assert result["fluidity_score"] == 0.0, result
+    assert result["wrist_y"] == 0.0, result
+    assert result["peak_detected"] is False, result
+
+
+def test_analyze_frame_persists_stroke_counter_state() -> None:
+    state = FrameAnalysisState()
+    result = None
+    for wrist_y, timestamp in _triangle_wave(cycles=3):
+        landmarks = _make_landmarks(default_visibility=0.1)
+        _set_arm_landmarks(
+            landmarks,
+            side="left",
+            shoulder=(0.0, 0.3),
+            elbow=(0.2, 0.3),
+            wrist=(0.4, wrist_y),
+            visibility=0.9,
+        )
+        result = analyze_frame(landmarks, timestamp=timestamp, state=state)
+
+    assert result is not None
+    assert result["stroke_count"] == 3, result
+    assert state.stroke_counter.stroke_count == 3
+
+
+def test_analyze_frame_occlusion_forward_fills_without_updating_counter() -> None:
+    state = FrameAnalysisState()
+    visible = _make_landmarks(default_visibility=0.1)
+    _set_arm_landmarks(
+        visible,
+        side="left",
+        shoulder=(0.0, 1.0),
+        elbow=(0.0, 0.0),
+        wrist=(1.0, 0.0),
+        visibility=0.9,
+    )
+    first = analyze_frame(visible, timestamp=0.0, state=state)
+    last_reliable_y = state.stroke_counter._last_y
+
+    occluded = _make_landmarks(default_visibility=0.1)
+    _set_arm_landmarks(
+        occluded,
+        side="left",
+        shoulder=(0.0, 0.0),
+        elbow=(1.0, 0.0),
+        wrist=(0.0, 10.0),
+        visibility=0.2,
+    )
+    second = analyze_frame(occluded, timestamp=0.1, state=state)
+
+    assert second["arm_side"] == "left", second
+    assert second["elbow_angle"] == first["elbow_angle"], (first, second)
+    assert second["wrist_y"] is None, second
+    assert second["peak_detected"] is False, second
+    assert state.stroke_counter._last_y == last_reliable_y
+
+
+def test_analyze_frame_without_landmarks_preserves_state() -> None:
+    state = FrameAnalysisState()
+    visible = _make_landmarks(default_visibility=0.1)
+    _set_arm_landmarks(
+        visible,
+        side="left",
+        shoulder=(0.0, 1.0),
+        elbow=(0.0, 0.0),
+        wrist=(1.0, 0.0),
+        visibility=0.9,
+    )
+    first = analyze_frame(visible, timestamp=0.0, state=state)
+    last_reliable_y = state.stroke_counter._last_y
+
+    missing = analyze_frame([], timestamp=0.1, state=state)
+
+    assert missing["arm_side"] is None, missing
+    assert missing["elbow_angle"] == first["elbow_angle"], (first, missing)
+    assert missing["stroke_count"] == first["stroke_count"], (first, missing)
+    assert missing["wrist_y"] is None, missing
+    assert missing["peak_detected"] is False, missing
+    assert state.stroke_counter._last_y == last_reliable_y
 
 
 def _collect_tests() -> list:

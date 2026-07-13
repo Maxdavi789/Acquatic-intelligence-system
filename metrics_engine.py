@@ -257,3 +257,76 @@ class StrokeCounter:
         self._last_peak_time = timestamp
         self.peak_timestamps.append(timestamp)
         return True
+
+
+@dataclass
+class FrameAnalysisState:
+    """Stato persistente condiviso tra le chiamate di ``analyze_frame``.
+
+    Le istanze stateful non vengono ricreate a ogni frame: in questo modo il
+    forward-fill dell'angolo, il debounce, il conteggio e la fluidita' restano
+    coerenti lungo l'intera sessione.
+    """
+
+    stroke_counter: StrokeCounter = field(default_factory=StrokeCounter)
+    elbow_smoother: ElbowAngleSmoother = field(default_factory=ElbowAngleSmoother)
+
+
+def analyze_frame(
+    landmarks: Any,
+    timestamp: float,
+    state: FrameAnalysisState,
+) -> dict[str, str | float | int | bool | None]:
+    """Orchestra selezione arto e metriche per un singolo frame.
+
+    Restituisce sempre il contratto T13 con le chiavi ``arm_side``,
+    ``elbow_angle``, ``stroke_count``, ``fluidity_score``, ``wrist_y`` e
+    ``peak_detected``. Se non ci sono landmark, lo stato non viene modificato.
+    Se l'arto selezionato e' occluso, l'angolo usa il forward-fill mentre il
+    contatore ignora le coordinate inaffidabili (RF-008, MVP-006).
+    """
+    selected_arm = select_camera_side_arm(landmarks)
+
+    if selected_arm is None:
+        counter_metrics = state.stroke_counter.snapshot(peak_detected=False)
+        return {
+            "arm_side": None,
+            "elbow_angle": state.elbow_smoother.last_angle,
+            "stroke_count": counter_metrics["stroke_count"],
+            "fluidity_score": counter_metrics["fluidity_score"],
+            "wrist_y": None,
+            "peak_detected": counter_metrics["peak_detected"],
+        }
+
+    elbow_angle = state.elbow_smoother.update(
+        shoulder=selected_arm["shoulder"],
+        elbow=selected_arm["elbow"],
+        wrist=selected_arm["wrist"],
+        min_visibility=selected_arm["min_visibility"],
+    )
+
+    landmarks_are_reliable = (
+        selected_arm["min_visibility"] >= state.elbow_smoother.visibility_threshold
+    )
+    if landmarks_are_reliable:
+        wrist_y = float(selected_arm["wrist"][1])
+        shoulder_y = float(selected_arm["shoulder"][1])
+        counter_metrics = state.stroke_counter.update(
+            wrist_y=wrist_y,
+            timestamp=float(timestamp),
+            shoulder_y=shoulder_y,
+        )
+    else:
+        # I landmark sotto soglia non devono contaminare direzione, debounce o
+        # grafico del polso; l'angolo e' gia' stato forward-filled dallo smoother.
+        wrist_y = None
+        counter_metrics = state.stroke_counter.snapshot(peak_detected=False)
+
+    return {
+        "arm_side": selected_arm["arm_side"],
+        "elbow_angle": elbow_angle,
+        "stroke_count": counter_metrics["stroke_count"],
+        "fluidity_score": counter_metrics["fluidity_score"],
+        "wrist_y": wrist_y,
+        "peak_detected": counter_metrics["peak_detected"],
+    }
