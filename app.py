@@ -239,6 +239,13 @@ def render_video_section(
             summary = render_video_stream(
                 source, placeholder, chart_slot, stroke_slot, fluidity_slot
             )
+            # T22: i risultati sopravvivono ai rerun di Streamlit (interazioni
+            # con i widget) finche' non parte una nuova elaborazione.
+            st.session_state["last_kpi"] = {
+                "stroke_count": summary["stroke_count"],
+                "fluidity_score": summary["fluidity_score"],
+            }
+            st.session_state["wrist_series"] = summary["wrist_series"]
             st.caption(
                 f"Elaborazione terminata: {summary['frames_rendered']} frame "
                 "renderizzati."
@@ -251,7 +258,12 @@ def render_video_section(
 
 
 def main() -> None:
-    """Renderizza la dashboard: layout T15 + input T16 + rendering video T17."""
+    """Renderizza la dashboard.
+
+    Layout a due colonne (T15), selettore input (T16), rendering video
+    annotato con angolo live (T17/T18), KPI e grafico onda Y collegati ai
+    dati reali (T19-T21), persistenza dei risultati tra i rerun (T22).
+    """
     st.title("AI Swimming Motion Analyzer")
     st.caption("Proof of Concept locale per l'analisi di movimenti natatori a secco")
 
@@ -273,9 +285,13 @@ def main() -> None:
             last_kpi["stroke_count"],
             last_kpi["fluidity_score"],
         )
-        chart_slot.caption(
-            "Il grafico dell'onda Y del polso si popola durante l'elaborazione."
-        )
+        persisted_series = st.session_state.get("wrist_series", [])
+        if persisted_series:
+            _update_wrist_chart(chart_slot, persisted_series)
+        else:
+            chart_slot.caption(
+                "Il grafico dell'onda Y del polso si popola durante l'elaborazione."
+            )
 
     with video_column:
         st.subheader("Video")
