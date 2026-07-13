@@ -44,8 +44,8 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M3 | Dashboard Streamlit `app.py` | T15-T22 | Completata: 8/8 |
 | M4 | Persistenza CSV | T23-T25 | Completata: 3/3 |
 | M5 | Robustezza e gestione errori | T26-T29 | Completata: 4/4 |
-| M6 | Test e validazione | T30-T33 | Completata: 4/4 (sul video provvisorio; da ripetere T30/T33 sul video ufficiale T35) |
-| M7 | Sandbox demo controllato | T34-T36 | Da iniziare |
+| M6 | Test e validazione | T30-T33 | Completata: 4/4; T30/T33 RIPETUTI sul video ufficiale (T30: diff 0; T33: identici) |
+| M7 | Sandbox demo controllato | T34-T36 | Completata: 3/3 in deroga DA-05 (video licenziato al posto del sandbox fisico, vedi SPEC_ERRATA) |
 | M8 | Demo, pitch e chiusura governance | T37-T41 | Da iniziare |
 
 ## Dettaglio M0
@@ -129,17 +129,23 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | T32 | Completata | Tre casi limite eseguiti e loggati (incidents.md): input non valido -> errore leggibile UI+CLI; fine stream -> chiusura pulita; stop a meta' -> release singolo, nessun handle. |
 | T33 | Completata (provvisorio) | Due run sullo stesso MP4: KPI IDENTICI (bracciate 2, fluidity 0.0, angolo medio 146,2519, max 179,9191), serie polso e serie angoli identiche frame per frame. 7/7 check. Da ripetere sul video ufficiale T35. |
 
+## Dettaglio M7
+
+| Task | Stato | Note |
+| --- | --- | --- |
+| T34 | Superata in deroga | Il sandbox fisico non e' realizzabile per l'MVP; le condizioni controllate sono garantite dalla clip scelta (camera fissa, sfondo uniforme, luce costante). Deroga DA-05/DA-08 formalizzata in SPEC_ERRATA (2026-07-14). L'allestimento proprio resta nella roadmap finanziata. |
+| T35 | Completata in deroga | Video ufficiale = Pexels 37264420 HD 720x1280 25fps, `test_videos/profilo_test.mp4`, VERSIONATO (licenza Pexels, 1,9 MB), SHA256 e fonte in SPEC_ERRATA (6adac64). Mulinelli ritmici in piedi: 10 cicli in 7 s. |
+| T36 | Completata | Giro completo pipeline sul video ufficiale: 175/175 frame, 10 bracciate, Fluidity 93,1, angoli [58,49; 179,92], grafico e KPI live, CSV esportato (riga: 10 / 93,1 / 163,17 / 179,92). Nessun picco spurio (intervalli >= 0,6 s; oscillazione bassa a f100 scartata dal gate spalla). 11/11 check. |
+
 ## Prossima Task
 
-- Prossima task in ordine: M7/T34, montare il sandbox controllato (spec
-  sez. 3.4, DA-08): AZIONE FISICA dell'utente (supporto camera fisso a 90
-  gradi, sfondo neutro, luci uniformi, marker a terra, costo 0, foto del
-  setup). Subito dopo T35: registrare il video ufficiale
-  `test_videos/profilo_test.mp4` nel sandbox, con bracciate CONTINUE e
-  RITMICHE (>= 4-5 cicli, vedi esito T30).
-- Software eseguibile senza sandbox nel frattempo: T36 attende T35;
-  di M8 sono anticipabili T37 (README finale) e T38 (screenshot) solo dopo
-  T36; T39 (slide pitch) e' preparabile in bozza.
+- Prossima task in ordine: M8/T37, README finale (descrizione onesta, "come
+  funziona", disclaimer non-medicale, vincolo 0 euro, roadmap sensori,
+  link alla spec e alla deroga video). Dipendenza T36 soddisfatta.
+- A seguire: T38 (screenshot/grafici per le slide: contact sheet e onda
+  gia' disponibili come base), T39 (slide pitch con richiesta fondi),
+  T40 (rehearsal demo x2 con il video ufficiale; da decidere l'eventuale
+  momento webcam live), T41 (chiusura governance).
 
 ## Task Arretrate o Bloccate
 

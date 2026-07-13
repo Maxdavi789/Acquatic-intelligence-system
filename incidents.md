@@ -294,6 +294,14 @@
   bracciate CONTINUE e RITMICHE (>= 4-5 cicli), per cui il debounce e il
   criterio +-1 sono progettati; su quel protocollo il plateau anomalo
   scompare.
+- Aggiornamento 2026-07-14 (T30 ripetuto sul VIDEO UFFICIALE): conteggio
+  manuale dal tracciato polso/spalla e dalla sequenza frame = 10 creste
+  complete sopra la quota spalla; conteggio automatico = 10.
+  |differenza| = 0: criterio pienamente soddisfatto. Bonus: attorno al
+  frame 100 c'e' un'oscillazione parziale che NON supera la spalla,
+  correttamente SCARTATA dal gate (prova visiva anti-falsi-positivi).
+  Anche T33 ripetuto sul video ufficiale: due run -> KPI e serie angoli
+  identici frame per frame.
 
 ### 2026-07-13 - T32: casi limite eseguiti e verificati (esito positivo)
 - Tipo: esito test M6, non incidente.
