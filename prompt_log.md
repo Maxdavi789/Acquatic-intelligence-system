@@ -564,3 +564,19 @@
   plausibili; resta da creare e validare lo script CLI previsto dal breakdown.
 - Il video provvisorio resta solo locale e fuori da Git per possibile licenza
   di terzi. Nessun push eseguito.
+
+## 2026-07-13 13:09 +02:00 - Richiesta commit/push per handoff
+
+### Messaggio utente
+- L'utente ha chiesto di eseguire commit e push appena terminato, per poter
+  continuare il lavoro da casa.
+
+### Messaggi/azioni assistente
+- Verificato lo stato prima del push: branch locale 7 commit avanti e 0
+  indietro rispetto a `origin/main`.
+- Confermato che le modifiche tecniche e di governance sono gia' committate.
+- Preparato questo commit di handoff del prompt log.
+- Il file `test_videos/profilo_provvisorio.mp4` resta deliberatamente untracked
+  ed escluso dal commit/push per la possibile licenza di terzi.
+- Azione autorizzata: push dei commit locali su `origin/main`, seguito da
+  verifica ahead/behind. Nessun altro file locale viene pubblicato.
