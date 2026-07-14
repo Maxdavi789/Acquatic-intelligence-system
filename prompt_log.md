@@ -1373,3 +1373,30 @@
 ### Stato iterazione
 - Server attivo; screenshot da rifare sul video ufficiale; fix INC-012
   proposti e in attesa di OK.
+
+## 2026-07-14 11:00 +02:00 - Screenshot rifatti sul video ufficiale: dashboard OK, gap T38 chiuso
+
+### Messaggio utente
+- "ora?" con i due nuovi screenshot allegati (rifatti dopo il rigetto dei
+  precedenti).
+
+### Verifica e azioni
+- Screenshot 105353 (dashboard completa): IDONEO. Video ufficiale
+  profilo_test.mp4 caricato, KPI reali 10 bracciate / Fluidity 93,1,
+  grafico onda con i 10 picchi regolari, angolo live sovrimpresso.
+  Numeri COERENTI con pitch deck e README. Nessun dato sensibile.
+- Screenshot 105401 (primo piano frame annotato): SCARTATO. Contiene il
+  popup dello Strumento di cattura sovrimpresso (con miniatura); inoltre
+  ridondante con demo_frame_annotato.png gia' esistente a piena
+  risoluzione. Nessuna nuova cattura necessaria.
+- Copiato lo screenshot idoneo come demo_dashboard.png sia nella cartella
+  Desktop pitch_claude_design sia in docs/pitch/ (versionato).
+- LEGGIMI_upload.txt aggiornato: demo_dashboard.png elencato (slide 5),
+  sezione "cosa manca" sostituita da "cartella COMPLETA".
+- Con questo si chiude il gap dichiarato in T38 (screenshot dashboard live
+  da rehearsal umana): tutti gli asset pitch sono ora reali e completi.
+
+### Stato iterazione
+- Cartella Desktop completa e pronta per l'upload su Claude Design.
+- Restano in attesa di OK i due fix di INC-012 (guard file_id upload +
+  width="stretch" al posto di use_container_width deprecato).
