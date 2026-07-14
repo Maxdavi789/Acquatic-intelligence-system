@@ -1400,3 +1400,29 @@
 - Cartella Desktop completa e pronta per l'upload su Claude Design.
 - Restano in attesa di OK i due fix di INC-012 (guard file_id upload +
   width="stretch" al posto di use_container_width deprecato).
+
+## 2026-07-14 11:10 +02:00 - Fix INC-012 approvati e applicati
+
+### Messaggio utente
+- "vai si procedi non avevo letto scusa": approvazione dei due fix.
+
+### Azioni
+- `app.py` / `persist_uploaded_video`: guard sul `file_id` in session_state
+  (+ controllo esistenza file): la cache `.cache/uploaded_session.mp4` viene
+  riscritta solo quando l'upload cambia davvero, mai a ogni rerun. Rimossa
+  la causa plausibile del segfault (troncamento del file sotto il decoder
+  nativo durante l'elaborazione).
+- `app.py` riga 213: `use_container_width=True` -> `width="stretch"` nel
+  rendering frame (deprecazione: un warning per frame eliminato).
+- Validazione: check funzionale dedicato del guard 4/4 (su path di test,
+  senza toccare la cache reale del server attivo); py_compile OK; AppTest
+  0 eccezioni; suite motore 23/23. INC-012 aggiornato a MITIGATO.
+- Nota operativa: Streamlit riesegue app.py dal sorgente a ogni rerun,
+  quindi basta ricaricare la pagina per avere il fix attivo; nessun
+  riavvio del server necessario.
+
+### Stato iterazione
+- INC-012 mitigato (resta il limite architetturale rerun-durante-inferenza,
+  con la raccomandazione demo di non toccare i widget durante il run).
+- Nessuna task di breakdown aperta; restano le azioni utente note
+  (rehearsal con proiettore, decisione momento webcam live).

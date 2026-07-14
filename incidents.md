@@ -400,6 +400,18 @@
   puo' interrompere l'inferenza nativa a meta' (spec sez. 14.2); il pattern
   `with create_pose_estimator()` per-run e' invece corretto (nessun oggetto
   Pose condiviso tra thread). Fix (1)+(2) in attesa di approvazione utente.
+- Aggiornamento 2026-07-14 (fix applicati con approvazione utente):
+  (1) `persist_uploaded_video` ora riscrive la cache SOLO quando il
+  `file_id` dell'upload cambia (guard in session_state + controllo
+  esistenza file); check funzionale dedicato 4/4: scrittura al primo
+  upload, NESSUNA riscrittura al rerun con lo stesso file, riscrittura su
+  upload nuovo, rigenerazione se la cache sparisce. (2) `placeholder.image`
+  usa `width="stretch"`: eliminato il warning di deprecazione per frame.
+  Validazione completa: py_compile OK, AppTest 0 eccezioni, suite 23/23.
+- Stato: MITIGATO. La causa plausibile del segfault (troncamento della
+  cache sotto il decoder) e' rimossa; resta il limite architetturale del
+  rerun durante l'inferenza nativa (documentato sopra), per cui vale
+  ancora la raccomandazione di non toccare i widget durante il run.
 
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.

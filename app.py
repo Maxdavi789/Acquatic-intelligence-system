@@ -52,12 +52,21 @@ st.set_page_config(
 def persist_uploaded_video(uploaded_file: Any) -> Path:
     """Scrive l'MP4 caricato in `.cache/` per renderlo leggibile da OpenCV.
 
-    Non è una persistenza di sessione: il file viene sovrascritto a ogni nuovo
-    upload, vive in una cartella gitignored e resta fuori da `data/` (spec
-    sez. 8.3: il video non viene salvato, si conservano solo metriche).
+    Non è una persistenza di sessione: il file vive in una cartella gitignored
+    e resta fuori da `data/` (spec sez. 8.3: il video non viene salvato, si
+    conservano solo metriche). Viene riscritto SOLO quando l'upload cambia
+    davvero (confronto sul `file_id`): riscriverlo a ogni rerun tronca il file
+    sotto il decoder nativo se un'elaborazione lo sta ancora leggendo, con
+    crash non intercettabile da Python (INC-2026-07-14-012).
     """
-    UPLOAD_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    UPLOADED_VIDEO_PATH.write_bytes(uploaded_file.getbuffer())
+    already_persisted = (
+        st.session_state.get("uploaded_file_id") == uploaded_file.file_id
+        and UPLOADED_VIDEO_PATH.exists()
+    )
+    if not already_persisted:
+        UPLOAD_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        UPLOADED_VIDEO_PATH.write_bytes(uploaded_file.getbuffer())
+        st.session_state["uploaded_file_id"] = uploaded_file.file_id
     return UPLOADED_VIDEO_PATH
 
 
@@ -210,7 +219,7 @@ def render_video_stream(
                 placeholder.image(
                     cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB),
                     channels="RGB",
-                    use_container_width=True,
+                    width="stretch",
                 )
                 frames_rendered += 1
     finally:
