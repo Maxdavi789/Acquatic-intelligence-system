@@ -1269,3 +1269,33 @@
   spiegata (redirezione RDP assente), rimedio in mano all'utente; a casa resta
   funzionante. Restano: rehearsal umana + screenshot dashboard, decisione
   momento webcam live.
+
+## 2026-07-14 10:20 +02:00 - Materiale per Claude Design + diagramma architettura
+
+### Messaggi utente
+- Domanda: la cartella docs caricata su Claude Design basta per una
+  presentazione dettagliata o va aggiunto qualcosa?
+- Richiesta: creare una cartella sul Desktop con tutto il materiale da
+  caricare; aprire la dashboard cosi' lo screenshot lo cattura l'utente.
+
+### Valutazione e azioni
+- Valutazione data: pitch_deck.md + 4 immagini reali sono una base solida;
+  mancavano un diagramma di architettura (slide 8 solo testuale), il contesto
+  del README per il generatore e lo screenshot della dashboard live (gap noto
+  di T38). Il PDF e' ridondante rispetto al markdown per un generatore.
+- Creato `docs/pitch/architettura_pipeline.png` (matplotlib, 5 blocchi:
+  input -> vision_tracker -> metrics_engine -> app -> CSV, etichette
+  "AI - percezione" vs "matematica deterministica - misura", fascia
+  "100% locale, 0 euro"); ispezionato visivamente prima dell'adozione.
+  Estende gli asset pitch di T38.
+- Creata `C:\Users\user\Desktop\pitch_claude_design\` con: pitch_deck.md,
+  diagramma, le 4 immagini demo, README.md e LEGGIMI_upload.txt (ruolo di
+  ogni file, prompt suggerito per il generatore, nota sul PDF escluso,
+  promemoria dello screenshot mancante demo_dashboard.png).
+- Avviata la dashboard Streamlit in background su http://localhost:8501
+  (health endpoint "ok") perche' l'utente catturi a mano lo screenshot con
+  KPI pieni (10 bracciate / Fluidity 93,1).
+
+### Stato iterazione
+- In attesa dello screenshot utente (demo_dashboard.png) da aggiungere alla
+  cartella Desktop e a docs/pitch. Diagramma committato; codice invariato.
