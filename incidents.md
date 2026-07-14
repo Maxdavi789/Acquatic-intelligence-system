@@ -383,6 +383,23 @@
   rehearsal umana sulla macchina della presentazione, non in sessione RDP.
 - Stato: aperto non bloccante, da monitorare; se si ripete, isolare con
   run senza interazioni vs run con interazione deliberata a meta'.
+- Aggiornamento 2026-07-14 (bug check su richiesta utente): revisione del
+  codice di `app.py` e `vision_tracker.py` alla ricerca della causa.
+  (1) CAUSA PLAUSIBILE individuata: `render_input_selector` chiama
+  `persist_uploaded_video` a OGNI rerun dello script, riscrivendo
+  `.cache/uploaded_session.mp4` da capo (write_bytes = truncate + write).
+  Se un rerun parte mentre il loop di elaborazione sta ancora leggendo lo
+  STESSO file, il decoder nativo FFmpeg/OpenCV si trova il file troncato
+  sotto i piedi: crash nativo non intercettabile, coerente con il segfault
+  osservato a meta' rendering. Fix proposto: persistere il file solo quando
+  l'upload cambia davvero (confronto `file_id` in session_state).
+  (2) CONFERMATO minore: `placeholder.image(..., use_container_width=True)`
+  e' deprecato e emette un warning PER FRAME (6.228 righe nel log della
+  sessione crashata): rumore e overhead inutili. Fix: `width="stretch"`.
+  (3) Limite architetturale non fixabile lato app: il rerun di Streamlit
+  puo' interrompere l'inferenza nativa a meta' (spec sez. 14.2); il pattern
+  `with create_pose_estimator()` per-run e' invece corretto (nessun oggetto
+  Pose condiviso tra thread). Fix (1)+(2) in attesa di approvazione utente.
 
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.

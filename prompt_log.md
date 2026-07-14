@@ -1344,3 +1344,32 @@
 ### Stato iterazione
 - Server attivo; screenshot demo_dashboard.png ancora in attesa; INC-012
   aperto non bloccante, da monitorare se si ripete.
+
+## 2026-07-14 10:55 +02:00 - Bug check sul segfault e verifica dei due screenshot
+
+### Messaggio utente
+- Richiesto un controllo in cerca di bug riguardo l'errore Streamlit
+  (INC-012); poi verificare i due screenshot fatti e, se ok, aggiungerli
+  alla cartella Desktop per Claude Design.
+
+### Bug check (esito in INC-012, aggiornamento 2026-07-14)
+- Causa plausibile del segfault: `persist_uploaded_video` riscrive
+  `.cache/uploaded_session.mp4` a ogni rerun; un rerun durante
+  l'elaborazione tronca il file sotto il decoder nativo -> crash non
+  intercettabile. Fix proposto: guard con `file_id` in session_state.
+- Confermato minore: `use_container_width=True` deprecato nel loop
+  (un warning per frame, 6.228 nel log del crash). Fix: `width="stretch"`.
+- Pattern Pose per-run corretto; il limite rerun-durante-inferenza resta
+  architetturale (spec sez. 14.2). Fix in attesa di approvazione.
+
+### Verifica screenshot (Pictures/Screenshots, 10:38)
+- ESITO: NON idonei, rifatti col video sbagliato. La dashboard mostra
+  `videoplayback (2).mp4` (il PROVVISORIO di terzi, INC-009: watermark,
+  frecce, diritti non chiariti) con KPI 2 bracciate / Fluidity 0.0,
+  in contraddizione con il deck (10 / 93,1) e non pubblicabile.
+- Non copiati nella cartella Desktop. Istruzioni date: ripetere con il
+  video UFFICIALE `test_videos/profilo_test.mp4` (KPI attesi 10 / 93,1).
+
+### Stato iterazione
+- Server attivo; screenshot da rifare sul video ufficiale; fix INC-012
+  proposti e in attesa di OK.
