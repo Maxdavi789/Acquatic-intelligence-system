@@ -25,6 +25,14 @@ spec (sez. 1.1, decisione DA-03).
 
 ## Demo
 
+Su Windows, per l'avvio con doppio clic usa:
+
+```text
+AVVIA_APP.bat
+```
+
+In alternativa, dal terminale:
+
 ```powershell
 .\venv\Scripts\python.exe -m streamlit run app.py
 ```

@@ -168,12 +168,19 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
   `SPEC_ERRATA.md`.
 - `HANDOFF.md` ricostruito sullo stato corrente; breakdown sorgente aggiunto a
   `docs/governance/` per tracciabilita'.
+- Presentazione finale `.pptx` creata il 2026-07-14 dalla struttura T39 con la
+  sorgente revisionata e gli asset ufficiali aggiornati. Deck finale di 11
+  slide (10 narrative + ringraziamenti), renderizzato integralmente,
+  ispezionato slide per slide e validato senza overflow; copia finale in
+  `C:\Users\user\Desktop\pitch_claude_design\AI_Swimming_Motion_Analyzer_Final.pptx`
+  e copia versionata in `docs/pitch/AI_Swimming_Motion_Analyzer_Final.pptx`.
+- INC-015: rilevato e mitigato lo snapshot Desktop precedente all'hardening;
+  il PPTX usa `docs/pitch/` come baseline autorevole.
 
 ## Azioni rimanenti (fuori breakdown)
 
-- L'utente deve indicare la cartella Desktop sorgente per la creazione della
-  presentazione finale `.pptx`; seguira' render e QA visiva con la skill
-  Presentations.
+- Presentazione finale `.pptx`: COMPLETATA e verificata il 2026-07-14.
+- Avvio Windows con doppio clic: `AVVIA_APP.bat` nella root del progetto.
 - Rehearsal umana della demo con proiettore.
 - Decidere se includere il momento webcam live nella scaletta (best-effort,
   T28 pronta). Il percorso MP4 resta quello garantito.
@@ -184,7 +191,7 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 ## Task Arretrate o Bloccate
 
 Nessuna task del breakdown e' arretrata o bloccata: T01-T41 sono completate.
-Il solo deliverable successivo e' il `.pptx`, fuori dal breakdown originario.
+Anche il deliverable `.pptx`, esterno al breakdown originario, e' completato.
 
 - Push/sync storico: RISOLTO. Prima dell'hardening pre-presentazione locale e
   `origin/main` erano allineati ad `a959c6c` (0/0). Il nuovo commit locale non

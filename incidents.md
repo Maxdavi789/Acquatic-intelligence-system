@@ -473,3 +473,20 @@
 - Azione eseguita: claim sostituiti con formulazioni limitate al protocollo
   testato; cache descritta esplicitamente; riuso subacqueo presentato come base
   da ricalibrare e rivalidare, non come trasferimento automatico.
+
+### INC-2026-07-14-015 - Cartella sorgente Desktop non allineata all'hardening pre-presentazione
+- Tipo: allineamento artefatti / rischio comunicativo.
+- Evidenza: la cartella `C:\Users\user\Desktop\pitch_claude_design` conteneva
+  ancora il `pitch_deck.md` precedente all'audit, con i claim assoluti corretti
+  da INC-014. Gli hash di `demo_export_csv.png` e `demo_sequenza.jpg` erano
+  inoltre diversi dagli asset rigenerati e validati nel repository; gli altri
+  quattro asset principali coincidevano byte per byte con la baseline.
+- Impatto: generare il PPTX usando ciecamente la copia Desktop avrebbe
+  reintrodotto claim non difendibili, due righe CSV storiche 2/0,0 e il frame
+  100 con tracking degradato.
+- Azione eseguita: la presentazione finale mantiene struttura e ordine della
+  cartella indicata, ma usa come fonte autorevole il sorgente revisionato e gli
+  asset aggiornati in `docs/pitch/`. Nessun file sorgente Desktop esistente e'
+  stato sovrascritto.
+- Stato: mitigato per il PPTX finale; la cartella Desktop resta uno snapshot
+  storico e non va riutilizzata come baseline senza riallinearla alla repo.

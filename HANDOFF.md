@@ -17,9 +17,9 @@ ricostruire la history. Leggere nell'ordine: `HANDOFF.md`, `spec.txt`,
   richiesta fondi qualitativa senza cifra).
 - T38: asset reali completi, incluso screenshot dashboard e diagramma della
   pipeline.
-- Prossimo deliverable: presentazione finale `.pptx`, esterna al breakdown
-  originario. Attendere che l'utente indichi la cartella sorgente sul Desktop;
-  poi usare la skill Presentations e completare render + QA visiva.
+- Presentazione finale `.pptx`, esterna al breakdown originario: COMPLETATA il
+  2026-07-14, renderizzata e verificata slide per slide. Copia consegnata in
+  `C:\Users\user\Desktop\pitch_claude_design\AI_Swimming_Motion_Analyzer_Final.pptx`.
 - Rehearsal umana con proiettore e decisione sulla webcam live restano attivita'
   di preparazione alla giornata, non task software aperte.
 
@@ -38,6 +38,7 @@ ricostruire la history. Leggere nell'ordine: `HANDOFF.md`, `spec.txt`,
   179,92. Due run producono KPI e serie identici.
 - Comando demo:
   `.\venv\Scripts\python.exe -m streamlit run app.py`.
+- Avvio Windows con doppio clic: `AVVIA_APP.bat` nella root del progetto.
 - Comando CLI ufficiale senza argomenti:
   `.\venv\Scripts\python.exe scripts\analyze_video.py`.
 
@@ -100,8 +101,13 @@ ricostruire la history. Leggere nell'ordine: `HANDOFF.md`, `spec.txt`,
 - `demo_sequenza.jpg`: versione rigenerata senza il frame 100 degradato.
 - `pitch_deck.md`: sorgente narrativa revisionata e prudente.
 - `pitch_deck_bozza.pdf`: snapshot storico T39, non il deliverable finale.
-- Deliverable futuro richiesto: `.pptx` nella cartella che indichera' l'utente,
-  con render e verifica di ogni slide prima della consegna.
+- Deliverable finale: `AI_Swimming_Motion_Analyzer_Final.pptx`, 11 slide
+  (10 narrative + ringraziamenti), generato con la sorgente revisionata e gli
+  asset ufficiali; render e verifica di ogni slide completati. INC-015
+  documenta la differenza rispetto allo snapshot storico presente nella
+  cartella Desktop.
+- Copia versionata del deliverable finale:
+  `docs/pitch/AI_Swimming_Motion_Analyzer_Final.pptx`.
 
 ## 8. Trappole da non ripetere
 

@@ -1618,3 +1618,175 @@
 - Presentazione PPTX non ancora creata: attende la cartella Desktop indicata
   dall'utente e l'uso della skill Presentations con render/QA.
 - Commit locale dedicato preparato in chiusura; nessun push eseguito.
+
+## 2026-07-14 12:27 +02:00 - Presentazione finale PPTX creata e verificata
+
+### Messaggio utente
+- `C:\Users\user\Desktop\pitch_claude_design`: indicazione della cartella
+  sorgente Desktop richiesta dopo l'audit e l'hardening.
+
+### Messaggi assistente catalogati
+- Comunicato l'avvio della fase Presentations: inventario integrale della
+  cartella, lettura delle regole tecniche, costruzione del deck e QA slide per
+  slide prima della consegna.
+- Segnalato che `pitch_deck.md`, `demo_export_csv.png` e
+  `demo_sequenza.jpg` nella cartella Desktop erano precedenti all'hardening;
+  dichiarata la scelta di usare la repo revisionata come fonte autorevole,
+  mantenendo struttura, ordine e tono indicati dall'utente.
+- Segnalato un problema ambientale del generatore: il runtime
+  `@oai/artifact-tool` non veniva risolto dalla HOME implicita. Corretto senza
+  installare dipendenze, usando il runtime Codex gia' presente sotto la HOME
+  dell'utente e il relativo interprete Python per i tool di rendering.
+- Comunicato il completamento del deck di 10 slide e l'avvio del QA PowerPoint
+  reale (render, overflow, sovrapposizioni e controllo visivo).
+- Comunicato il superamento del controllo slide per slide e l'aggiornamento
+  obbligatorio di governance/incidenti prima della consegna.
+
+### Lettura e verifica delle fonti
+- Usata la skill Presentations; letti integralmente `content-rules.md`,
+  `ARTIFACT.md`, `design_tokens.json`, `API_QUICK_START.md` e `API_DOCS.md`.
+- Analizzato l'intero registro dei 26 layout Codex Grid e ispezionati il
+  montage della libreria, i preview e i moduli JavaScript esatti dei layout
+  selezionati/adattati (cover, image split, callout, comparison, metriche,
+  evidence rail, timeline e closing).
+- Letti integralmente i tre file testuali della cartella Desktop
+  (`pitch_deck.md`, `README.md`, `LEGGIMI_upload.txt`); inventariati e hashati
+  tutti i sei asset raster.
+- Confronto con `docs/pitch/`: quattro asset coincidevano byte per byte;
+  export CSV e sequenza erano snapshot precedenti. Il pitch Desktop conteneva
+  i claim assoluti gia' corretti da INC-014. Registrato INC-015.
+- Usato `docs/pitch/pitch_deck.md` revisionato e gli asset autentici della repo:
+  frame annotato, dashboard reale, export ufficiale pulito e diagramma della
+  pipeline. Nessuna immagine inventata o reperita sul web.
+
+### Costruzione del deck
+- Comunicazione definita: al termine, docenti/valutatori devono comprendere
+  che la pipeline software locale e' stata provata sul protocollo testato e
+  che il finanziamento richiesto serve a produrre l'evidenza hardware/in acqua.
+- Creata una presentazione 16:9 di 10 slide in italiano, con sistema visivo
+  Codex Grid (bianco, nero, pannelli grigi, accento azzurro), gerarchia
+  tipografica da presentazione e oggetti PowerPoint editabili.
+- Narrazione: problema -> separazione del rischio -> soluzione -> demo ->
+  validazione onesta -> confine tra provato e da validare -> architettura ->
+  roadmap -> richiesta.
+- Claim mantenuti entro le evidenze: rischio software "ridotto e misurato",
+  ripetibilita' limitata allo stesso MP4/condizioni validate, nessuna validita'
+  biomeccanica in acqua, privacy descritta includendo la cache locale
+  gitignored, disclaimer non-medicale conservato.
+- Numeri mostrati: 10 bracciate, Fluidity 93,1, 175/175 frame, manuale 10 vs
+  automatico 10, 23/23 test metriche e due run identiche sullo stesso MP4.
+
+### QA e consegna
+- Generatore: `@oai/artifact-tool`; nessun uso di `python-pptx`.
+- Esportate preview e layout strutturali di tutte le slide; creato montage.
+- Eseguito `render_slides.py` sul PPTX, quindi `slides_test.py`: test passato,
+  nessun overflow.
+- Ispezionate visivamente tutte le 10 slide renderizzate a piena dimensione:
+  nessun clipping, testo illeggibile o sovrapposizione involontaria; flusso e
+  coerenza grafica approvati.
+- Copiato il file finale in
+  `C:\Users\user\Desktop\pitch_claude_design\AI_Swimming_Motion_Analyzer_Final.pptx`.
+  Dimensione 2.137.738 byte; SHA256
+  `7DCEDA0C7EC9237580882A60038C70DBFD6554D956E61E723E45A2D0567EBA17`;
+  hash identico all'artefatto QA.
+- `breakdown_status.md` e `HANDOFF.md` aggiornati alla data odierna: T01-T41
+  restano chiuse e anche il deliverable PPTX esterno al breakdown e' ora
+  completato. Il README non richiede un'altra modifica: descrive gia'
+  correttamente progetto, demo, limiti e governance; il PPTX e' consegnato
+  fuori repo nella cartella esplicitamente indicata.
+- Nessun push eseguito. Il branch resta con il commit di hardening locale
+  `707e7b5` non pubblicato; gli aggiornamenti governance di questa iterazione
+  restano modifiche locali non committate in attesa di un eventuale nuovo OK.
+
+## 2026-07-14 12:52 +02:00 - Aggiunta slide finale di ringraziamento
+
+### Messaggio utente
+- "e' perfetta la presentazione manca solo una slide finale di
+  ringraziamenti.": approvazione esplicita delle prime 10 slide e richiesta di
+  una sola aggiunta conclusiva.
+
+### Messaggi e metodo assistente
+- Comunicato l'uso della skill Presentations e il vincolo di mantenere intatte
+  le 10 slide approvate, aggiungendo soltanto una slide 11 coerente.
+- Letti nuovamente e integralmente `SKILL.md`, le regole narrative, la guida
+  template-following e la documentazione artifact-tool. Il PPTX esistente e'
+  stato trattato come riferimento visuale esclusivo.
+- Ispezionate tutte le 10 slide sorgente, i layout, gli oggetti, i font e gli
+  asset. La slide 10 e' stata scelta come layout ereditato per la chiusura.
+- Lo script di ispezione template ha richiesto `unzip` nel PATH: usata
+  l'utility gia' inclusa in Git per Windows. La prima generazione del contact
+  sheet cercava `python3`: ripetuta senza quella opzione e creato il montage
+  con l'interprete Python gia' incluso nel runtime Codex. Nessuna dipendenza
+  installata e nessuna modifica al progetto applicativo.
+
+### Modifica eseguita
+- Creato un template starter da 11 slide: output 1-10 duplicano e preservano
+  le rispettive slide sorgente; output 11 duplica la slide 10.
+- La slide 11 riusa soltanto oggetti ereditati. Testi finali:
+  `AI SWIMMING MOTION ANALYZER`, `Grazie.`,
+  `Domande, osservazioni o idee per la fase in acqua?`, repository e
+  `Massimo Davide Fedrigo · ITS ICT Academy Roma`; pagina `11`.
+- Il pannello "Prossimo passo" duplicato e i relativi elementi sono stati
+  eliminati dalla sola slide 11 per ottenere una chiusura sobria e ariosa.
+  Nessuna delle prime 10 slide e' stata modificata.
+
+### QA e consegna
+- Validazione del piano template: PASS, 0 finding.
+- Template fidelity check: PASS, 0 finding; prime 10 slide preservate.
+- Render PowerPoint completo di 11 slide e montage eseguiti.
+- `slides_test.py`: PASS, nessun overflow. Slide 11 e flusso complessivo
+  ispezionati visivamente a piena dimensione: nessun clipping,
+  sovrapposizione o wrapping inatteso.
+- File Desktop sovrascritto con la versione definitiva:
+  `C:\Users\user\Desktop\pitch_claude_design\AI_Swimming_Motion_Analyzer_Final.pptx`.
+  Dimensione 2.140.554 byte; SHA256
+  `26420EC1E218161A805C5EF0356489B991F88C8644A51C02390F322B445EB3FD`;
+  hash identico all'artefatto QA.
+- `breakdown_status.md` e `HANDOFF.md` aggiornati: presentazione finale = 11
+  slide (10 narrative + ringraziamenti). Nessun nuovo incidente applicativo e
+  nessun push eseguito.
+
+## 2026-07-14 12:59 +02:00 - Avvio cliccabile e pubblicazione finale autorizzata
+
+### Messaggio utente
+- "fai commit/push e dimmi che file devo cliccare per avviare il programma":
+  autorizzazione esplicita a committare e pushare; richiesta di un entrypoint
+  Windows chiaro e cliccabile.
+
+### Verifica e decisioni
+- Usata la skill `github:yeet` per delimitare lo scope di pubblicazione.
+- Worktree iniziale: branch `main`, un commit locale di hardening gia' ahead
+  rispetto a `origin/main`, piu' quattro modifiche governance della fase PPTX.
+- Nessun launcher `.bat`, `.cmd`, `.ps1` o `.exe` era presente: il solo
+  entrypoint applicativo era `app.py`, che non va avviato con doppio clic
+  perche' richiede il runner Streamlit.
+- GitHub CLI (`gh`) non era installato. Il tentativo di installazione e' stato
+  bloccato perche' persistente e non necessario al push richiesto. Scelta la
+  strada piu' sicura: `git push` HTTPS gia' configurato, senza installazioni e
+  senza PR (l'utente ha chiesto il push diretto).
+
+### Modifiche incluse
+- Aggiunto `AVVIA_APP.bat` nella root: cambia directory nella repo, verifica
+  `venv\Scripts\python.exe`, mostra istruzioni leggibili se manca il venv e
+  avvia `python -m streamlit run app.py`. Il file mantiene aperta la finestra
+  in caso di uscita, salvo `NO_PAUSE` usato dai test automatici.
+- Il primo check non bloccante con `--help` ha raggiunto correttamente
+  Streamlit ma il testo help di Click conteneva una freccia Unicode non
+  codificabile dalla console cp1252 italiana. Non e' un difetto dell'avvio
+  normale. Aggiunta l'opzione interna `--check`, che esegue soltanto
+  `streamlit version` e consente di validare il launcher senza aprire il
+  server o dipendere dall'help Unicode.
+- README aggiornato: `AVVIA_APP.bat` indicato come avvio Windows con doppio
+  clic, mantenendo il comando PowerShell come alternativa.
+- Presentazione definitiva da 11 slide copiata e versionata in
+  `docs/pitch/AI_Swimming_Motion_Analyzer_Final.pptx`; hash identico alla copia
+  Desktop gia' validata.
+- `HANDOFF.md` e `breakdown_status.md` aggiornati con launcher e percorso della
+  copia PPTX versionata.
+
+### Pubblicazione
+- Scope del commit: hardening pre-presentazione gia' committato ma non ancora
+  pubblicato, governance finale, INC-015, prompt log, launcher, README e PPTX
+  definitivo. Nessuna modifica estranea rilevata.
+- Validazioni, commit e push su `origin/main` eseguiti in chiusura di questa
+  iterazione; nessuna PR richiesta o creata.
