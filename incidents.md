@@ -357,6 +357,33 @@
   prono; primo picco a t=0,16 s perche' la clip inizia a braccio alzato.
 - Dettagli formali in SPEC_ERRATA.md (deroga T34/T35).
 
+### INC-2026-07-14-012 - Segmentation fault del processo Streamlit durante l'uso della dashboard (macchina ufficio)
+- Tipo: crash nativo runtime / stabilita' della demo.
+- Contesto: dashboard avviata in background per la cattura manuale dello
+  screenshot (sessione remota/virtualizzata, vedi INC-010). L'utente stava
+  usando l'app; il log mostra un burst di rendering frame (~28 fps, timestamp
+  10:34:01) e subito dopo la terminazione del processo Python con
+  "Segmentation fault" (exit code 139). Nessuna eccezione Python nel log:
+  crash nello strato nativo (MediaPipe/OpenCV), non intercettabile da
+  try/except applicativi.
+- Evidenza: output del task in background (304 KB); ultima riga
+  `Segmentation fault ./venv/Scripts/python.exe -m streamlit run app.py`.
+  Browser lato utente: ERR_CONNECTION_REFUSED (processo morto).
+- Causa: NON isolata. Ipotesi principale: rerun di Streamlit innescato da
+  un'interazione con i widget mentre il loop di elaborazione era attivo puo'
+  distruggere l'oggetto Pose a meta' inferenza nativa. Da notare che la
+  rehearsal T40 (2 giri consecutivi senza interazioni durante il run) era
+  stata pulita, e che l'ambiente e' una sessione RDP/Hyper-V.
+- Impatto: il processo muore e la pagina diventa irraggiungibile; nessuna
+  perdita di dati persistiti (il CSV non era coinvolto); lo stato KPI in
+  session_state va perso. Riavvio immediato possibile e verificato.
+- Mitigazioni per la demo: (1) durante l'elaborazione (~4 s) NON toccare i
+  widget; (2) tenere pronto il comando di riavvio
+  `.\venv\Scripts\python.exe -m streamlit run app.py`; (3) provare la
+  rehearsal umana sulla macchina della presentazione, non in sessione RDP.
+- Stato: aperto non bloccante, da monitorare; se si ripete, isolare con
+  run senza interazioni vs run con interazione deliberata a meta'.
+
 ### INC-2026-07-13-010 - Webcam non disponibile sulla macchina di test
 - Tipo: hardware / input secondario best-effort.
 - Evidenza: `cv2.VideoCapture(0)` restituisce `isOpened() == False` e OpenCV

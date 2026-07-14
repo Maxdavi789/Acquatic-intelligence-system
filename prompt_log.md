@@ -1320,3 +1320,27 @@
 
 ### Stato iterazione
 - UI ripulita; resta in attesa lo screenshot utente demo_dashboard.png.
+
+## 2026-07-14 10:40 +02:00 - Crash segfault della dashboard e riavvio (INC-012)
+
+### Messaggio utente
+- "andava bene non ho fatto lo screen ma ad una certa si e' chiusa da sola
+  perche' streamlit si e' riavviato, sei stato tu?" + screenshot del browser
+  con ERR_CONNECTION_REFUSED.
+
+### Ricostruzione e risposta data
+- Alle 10:28 il riavvio ERA dell'assistente (annunciato: applicava la pulizia
+  della stringa UI). La chiusura successiva (~10:34), durante l'uso
+  dell'utente, NON era un riavvio: il processo e' morto da solo con
+  Segmentation fault (exit 139), crash nativo MediaPipe/OpenCV documentato
+  nel log del task in background.
+- Registrato INC-2026-07-14-012 con evidenze, ipotesi (rerun con widget
+  durante il loop di elaborazione), impatto e mitigazioni per la demo
+  (non toccare i widget durante il run; comando di riavvio pronto;
+  rehearsal sulla macchina vera, non in RDP).
+- Dashboard riavviata e verificata (health "ok"); l'utente puo' ricaricare
+  la pagina e ritentare lo screenshot.
+
+### Stato iterazione
+- Server attivo; screenshot demo_dashboard.png ancora in attesa; INC-012
+  aperto non bloccante, da monitorare se si ripete.
