@@ -1299,3 +1299,24 @@
 ### Stato iterazione
 - In attesa dello screenshot utente (demo_dashboard.png) da aggiungere alla
   cartella Desktop e a docs/pitch. Diagramma committato; codice invariato.
+
+## 2026-07-14 10:28 +02:00 - Pulizia stringa UI da nota di sviluppo
+
+### Messaggio utente
+- Segnalata (giustamente, con fastidio) la scritta UI "Carica un file MP4:
+  il rendering verra' collegato nella task T17": linguaggio da cantiere,
+  non da MVP. Richiesta: tenere "Carica un file MP4" e togliere il resto.
+
+### Azioni
+- Verificato con grep che quella di riga 94 era l'UNICA stringa visibile in
+  UI con riferimenti a task ID; gli altri match sono docstring/commenti di
+  tracciabilita' nel codice, non mostrati all'utente.
+- `app.py`: st.info ridotto a "Carica un file MP4." (la nota era stantia da
+  quando T17 e' stata completata: il rendering E' collegato).
+- Validazione: py_compile OK; AppTest 0 eccezioni, messaggio info pulito e
+  nessun riferimento a task nella UI.
+- Dashboard riavviata su http://localhost:8501 (health "ok") cosi' la pagina
+  riparte gia' corretta per lo screenshot.
+
+### Stato iterazione
+- UI ripulita; resta in attesa lo screenshot utente demo_dashboard.png.

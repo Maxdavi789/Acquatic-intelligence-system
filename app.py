@@ -91,7 +91,7 @@ def render_input_selector() -> None:
             )
         else:
             st.session_state.pop("video_source", None)
-            st.info("Carica un file MP4: il rendering verrà collegato nella task T17.")
+            st.info("Carica un file MP4.")
     else:
         st.session_state["video_source"] = WEBCAM_DEVICE_INDEX
         st.warning(
