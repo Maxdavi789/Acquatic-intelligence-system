@@ -1,8 +1,9 @@
 # Pitch Deck - AI Swimming Motion Analyzer (bozza T39)
 
-Sorgente testuale delle slide. Il PDF bozza e' `pitch_deck_bozza.pdf`
-(generato da questo contenuto). Stato: BOZZA in attesa di revisione dello
-studente (DoD T39: "slide esportate in PDF, riviste").
+Sorgente testuale delle slide. Il PDF e' `pitch_deck_bozza.pdf`
+(generato da questo contenuto). Stato: REVISIONATA dallo studente il
+2026-07-14 (nome inserito; richiesta fondi in forma qualitativa, senza cifra,
+scelta didattica). DoD T39 "slide esportate in PDF, riviste": soddisfatto.
 
 Angolo di vendita: "il rischio software e' azzerato, finanziate il rischio
 hardware". Il dry-run va presentato onestamente: prova che il software
@@ -14,7 +15,7 @@ funziona, NON la validita' biomeccanica in acqua (spec sez. 14.4).
 **AI Swimming Motion Analyzer**
 Analisi biomeccanica del nuoto, a partire da un video.
 Proof of Concept funzionante - costo di sviluppo e di esercizio: 0 euro.
-[Nome studente] - ITS ICT Academy Roma, corso AI Projects Development.
+Massimo Davide Fedrigo - ITS ICT Academy Roma, corso AI Projects Development.
 
 ## Slide 2 - Il problema
 - L'analisi biomeccanica del nuoto oggi e' roba d'elite: sistemi
@@ -82,7 +83,9 @@ Proof of Concept funzionante - costo di sviluppo e di esercizio: 0 euro.
 ## Slide 10 - La richiesta
 - Il rischio software e' azzerato: pipeline end-to-end funzionante,
   riproducibile, a costo zero, dimostrata dal vivo oggi.
-- Chiediamo [importo da definire] per la fase hardware.
+- Chiediamo un finanziamento per la fase hardware: telecamere
+  subacquee, mini-PC edge, sensori e riprese in vasca. Il budget di
+  dettaglio si definisce insieme, sopra un software gia' provato.
 - Repository completo e verificabile:
   github.com/Maxdavi789/Acquatic-intelligence-system
 - Disclaimer: non e' un dispositivo medico e non fornisce consigli
