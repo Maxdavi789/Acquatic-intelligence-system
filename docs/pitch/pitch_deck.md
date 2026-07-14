@@ -1,13 +1,15 @@
-# Pitch Deck - AI Swimming Motion Analyzer (bozza T39)
+# Pitch Deck - AI Swimming Motion Analyzer (sorgente revisionata)
 
-Sorgente testuale delle slide. Il PDF e' `pitch_deck_bozza.pdf`
-(generato da questo contenuto). Stato: REVISIONATA dallo studente il
+Sorgente testuale revisionata delle slide. Il PDF `pitch_deck_bozza.pdf` e'
+lo snapshot storico T39; la presentazione finale richiesta sara' un file
+PPTX generato e verificato separatamente. Stato: REVISIONATA dallo studente il
 2026-07-14 (nome inserito; richiesta fondi in forma qualitativa, senza cifra,
 scelta didattica). DoD T39 "slide esportate in PDF, riviste": soddisfatto.
 
-Angolo di vendita: "il rischio software e' azzerato, finanziate il rischio
-hardware". Il dry-run va presentato onestamente: prova che il software
-funziona, NON la validita' biomeccanica in acqua (spec sez. 14.4).
+Angolo di vendita: "il rischio software e' stato ridotto e misurato; la fase
+successiva finanzia hardware e dati". Il dry-run va presentato onestamente:
+prova che la pipeline software funziona sul protocollo testato, NON la
+validita' biomeccanica in acqua (spec sez. 14.4).
 
 ---
 
@@ -45,16 +47,17 @@ Massimo Davide Fedrigo - ITS ICT Academy Roma, corso AI Projects Development.
 - Ora, davanti a voi: carico il video di riferimento e il sistema conta
   10 bracciate in tempo reale, misura l'angolo del gomito frame per frame
   e calcola un indice di regolarita' del ritmo (Fluidity 93/100).
-- Ripetibile all'infinito con gli STESSI numeri: due esecuzioni producono
-  risultati identici bit a bit (test di riproducibilita' documentato).
-[immagine: demo_onda_polso.png]
+- Ripetibile nelle condizioni validate: due esecuzioni sullo stesso MP4 hanno
+  prodotto risultati identici (test di riproducibilita' documentato).
+[immagine: demo_dashboard.png]
 
 ## Slide 6 - Validazione onesta
 - Conteggio bracciate: manuale 10 vs automatico 10 (differenza 0).
 - Robustezza: braccio coperto per 100 frame -> nessuna bracciata
-  inventata, nessun crash (il sistema puo' sottostimare dopo occlusioni
-  lunghe, MAI sovrastimare: limite documentato).
-- Privacy by design: nessun video salvato, solo metriche anonime.
+  inventata e nessun crash nello scenario controllato; dopo occlusioni
+  lunghe puo' sottostimare (limite documentato, non garanzia universale).
+- Privacy by design: nessun video esportato o versionato; l'upload viene
+  materializzato solo nella cache locale gitignored richiesta da OpenCV.
 - Ogni numero di questa presentazione e' riproducibile dal repository.
 [immagine: demo_export_csv.png]
 
@@ -67,10 +70,12 @@ Massimo Davide Fedrigo - ITS ICT Academy Roma, corso AI Projects Development.
 
 ## Slide 8 - Architettura pronta a crescere
 - Tre moduli disaccoppiati: visione / metriche / interfaccia.
-- Il motore metriche e' gia' testato (23 unit test) e riusabile identico
-  nella versione con telecamere subacquee.
+- Il motore metriche e' gia' testato (23 unit test) e costituisce una base
+  riusabile; il passaggio alle riprese subacquee richiedera' nuova calibrazione
+  e validazione sul dominio acqua.
 - Il modello di posa e' sostituibile (oggi MediaPipe, domani modelli
   custom addestrati sui dati raccolti in vasca).
+[immagine: architettura_pipeline.png]
 
 ## Slide 9 - Roadmap con i fondi
 - Fase 1 (finanziata): sandbox di ripresa proprietario + protocollo di
@@ -81,8 +86,8 @@ Massimo Davide Fedrigo - ITS ICT Academy Roma, corso AI Projects Development.
 - Il software di analisi c'e' gia': i fondi comprano hardware e dati.
 
 ## Slide 10 - La richiesta
-- Il rischio software e' azzerato: pipeline end-to-end funzionante,
-  riproducibile, a costo zero, dimostrata dal vivo oggi.
+- Il rischio software iniziale e' stato ridotto e misurato: pipeline
+  end-to-end funzionante, riproducibile, a costo zero sul protocollo testato.
 - Chiediamo un finanziamento per la fase hardware: telecamere
   subacquee, mini-PC edge, sensori e riprese in vasca. Il budget di
   dettaglio si definisce insieme, sopra un software gia' provato.

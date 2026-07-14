@@ -1426,3 +1426,195 @@
   con la raccomandazione demo di non toccare i widget durante il run).
 - Nessuna task di breakdown aperta; restano le azioni utente note
   (rehearsal con proiettore, decisione momento webcam live).
+
+## 2026-07-14 12:01 +02:00 - Audit finale pre-presentazione e piano in attesa di approvazione
+
+### Messaggi utente
+- Richiesto di catalogare ogni iterazione e messaggio in `prompt_log.md` prima
+  dell'output e di mantenere `incidents.md` come registro degli incidenti.
+- Obiettivo: continuare il breakdown con data odierna, leggere integralmente i
+  due allegati, l'intero prompt log e breakdown status, analizzare tutto il
+  progetto e le discordanze, individuare task successive/arretrate, verificare
+  Git locale vs origin, valutare il README e presentare un piano prima di
+  qualsiasi costruzione.
+- Subtask: il progetto e' considerato finito lato software; manca la
+  presentazione. Prima eseguire un audit; in una fase successiva l'utente
+  indichera' una cartella Desktop da cui creare un file `.pptx`.
+- Vincolo esplicito: non inventare e non modificare/costruire prima
+  dell'approvazione del piano.
+- Follow-up durante l'audit: "tutto bene ti sei bloccato?". Risposta: audit non
+  bloccato, in fase di registrazione finale prima della consegna del piano.
+
+### Messaggi/azioni assistente - perimetro e letture
+- Confermato che questa iterazione sarebbe rimasta un audit in sola lettura;
+  nessuna funzionalita' o presentazione costruita. La skill Presentations e'
+  rinviata alla fase in cui l'utente indichera' la cartella sorgente.
+- Inventariata la repo completa, inclusi file tracciati, runtime ignorati e
+  asset binari. Nessun `AGENTS.md` o altra istruzione locale presente.
+- Letti integralmente i due allegati:
+  - breakdown v1: 20.985 byte, 409 righe, SHA256
+    `951D4821A40A60F1A45937D82E8B4B57369CA80B5D2E966469C1066ACBA22A79`;
+  - Technical Spec v1.1: 31.507 byte, 530 righe, SHA256
+    `99974568064C0CFD36572FFF6028ED5B059B519FE5D263CA0572E517F268B45C`.
+- Letti integralmente `prompt_log.md` (prima di questa entry: 1.428 righe),
+  `breakdown_status.md`, `incidents.md`, `HANDOFF.md`, `README.md`, `spec.txt`,
+  `SPEC_ERRATA.md`, requirements, gitignore, tutto il codice Python e il
+  sorgente del pitch deck. Verificata la history dei commit task T01-T41.
+- La differenza byte-per-byte tra Technical Spec allegata e `spec.txt` e'
+  intenzionale: la copia repo e' la versione ASCII normalizzata, portata da
+  BOZZA a CONGELATA con registro freeze T01; contenuto e sezioni 0-16 restano
+  semanticamente allineati. Il breakdown sorgente allegato non e' invece
+  versionato nella repo: resta un piccolo gap di tracciabilita'.
+
+### Verifica Git/GitHub
+- Usata la skill GitHub per orientare il controllo remoto e il Git locale per
+  la divergenza effettiva della checkout. Repo confermata:
+  `Maxdavi789/Acquatic-intelligence-system`, pubblica, default branch `main`.
+- Eseguito `git fetch --prune origin`; `HEAD` e `origin/main` coincidono a
+  `a959c6c07069d5663e514393aa9b4d6a776147c5` (0 ahead / 0 behind).
+- Working tree pulita prima di questa entry. Nessun push, pull o write remoto.
+  Il connettore GitHub disponibile in questa sessione e' read-only; cio' non
+  modifica lo stato delle credenziali Git locali usate in passato.
+
+### Validazione tecnica eseguita
+- Ambiente: Python 3.12.10, OpenCV 4.11.0, MediaPipe 0.10.21 con
+  `mp.solutions.pose`, NumPy 1.26.4, Pandas 3.0.3, Streamlit 1.59.1.
+- `pip check`: nessuna dipendenza rotta.
+- Suite `scripts/test_metrics.py`: 23/23 test passati.
+- `py_compile`: tutti i moduli applicativi e gli script compilano.
+- Streamlit AppTest: 0 eccezioni, 2 colonne, titolo corretto.
+- Pipeline CLI sul video ufficiale: 175/175 frame con posa, 10 bracciate,
+  Fluidity 93,1, angoli [58,49; 179,92], exit 0.
+- Verificati hash video: ufficiale
+  `2102C40...5CD83`; provvisorio locale ignorato
+  `49702466...906A3`. La cache upload corrente coincide con il video ufficiale.
+- Asset pitch raster ispezionati uno per uno: diagramma, dashboard, export,
+  frame annotato, onda del polso e sequenza. PDF strutturalmente integro
+  (`%PDF-1.4`, EOF presente, 10 pagine, 406.339 byte).
+- La skill PDF non ha potuto validare visivamente le pagine: Poppler non e'
+  installato, Edge headless ha reso una pagina bianca e non esiste una sessione
+  browser integrata. Nessuna dipendenza installata per rispettare l'ambiente.
+  Questo limite non riguarda il futuro `.pptx`, che avra' un ciclo autonomo di
+  rendering e verifica.
+
+### Findings reali dell'audit
+1. `scripts/analyze_video.py` usa ancora come default il video storico
+   `profilo_provvisorio.mp4`, ignorato da Git. Il README presenta invece il
+   comando senza argomenti come analisi del video ufficiale. Su questa macchina
+   il comando produce 2 bracciate / Fluidity 0; su un clone pulito puo' fallire.
+2. `breakdown_status.md` e `HANDOFF.md` contengono sezioni stale: M8/T39 ancora
+   indicata come bozza in revisione e azioni utente (nome/importo/revisione)
+   gia' chiuse; stato Git/punto di ripresa e prossima M8 non aggiornati.
+3. Il pitch corrente contiene claim troppo assoluti rispetto alle evidenze:
+   "rischio software azzerato" non e' coerente con INC-012; "MAI
+   sovrastimare" e' smentito dal vecchio test provvisorio manuale 1 vs auto 2;
+   "nessun video salvato" va precisato perche' l'upload viene materializzato
+   su disco nella cache gitignored e oggi resta dopo la sessione.
+4. Gli asset sono autentici ma da selezionare meglio per il nuovo PPTX:
+   `demo_export_csv.png` mostra anche due righe storiche 2/0,0 e la sequenza
+   include un evidente artefatto di tracking al frame 100. Dashboard, frame
+   singolo, onda e diagramma architettura sono idonei.
+5. `streamlit` e `pandas` restano non pinnati in `requirements.txt`: non viola
+   il DoD T02 (che richiedeva MediaPipe), ma e' un rischio residuo per una
+   reinstallazione futura realmente riproducibile.
+6. Il README e' sostanzialmente buono ma va aggiornato per: default CLI
+   ufficiale, wording privacy/cache, claim conservativi e mitigazione INC-012.
+
+### Piano validato proposto - attende approvazione utente
+1. Correggere il default CLI al video ufficiale e aggiungere un controllo di
+   regressione/smoke test sul comando senza argomenti; registrare il finding in
+   `incidents.md`.
+2. Riallineare `breakdown_status.md` e `HANDOFF.md` allo stato 2026-07-14:
+   T01-T41 chiuse, T39 revisionata, T38 asset completi, INC-012 mitigato,
+   prossimo lavoro = presentazione PPTX.
+3. Aggiornare README e sorgente pitch con formulazioni difendibili; chiarire
+   cache upload e limiti; eliminare assoluti non sostenuti dalle prove.
+4. Pin opzionale ma raccomandato delle versioni Streamlit/Pandas validate e
+   nuova verifica `pip check`/test/AppTest/pipeline ufficiale.
+5. Preparare gli asset per il deck finale: export solo della riga ufficiale e
+   sequenza senza frame di tracking degradato. Versionare anche il breakdown
+   sorgente allegato per tracciabilita', se approvato.
+6. Aggiornare governance con soli esiti reali, creare un commit locale di
+   hardening/documentazione; nessun push senza nuovo OK esplicito.
+7. Dopo che l'utente indichera' la cartella Desktop, usare la skill
+   Presentations per creare il `.pptx`, renderizzarlo e iterare fino a QA
+   visiva completa.
+
+### Stato iterazione
+- Audit concluso; software core sano e test verdi, ma non dichiarato "tutto
+  perfetto" per i finding sopra.
+- Nessun codice, documento di stato, incidente, README, asset o presentazione
+  modificato in questa iterazione. Unica modifica: questa entry obbligatoria di
+  `prompt_log.md`.
+- In attesa dell'approvazione o correzione del piano.
+
+## 2026-07-14 12:12 +02:00 - Piano approvato: hardening pre-presentazione completato
+
+### Messaggio utente
+- "procedi": approvazione del piano in sette punti esposto dopo l'audit.
+- Perimetro applicato: correzioni locali, asset e governance, validazione e
+  commit locale; nessun push e nessuna creazione PPTX in questa fase.
+
+### Correzione CLI e test
+- `scripts/analyze_video.py`: `DEFAULT_SOURCE` e help spostati dal vecchio
+  `profilo_provvisorio.mp4` gitignored al video ufficiale versionato
+  `test_videos/profilo_test.mp4`.
+- Aggiunto `scripts/test_project_smoke.py` con tre check: default ufficiale
+  presente, MediaPipe legacy Pose disponibile, primo render Streamlit senza
+  eccezioni e con due colonne.
+- INC-2026-07-14-013 registrato e chiuso.
+
+### Riproducibilita' dipendenze
+- `requirements.txt`: pinnati `streamlit==1.59.1` e `pandas==3.0.3`, versioni
+  effettivamente installate e validate in questa baseline.
+- Delta documentato in `SPEC_ERRATA.md`; nessuna modifica funzionale o
+  architetturale alla spec congelata.
+
+### Governance e contenuti
+- `HANDOFF.md` ricostruito sullo stato reale: T01-T41 complete, T38/T39 chiuse,
+  prossimo deliverable `.pptx`, baseline, demo, privacy/cache, INC-011/012,
+  Git e trappole operative.
+- `breakdown_status.md` riallineato: M8 5/5, T39 revisionata, asset completi,
+  hardening pre-presentazione e azioni residue fuori breakdown.
+- README aggiornato con smoke test, pin completi, default CLI ufficiale,
+  wording prudente su occlusioni/INC-012 e descrizione esatta della cache
+  `uploaded_session.mp4`.
+- `docs/pitch/pitch_deck.md`: rimosse formule assolute (rischio "azzerato",
+  "mai sovrastima", ripetibilita' "all'infinito"); precisati protocollo
+  testato, cache locale e necessita' di ricalibrazione nel dominio acqua;
+  aggiunti riferimenti a screenshot dashboard e diagramma architettura.
+- INC-2026-07-14-014 registrato e chiuso.
+- Aggiunta in `docs/governance/` una copia UTF-8 con newline normalizzate del
+  breakdown allegato. Confronto del contenuto normalizzato: identico alla
+  sorgente Downloads.
+
+### Asset pitch
+- Aggiunto `scripts/generate_pitch_assets.py` per rigenerare in modo
+  riproducibile due asset dalla baseline ufficiale.
+- `demo_export_csv.png`: ora mostra soltanto la sessione ufficiale
+  (10 bracciate, Fluidity 93,1, angolo medio 163,17, max 179,92), senza le due
+  righe storiche 2/0,0.
+- `demo_sequenza.jpg`: rigenerata su 12 frame ufficiali; il frame 100 con
+  tracking degradato e' sostituito dal frame 110 pulito.
+- Entrambi gli asset sono stati aperti e ispezionati visivamente: testo
+  leggibile, nessun clipping, skeleton coerente e nessun artefatto evidente.
+- Il primo avvio dello script asset nel sandbox non ha trovato l'interprete
+  base del venv; rilanciato con il permesso previsto e completato. E' un limite
+  del sandbox gia' noto, non un incidente applicativo.
+
+### Validazione finale
+- `git diff --check`: verde.
+- `py_compile`: app, motore, tracker, CLI, test e generatore asset verdi.
+- Versioni pin verificate a runtime: Streamlit 1.59.1, Pandas 3.0.3.
+- `pip check`: nessuna dipendenza rotta.
+- Suite metriche: 23/23 test passati.
+- Smoke progetto: 3/3 passati.
+- CLI SENZA argomenti: 175/175 frame con posa, 10 bracciate, Fluidity 93,1,
+  angoli [58,49; 179,92], exit 0. Il problema INC-013 non e' riproducibile.
+
+### Stato iterazione
+- Hardening approvato completato; il core software non ha subito cambi di
+  algoritmo.
+- Presentazione PPTX non ancora creata: attende la cartella Desktop indicata
+  dall'utente e l'uso della skill Presentations con render/QA.
+- Commit locale dedicato preparato in chiusura; nessun push eseguito.

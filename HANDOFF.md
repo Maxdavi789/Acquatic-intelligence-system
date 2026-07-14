@@ -1,164 +1,114 @@
-# HANDOFF - Punto di ripresa del lavoro
+# HANDOFF - Stato corrente del progetto
 
-Data: 2026-07-14 (aggiornato dalla sincronizzazione ufficio dopo la sessione casa)
+Data: 2026-07-14 (audit pre-presentazione)
+
 Scopo: consentire a un altro assistente di riprendere il progetto senza
-ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
-`breakdown_status.md`, `prompt_log.md`, `incidents.md`, `SPEC_ERRATA.md`.
+ricostruire la history. Leggere nell'ordine: `HANDOFF.md`, `spec.txt`,
+`SPEC_ERRATA.md`, `breakdown_status.md`, ultima entry di `prompt_log.md`,
+`incidents.md`.
 
-> Nota multi-macchina: il progetto viene sviluppato da due postazioni.
-> Ufficio: workspace storico, autenticato come MrChuck118 (collaboratore).
-> Casa: clone in `C:\none\Acquatic-intelligence-system`, venv ricreato e
-> baseline rivalidata il 2026-07-13; primo push da casa RIUSCITO. L'ufficio ha
-> poi sincronizzato con `git pull --ff-only` (2026-07-14): entrambe le
-> postazioni sono allineate a `origin/main` (0/0). Il video UFFICIALE
-> `profilo_test.mp4` E' versionato e viaggia con Git; il vecchio provvisorio
-> `profilo_provvisorio.mp4` e' ora escluso via `.gitignore` (obsoleto, INC-009).
+## 1. Punto di ripresa
 
----
+- Progetto: AI Swimming Motion Analyzer, PoC a secco locale/offline.
+- Spec: `spec.txt` v1.1 CONGELATA; ogni delta successivo vive in
+  `SPEC_ERRATA.md`.
+- Breakdown T01-T41: COMPLETATO. Non esistono task arretrate o bloccate.
+- T39: chiusa e revisionata il 2026-07-14 (nome Massimo Davide Fedrigo,
+  richiesta fondi qualitativa senza cifra).
+- T38: asset reali completi, incluso screenshot dashboard e diagramma della
+  pipeline.
+- Prossimo deliverable: presentazione finale `.pptx`, esterna al breakdown
+  originario. Attendere che l'utente indichi la cartella sorgente sul Desktop;
+  poi usare la skill Presentations e completare render + QA visiva.
+- Rehearsal umana con proiettore e decisione sulla webcam live restano attivita'
+  di preparazione alla giornata, non task software aperte.
 
-## 1. Dove siamo
+## 2. Baseline validata
 
-- Progetto: AI Swimming Motion Analyzer (PoC a secco). Spec di riferimento:
-  `spec.txt` = versione v1.1 CONGELATA (2026-07-13). NON modificarla senza
-  registrare l'errata in `SPEC_ERRATA.md`.
-- Moduli completati prima dell'audit Codex:
-  - M0: 6/6 task completate. T02 e' stata corretta con il runtime MediaPipe
-    legacy compatibile; T03 e' validata sul MP4 provvisorio. La webcam
-    best-effort non e' disponibile sull'hardware corrente (INC-010).
-  - M1 (T07-T12): hardening del motore metriche + suite di test. Codex ha
-    corretto anche il bordo T10 `peak_y == shoulder_y` con test di regressione.
-  - M2 (T13-T14): completata. `analyze_frame` validata su input sintetici e,
-    con `scripts/analyze_video.py`, sul video reale provvisorio (448/448 frame,
-    angolo in [4,40; 179,92], conteggio 2).
-  - M3 (T15-T22): COMPLETATA. Dashboard con selettore input (MP4 primario,
-    webcam sperimentale), video annotato con scheletro e angolo gomito live,
-    KPI reali (bracciate, fluidity), grafico onda Y del polso e persistenza
-    dei risultati tra i rerun.
-  - M4 (T23-T25): COMPLETATA. Bottone "Termina Sessione ed Esporta Dati":
-    aggrega timestamp ISO, bracciate, fluidity, angolo medio/max in un
-    DataFrame con preview e lo accoda a `data/sessions.csv` (header alla
-    prima scrittura, append mai distruttivo). Verifica privacy T25 passata.
-  - M5 (T26-T29): COMPLETATA. Occlusioni verificate nel loop app (INC-011:
-    falso negativo post-occlusione = limite MediaPipe documentato); errori
-    sorgente gestiti in UI (`_execute_processing`); anteprima webcam
-    sperimentale a frame limitati validata con hardware reale; cleanup
-    risorse garantito anche su stop a meta'.
-  - M6 (T30-T33): COMPLETATA. Sul VIDEO UFFICIALE: T30 manuale 10 vs auto
-    10 (diff 0); T33 due run bit-identici.
-  - M7 (T34-T36): COMPLETATA in deroga DA-05 (SPEC_ERRATA 2026-07-14):
-    video ufficiale = clip Pexels licenziata `test_videos/profilo_test.mp4`
-    VERSIONATA in repo (HD 720x1280, 7 s, 10 mulinelli ritmici). T36:
-    175/175 frame, 10 bracciate, Fluidity 93,1, CSV esportato, nessun
-    picco spurio. Prossimo modulo: M8 (demo e pitch).
-- Stato Git verificato all'inizio dell'audit Codex: locale e `origin/main`
-  allineati al commit `f32f661` (0/0). Il lavoro successivo resta locale fino a
-  un OK esplicito per il push; usare `git status` per lo stato corrente.
-- Convenzione commit: UN commit per task, messaggio con prefisso task ID
-  (es. `T13: analyze_frame ...`). Push su `origin` SOLO dopo OK dell'utente.
+- Python 3.12.10.
+- MediaPipe 0.10.21 legacy (`mp.solutions.pose`).
+- OpenCV contrib 4.11.0.86, NumPy 1.26.4, protobuf 4.25.9.
+- Streamlit 1.59.1 e Pandas 3.0.3, pinnati nell'audit finale.
+- `pip check`: pulito.
+- `scripts/test_metrics.py`: 23/23.
+- `scripts/test_project_smoke.py`: controlla default video ufficiale,
+  MediaPipe legacy e primo render Streamlit.
+- Video ufficiale `test_videos/profilo_test.mp4`: 175/175 frame con posa,
+  manuale 10 / automatico 10, Fluidity 93,1, angolo medio 163,17 e massimo
+  179,92. Due run producono KPI e serie identici.
+- Comando demo:
+  `.\venv\Scripts\python.exe -m streamlit run app.py`.
+- Comando CLI ufficiale senza argomenti:
+  `.\venv\Scripts\python.exe scripts\analyze_video.py`.
 
-## 2. PUNTO DI RIPRESA -> BREAKDOWN COMPLETATO (restano azioni utente)
+## 3. Architettura corrente
 
-- M2 e' completata (T13-T14: `analyze_frame` + script CLI
-  `scripts/analyze_video.py`, validati sul video provvisorio).
-- M3 e' completata (T15-T22, un commit per task: ab917d0, 21d0a56, 5980826,
-  7b6a480, 77ba2a1, 5678103). Architettura attuale di `app.py`:
-  - `render_input_selector` (T16): radio MP4/webcam + uploader; sorgente in
-    `st.session_state["video_source"]` (percorso file o indice 0).
-  - `render_video_stream(source, placeholder, chart_slot, stroke_slot,
-    fluidity_slot)` (T17/T18/T20/T21): loop frame -> posa -> `analyze_frame`
-    (stato T13, timestamp da fps) -> overlay scheletro+angolo -> `st.image`;
-    aggiorna grafico e KPI live; ritorna il riepilogo
-    `{frames_rendered, stroke_count, fluidity_score, wrist_series}`.
-  - `render_kpis` (T19): due `st.metric`, nessuna simmetria.
-  - La colonna metriche viene costruita PRIMA della colonna video cosi' che
-    gli slot esistano quando il loop li aggiorna.
-  - T22: a fine loop il riepilogo va in `st.session_state["last_kpi"]` e
-    `["wrist_series"]`; a ogni rerun KPI e grafico si ri-renderizzano dai
-    valori persistiti.
-- Tutte le task software del breakdown (T01-T41) sono completate; vedi
-  breakdown_status.md per il dettaglio con commit ed evidenze.
-- Numeri di riferimento della demo (video ufficiale, riproducibili):
-  175/175 frame con posa, 10 bracciate (manuale 10, diff 0), Fluidity
-  93,1, angolo medio 163,17 / max 179,92; elaborazione ~3,6 s a giro
-  (~48 fps). Avvio: `.\venv\Scripts\python.exe -m streamlit run app.py`.
-- RESTANO ALL'UTENTE: revisione/approvazione del pitch deck (importo e
-  nome da inserire in docs/pitch/pitch_deck.md, poi rigenerare il PDF o
-  modificarlo a mano); rehearsal umana con proiettore (+ screenshot
-  dashboard per le slide); decisione sul momento webcam live
-  (best-effort, gia' implementato e validato in T28).
-- Se si riprende da un'altra macchina: clone -> `python -m venv venv` ->
-  `pip install -r requirements.txt` -> suite 23/23 -> demo. Il video
-  ufficiale e' NEL repo; il vecchio provvisorio resta solo locale.
-- Landmark occlusi: forward-fill dell'angolo, nessun aggiornamento del counter e
-  `wrist_y=None`; frame senza persona: stato invariato.
-- Suite sintetica: 23/23 test passati anche sulla macchina di casa.
-- Sulla macchina di casa la webcam indice 0 ESISTE e legge frame reali
-  (480x640x3): INC-010 e' risolto qui e la modalita' sperimentale T28 sara'
-  verificabile visivamente.
+- `vision_tracker.py`: acquisizione MP4/webcam, resize, MediaPipe Pose,
+  estrazione landmark e overlay.
+- `metrics_engine.py`: selezione arto lato-camera, angolo gomito,
+  `StrokeCounter`, Fluidity Score, forward-fill e `analyze_frame` stateful.
+- `app.py`: Streamlit a due colonne, upload MP4 primario, webcam sperimentale,
+  rendering annotato, KPI/grafico live, riepilogo ed export CSV append.
+- `scripts/analyze_video.py`: pipeline headless sul video ufficiale.
+- `scripts/test_metrics.py`: 23 unit test deterministici.
+- `scripts/test_project_smoke.py`: smoke test installazione/entrypoint/UI.
+- Symmetry Score: funzione airbag fuori MVP, con zero chiamate attive. Non
+  reintrodurla nella pipeline o nei KPI (DA-01).
 
-## 3. Ambiente
+## 4. Dati, privacy e demo
 
-- Python: la spec fissa 3.11; in locale c'e' 3.12.10, con cui e' stato creato il
-  `venv/` (gitignored). Il runtime validato e' MediaPipe 0.10.21, OpenCV contrib
-  4.11.0.86, NumPy 1.26.4 e protobuf 4.25.9.
-- Eseguire i test del motore:
-  `.\venv\Scripts\python.exe scripts\test_metrics.py`  (atteso: 23/23, exit 0).
-- Eseguire il pose tracking CLI:
-  `.\venv\Scripts\python.exe vision_tracker.py --source <clip>.mp4`
-- Se il `venv` non c'e' (altra macchina): `python -m venv venv` poi
-  `.\venv\Scripts\python.exe -m pip install -r requirements.txt`.
-- Dipendenze di compatibilita' pinnate in `requirements.txt`; installazione
-  verificata anche in un venv temporaneo pulito (`pip check` verde,
-  `mp.solutions.pose` presente). `matplotlib` NON e' una dipendenza diretta
-  (arriva transitivo da MediaPipe; cache via `MPLCONFIGDIR`).
+- `data/sessions.csv` contiene solo metriche aggregate ed e' gitignored.
+- Il video non viene esportato come risultato ne' versionato dall'upload.
+  OpenCV richiede pero' un percorso: l'upload viene materializzato in
+  `.cache/uploaded_session.mp4`, file locale gitignored che puo' restare dopo
+  la sessione. Non descriverlo come "mai salvato" senza questa precisazione.
+- Video ufficiale: clip Pexels licenziata, hash e fonte in `SPEC_ERRATA.md`.
+- Video provvisorio: `profilo_provvisorio.mp4`, storico, gitignored e non
+  necessario. Il default CLI e' stato corretto in INC-013.
+- Claim pitch approvati: il rischio software e' stato ridotto e misurato sul
+  protocollo testato; non "azzerato". Il PoC non valida biomeccanica in acqua.
 
-## 4. Git / autenticazione
+## 5. Limiti e incidenti da ricordare
 
-- Repo: https://github.com/Maxdavi789/Acquatic-intelligence-system (branch `main`).
-- Macchina UFFICIO: autenticata su GitHub come account `MrChuck118`, aggiunto
-  come collaboratore (Write) sul repo di Maxdavi789: `git push origin main`
-  FUNZIONA da li'.
-- Macchina CASA: identita' git globale MrChuck118; credenziali push non ancora
-  esercitate da qui, da verificare al primo push autorizzato.
-- Identita' dei commit configurata in locale su entrambe le postazioni:
-  `Massimo davide fedrigo <115544464+Maxdavi789@users.noreply.github.com>`.
-- Le password di account NON funzionano per il push (GitHub le ha disabilitate):
-  usare le credenziali collaboratore gia' presenti, o un token.
+- INC-011: dopo occlusioni lunghe MediaPipe puo' perdere picchi reali. Nel test
+  controllato non ha prodotto falsi positivi, ma non usare "mai sovrastima"
+  come garanzia universale.
+- INC-012: segfault Streamlit osservato in RDP. La causa concreta piu'
+  plausibile (riscrittura/troncamento della cache upload durante un rerun) e'
+  stata rimossa; il limite di interrompere inferenza nativa con un rerun resta.
+  Durante i circa quattro secondi di demo MP4 non toccare i widget.
+- INC-010: webcam funzionante a casa; in ufficio non visibile dalla sessione
+  RDP senza redirezione camera. E' best-effort e non blocca la demo MP4.
+- Fluidity K=50: indice relativo euristico, non misura clinica o assoluta.
 
-## 5. Blocchi / cose in sospeso (serve l'utente)
+## 6. Git e politica operativa
 
-- Nessun blocco tecnico: il breakdown T01-T41 e' completo e sincronizzato su
-  entrambe le postazioni (casa ha pushato, ufficio ha pullato il 2026-07-14).
-- Video ufficiale: `test_videos/profilo_test.mp4` (licenza Pexels) e'
-  VERSIONATO ed e' il riferimento di demo/validazione. Il vecchio provvisorio
-  `profilo_provvisorio.mp4` resta solo locale, gitignored e non piu' necessario
-  (INC-009).
-- Webcam: assente in ufficio, presente e funzionante a casa (INC-010). Non
-  blocca il percorso MP4 primario; prova UI = modalita' sperimentale T28.
-- `data/sessions.csv`: generato a runtime dal modulo di export (M4), gitignored.
-- Azioni utente residue: revisione pitch deck T39 (nome fornito: Massimo Davide
-  Fedrigo; importo fondi da decidere) e rehearsal umana con proiettore.
+- Repo: `https://github.com/Maxdavi789/Acquatic-intelligence-system`, branch
+  `main`.
+- All'inizio dell'audit del 2026-07-14, dopo `git fetch --prune`, locale e
+  `origin/main` coincidevano a `a959c6c` (0 ahead / 0 behind).
+- L'hardening pre-presentazione viene raccolto in un commit locale dedicato.
+- Push solo dopo OK esplicito dell'utente.
+- Macchina ufficio: Git HTTPS configurato tramite account collaboratore.
+- Non inserire password/token in chat o nei file del progetto.
 
-## 6. Trappole da NON ripetere
+## 7. Asset presentazione
 
-- NON reintrodurre il Symmetry Score nella pipeline o nei KPI: e' fuori scope MVP
-  (spec sez. 4.2, DA-01 = A) perche' contraddice la vista laterale. La funzione
-  `calculate_symmetry_score` resta in `metrics_engine.py` solo come airbag NON
-  collegato. Se torna la tentazione -> entry in `incidents.md`, non codice.
-- NON seguire il vecchio `breakdown_status` (pre-2026-07-13) che parlava di
-  "FASE 3 con KPI Simmetria": era obsoleto.
-- Documentazione di governance in ASCII con apostrofo per gli accenti
-  (`e'`, `gia'`, `perche'`), per coerenza con i file esistenti.
+- Idonei: `demo_dashboard.png`, `demo_frame_annotato.png`,
+  `demo_onda_polso.png`, `architettura_pipeline.png`.
+- `demo_export_csv.png`: versione pulita con la sola sessione ufficiale.
+- `demo_sequenza.jpg`: versione rigenerata senza il frame 100 degradato.
+- `pitch_deck.md`: sorgente narrativa revisionata e prudente.
+- `pitch_deck_bozza.pdf`: snapshot storico T39, non il deliverable finale.
+- Deliverable futuro richiesto: `.pptx` nella cartella che indichera' l'utente,
+  con render e verifica di ogni slide prima della consegna.
 
-## 7. File chiave
+## 8. Trappole da non ripetere
 
-- `spec.txt` - specifica v1.1 CONGELATA (contesto globale per l'editor AI).
-- `metrics_engine.py` - motore metriche (angolo, stroke, fluidity, selezione
-  arto, smoother e `analyze_frame`; simmetria airbag fuori pipeline).
-- `vision_tracker.py` - ingestione video + MediaPipe Pose + overlay (FASE 1).
-- `app.py` - dashboard Streamlit completa (T15-T22): input, rendering
-  annotato, angolo gomito live, KPI reali, grafico onda polso, export CSV.
-- `scripts/test_metrics.py` - runner di validazione del motore (auto-discovery,
-  23 test).
-- `breakdown_status.md` - avanzamento per modulo/task (T01-T41).
-- `prompt_log.md` / `incidents.md` / `SPEC_ERRATA.md` - governance.
+- Non usare il video provvisorio per demo o test di default.
+- Non reintrodurre Symmetry Score.
+- Non presentare il PoC come validazione in acqua o dispositivo medico.
+- Non usare claim assoluti non sostenuti dalle prove.
+- Non modificare `spec.txt` congelata: usare `SPEC_ERRATA.md`.
+- Aggiornare `prompt_log.md` prima di ogni output finale e registrare in
+  `incidents.md` ogni incidente reale.

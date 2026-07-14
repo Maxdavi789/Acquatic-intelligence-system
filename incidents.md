@@ -445,3 +445,31 @@
   > reindirizza fotocamera), poi riconnettersi. La camera comparira' sotto il
   bus RDCAMERA e OpenCV potra' aprirla all'indice 0 (modalita' T28 gia'
   pronta). Stato: aperto non bloccante in ufficio; risolto a casa.
+
+### INC-2026-07-14-013 - Default CLI rimasto sul video provvisorio locale
+- Tipo: portabilita' / documentazione runtime.
+- Evidenza: `scripts/analyze_video.py` impostava `DEFAULT_SOURCE` su
+  `test_videos/profilo_provvisorio.mp4`, file storico gitignored e non presente
+  in un clone pulito. Il README descriveva invece il comando senza argomenti
+  come analisi del video ufficiale. Sulla postazione corrente il residuo locale
+  produceva KPI 2 bracciate / Fluidity 0,0 invece dei valori demo 10 / 93,1.
+- Impatto: comando documentato non portabile e rischio di mostrare in demo il
+  materiale sbagliato.
+- Stato: risolto nell'audit pre-presentazione del 2026-07-14.
+- Azione eseguita: default e help spostati su
+  `test_videos/profilo_test.mp4`; aggiunto `scripts/test_project_smoke.py` per
+  controllare default ufficiale, MediaPipe legacy e primo render Streamlit.
+
+### INC-2026-07-14-014 - Claim pitch troppo assoluti rispetto alle evidenze
+- Tipo: governance / comunicazione tecnica.
+- Evidenza: il sorgente T39 usava "rischio software azzerato", "MAI
+  sovrastimare" e "nessun video salvato". INC-012 documenta un segfault poi
+  mitigato; il vecchio test provvisorio T30 aveva manuale 1 vs automatico 2;
+  l'upload Streamlit viene materializzato su disco in una cache locale
+  gitignored necessaria a OpenCV.
+- Impatto: presentazione non pienamente coerente con il principio di onesta'
+  DA-03 e con la reale gestione del dato video.
+- Stato: risolto nel sorgente pitch/README durante l'audit pre-presentazione.
+- Azione eseguita: claim sostituiti con formulazioni limitate al protocollo
+  testato; cache descritta esplicitamente; riuso subacqueo presentato come base
+  da ricalibrare e rivalidare, non come trasferimento automatico.

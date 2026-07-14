@@ -1,8 +1,8 @@
 opencv-contrib-python==4.11.0.86
 mediapipe==0.10.21
-streamlit
+streamlit==1.59.1
 numpy==1.26.4
-pandas
+pandas==3.0.3
 protobuf==4.25.9
 # matplotlib rimosso da requirements: non usato per i grafici (si usa
 # st.line_chart). Arriva comunque come dipendenza transitiva di mediapipe, che

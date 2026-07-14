@@ -63,14 +63,17 @@ python -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Le versioni sono pinnate (MediaPipe 0.10.21 legacy, OpenCV contrib 4.11,
-NumPy 1.26.4, protobuf 4.25.9). Non installare `opencv-python` in parallelo a
-`opencv-contrib-python`: condividono il namespace `cv2`.
+Le dipendenze applicative dirette sono pinnate sulla baseline validata
+(MediaPipe 0.10.21 legacy, OpenCV contrib 4.11, Streamlit 1.59.1,
+NumPy 1.26.4, Pandas 3.0.3 e protobuf 4.25.9). Non installare
+`opencv-python` in parallelo a `opencv-contrib-python`: condividono il
+namespace `cv2`.
 
 ## Validazione
 
 ```powershell
 .\venv\Scripts\python.exe scripts\test_metrics.py          # 23/23 unit test motore
+.\venv\Scripts\python.exe scripts\test_project_smoke.py    # 3/3 smoke baseline/UI
 .\venv\Scripts\python.exe scripts\analyze_video.py         # pipeline CLI su video ufficiale
 .\venv\Scripts\python.exe vision_tracker.py --source test_videos\profilo_test.mp4
 ```
@@ -100,10 +103,15 @@ espressamente prevista dalla spec (sez. 14.2).
 - Il Fluidity Score e' un **indice relativo** (K=50 euristico), non una misura
   assoluta (DA-04).
 - Dopo occlusioni prolungate il tracking MediaPipe puo' perdere un picco
-  reale: possibile sottostima conservativa, mai sovrastima (INC-011).
+  reale. Nel test controllato INC-011 non sono comparsi falsi positivi, ma
+  questo non autorizza un'affermazione assoluta su ogni video futuro.
 - La misura e' 2D monoculare su vista laterale: l'arto lontano non e'
   affidabile, per questo il Symmetry Score e' fuori scope MVP (DA-01).
 - Webcam in Streamlit: percorso sperimentale a durata limitata (RF-014).
+- Un rerun di Streamlit durante l'inferenza nativa resta un limite noto. La
+  causa concreta osservata in INC-012 (riscrittura della cache sotto il
+  decoder) e' stata rimossa; durante la demo e' comunque prudente non toccare
+  i widget nei pochi secondi di elaborazione.
 
 ## Roadmap (fase finanziata)
 
@@ -119,19 +127,25 @@ protocollo scientifico.
 +-- vision_tracker.py       # ingestione video + MediaPipe Pose + overlay
 +-- metrics_engine.py       # motore metriche deterministico + analyze_frame
 +-- scripts/test_metrics.py # validatore unit (23 test)
++-- scripts/test_project_smoke.py # smoke test ambiente/default/UI
 +-- scripts/analyze_video.py# validazione CLI su video reale
 +-- test_videos/profilo_test.mp4  # video ufficiale (licenza Pexels)
 +-- data/                   # sessions.csv (generato a runtime, gitignored)
++-- docs/governance/        # breakdown sorgente versionato
 +-- spec.txt / SPEC_ERRATA.md
 +-- breakdown_status.md / prompt_log.md / incidents.md / HANDOFF.md
 ```
 
 ## Privacy
 
-I frame video non vengono mai persistiti: si salvano solo metriche aggregate
-anonime in `data/sessions.csv` (verifica T25). L'upload della dashboard usa
-una cache locale transitoria gitignored. Eventuali persone riprese devono
-essere consenzienti; i video di terzi richiedono una licenza adeguata.
+Il video non viene conservato come output di sessione, inserito nel CSV o
+versionato: si salvano soltanto metriche aggregate in `data/sessions.csv`
+(verifica T25). Per consentire a OpenCV di leggere un upload, Streamlit ne
+materializza temporaneamente i byte in `.cache/uploaded_session.mp4`: e' un
+file locale gitignored, sovrascritto quando cambia l'upload, ma puo' restare su
+disco dopo la sessione e va trattato come dato personale locale. Eventuali
+persone riprese devono essere consenzienti; i video di terzi richiedono una
+licenza adeguata.
 
 **Questo progetto non e' un dispositivo medico e non fornisce consigli
 clinici o di prevenzione degli infortuni.** L'interpretazione dei numeri
@@ -143,6 +157,8 @@ spetta a un umano: il sistema e' un supporto alla decisione, non un decisore.
 - `prompt_log.md`: registro delle iterazioni di lavoro.
 - `incidents.md`: incidenti reali, finding e limiti documentati.
 - `SPEC_ERRATA.md`: modifiche tracciate dopo il congelamento della spec.
+- `docs/governance/AISwimmingAnalyzer_breakdown_tasks_v1.md`: breakdown
+  sorgente usato per T01-T41.
 
 ---
 

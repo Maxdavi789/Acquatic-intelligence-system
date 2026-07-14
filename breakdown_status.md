@@ -5,9 +5,10 @@ Data aggiornamento: 2026-07-14
 ## Stato Generale
 
 Repository: `https://github.com/Maxdavi789/Acquatic-intelligence-system.git`,
-branch `main`. All'inizio dell'audit Codex del 2026-07-13, locale e
-`origin/main` coincidevano al commit `f32f661` (0 ahead / 0 behind). Le modifiche
-della ripresa Codex restano locali fino a un nuovo OK esplicito per il push.
+branch `main`. Nell'audit pre-presentazione del 2026-07-14 e' stato eseguito
+`git fetch --prune`: locale e `origin/main` coincidevano al commit `a959c6c`
+(0 ahead / 0 behind) prima dell'hardening approvato. Le correzioni finali
+restano locali fino a un nuovo OK esplicito per il push.
 
 Ripresa da casa (2026-07-13, sera): repo clonata pulita in
 `C:\none\Acquatic-intelligence-system` al commit `9d33510` (allineato a
@@ -56,7 +57,7 @@ Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 | M5 | Robustezza e gestione errori | T26-T29 | Completata: 4/4 |
 | M6 | Test e validazione | T30-T33 | Completata: 4/4; T30/T33 RIPETUTI sul video ufficiale (T30: diff 0; T33: identici) |
 | M7 | Sandbox demo controllato | T34-T36 | Completata: 3/3 in deroga DA-05 (video licenziato al posto del sandbox fisico, vedi SPEC_ERRATA) |
-| M8 | Demo, pitch e chiusura governance | T37-T41 | In chiusura: T37/T38/T40/T41 fatte; T39 bozza PDF in revisione utente |
+| M8 | Demo, pitch e chiusura governance | T37-T41 | Completata: 5/5; T39 revisionata, asset T38 completi |
 
 ## Dettaglio M0
 
@@ -108,10 +109,10 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 - Step 0 (05f13d7): SPEC_ERRATA.md + riallineamento a T01-T41.
 - Ambiente: venv Python 3.12; MediaPipe 0.10.21, OpenCV contrib 4.11.0.86,
   NumPy 1.26.4 e protobuf 4.25.9. Installazione pulita verificata.
-- Commit locali per task (prefisso task ID). Il blocco INC-2026-07-13-006 e'
-  risolto; il push resta comunque subordinato all'OK esplicito dell'utente.
-- README riallineato in modo intermedio il 2026-07-13; il DoD completo T37 resta
-  futuro, dopo la validazione end-to-end.
+- Commit per task tracciati nella history. Il blocco INC-2026-07-13-006 e'
+  risolto; ogni nuovo push resta subordinato all'OK esplicito dell'utente.
+- README finale T37 completato e sottoposto a hardening di accuratezza durante
+  l'audit pre-presentazione (INC-013/INC-014).
 
 ## Dettaglio M4
 
@@ -152,31 +153,42 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
 | Task | Stato | Note |
 | --- | --- | --- |
 | T37 | Completata | README finale riscritto (ac22859): scope onesto DA-03, demo con numeri attesi, confine AI/deterministico, limiti, roadmap, disclaimer non-medicale, governance. |
-| T38 | Completata | 4 asset REALI in `docs/pitch/` (c5cbaed): frame annotato full-res, sequenza 12 frame, onda polso con picchi, tabella export CSV. Screenshot della dashboard live da catturare durante la rehearsal umana (la cattura headless mostra solo lo skeleton di caricamento). |
-| T39 | Bozza in revisione | `pitch_deck.md` + `pitch_deck_bozza.pdf`, 10 slide con immagini reali e note presentatore (395519f). RESTANO ALL'UTENTE: importo richiesto, nome, approvazione testi (DoD "riviste"). |
+| T38 | Completata | Asset reali completi: frame annotato, sequenza, onda polso, export CSV, diagramma architettura (0786a05) e screenshot dashboard live sul video ufficiale (b4cada1). Nell'audit pre-presentazione export/sequenza sono stati ripuliti per evitare righe storiche e frame degradati. |
+| T39 | Completata | `pitch_deck.md` revisionato con nome Massimo Davide Fedrigo e richiesta fondi qualitativa senza cifra; PDF 10 slide rigenerato (b9cf487). Nell'audit i claim assoluti sono stati resi coerenti con INC-012 e con i limiti reali. Il futuro `.pptx` e' un deliverable successivo, esterno al breakdown. |
 | T40 | Completata (tecnica) | 2 giri demo consecutivi cronometrati: 3,6 s l'uno, 48 fps di elaborazione (target spec >= 15), KPI identici (10 / 93,1), CSV in append, zero intoppi. Rehearsal UMANA con proiettore raccomandata prima del giorno X (occasione per gli screenshot dashboard). |
 | T41 | Completata | Questa chiusura: breakdown_status, HANDOFF, prompt_log aggiornati e committati. incidents.md: 20+ entry (DoD >= 5 ampiamente superato). |
 
-## Azioni rimanenti (fuori breakdown, in mano all'utente)
+## Hardening pre-presentazione (fuori breakdown, 2026-07-14)
 
-- Rivedere e approvare il pitch deck (importo fondi, nome, testi) - chiude
-  il DoD di T39.
-- Rehearsal umana della demo con proiettore + cattura screenshot dashboard.
-- Decidere il momento webcam live nella scaletta (best-effort, T28 pronta).
+- INC-013: default di `scripts/analyze_video.py` corretto dal provvisorio
+  gitignored al video ufficiale versionato; aggiunto smoke test di progetto.
+- INC-014: README e sorgente pitch riallineati a claim dimostrabili; precisata
+  la materializzazione locale dell'upload in cache.
+- `streamlit` e `pandas` pinnati alle versioni validate; delta registrato in
+  `SPEC_ERRATA.md`.
+- `HANDOFF.md` ricostruito sullo stato corrente; breakdown sorgente aggiunto a
+  `docs/governance/` per tracciabilita'.
+
+## Azioni rimanenti (fuori breakdown)
+
+- L'utente deve indicare la cartella Desktop sorgente per la creazione della
+  presentazione finale `.pptx`; seguira' render e QA visiva con la skill
+  Presentations.
+- Rehearsal umana della demo con proiettore.
+- Decidere se includere il momento webcam live nella scaletta (best-effort,
+  T28 pronta). Il percorso MP4 resta quello garantito.
 - Portabilita': verificata anche sulla postazione ufficio il 2026-07-14
   (suite 23/23 + pipeline sul video ufficiale con numeri identici). Replica su
   ulteriori macchine: clone -> venv -> requirements -> demo.
 
 ## Task Arretrate o Bloccate
 
-Nessuna task del breakdown e' arretrata o bloccata: T01-T41 completate e
-sincronizzate su entrambe le postazioni. Restano solo azioni utente (vedi
-"Azioni rimanenti").
+Nessuna task del breakdown e' arretrata o bloccata: T01-T41 sono completate.
+Il solo deliverable successivo e' il `.pptx`, fuori dal breakdown originario.
 
-- Push/sync: RISOLTO. Casa ha pushato tutto (fino a 8fba712) e l'ufficio ha
-  sincronizzato con `git pull --ff-only` (2026-07-14); locale e `origin/main`
-  allineati (0/0). I commit di governance restano subordinati all'OK esplicito
-  per il push, come da politica.
+- Push/sync storico: RISOLTO. Prima dell'hardening pre-presentazione locale e
+  `origin/main` erano allineati ad `a959c6c` (0/0). Il nuovo commit locale non
+  viene pushato senza OK esplicito, come da politica.
 - Video provvisorio: `profilo_provvisorio.mp4` resta solo locale, ora ESCLUSO
   da Git via `.gitignore`; superato dal video ufficiale `profilo_test.mp4`
   (versionato). Non piu' necessario.

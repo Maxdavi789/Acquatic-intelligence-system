@@ -45,6 +45,20 @@ Qui si annotano baseline, delta e correzioni successive, con data e task ID.
 
 ## Errata successivi
 
+### 2026-07-14 - Hardening riproducibilita' ambiente UI (audit pre-presentazione)
+
+- La spec richiede esplicitamente il pin di MediaPipe (DA-06); l'audit finale
+  ha rilevato che le altre due dipendenze applicative dirette, `streamlit` e
+  `pandas`, erano ancora flottanti in `requirements.txt`.
+- Per rendere ripetibile anche la dashboard/export sulla baseline realmente
+  validata vengono fissate le versioni installate e testate:
+  `streamlit==1.59.1` e `pandas==3.0.3`.
+- Nessuna modifica funzionale o architetturale: il pin documenta l'ambiente con
+  cui sono passati suite 23/23, smoke test Streamlit e pipeline ufficiale.
+- Corretto inoltre il default di `scripts/analyze_video.py`: ora usa il video
+  ufficiale versionato `test_videos/profilo_test.mp4`, non il vecchio file
+  provvisorio locale e gitignored.
+
 ### 2026-07-14 - Deroga T34/T35 (DA-05, DA-08): video ufficiale da footage con licenza libera
 
 - Contesto: la registrazione in proprio del video di riferimento nel sandbox

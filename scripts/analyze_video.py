@@ -39,7 +39,7 @@ from vision_tracker import (  # noqa: E402
 from metrics_engine import FrameAnalysisState, analyze_frame  # noqa: E402
 
 
-DEFAULT_SOURCE = PROJECT_ROOT / "test_videos" / "profilo_provvisorio.mp4"
+DEFAULT_SOURCE = PROJECT_ROOT / "test_videos" / "profilo_test.mp4"
 FALLBACK_FPS = 30.0
 
 
@@ -123,7 +123,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--source",
         default=str(DEFAULT_SOURCE),
-        help="Percorso MP4 (default: test_videos/profilo_provvisorio.mp4).",
+        help="Percorso MP4 (default: test_videos/profilo_test.mp4).",
     )
     parser.add_argument(
         "--max-width",
