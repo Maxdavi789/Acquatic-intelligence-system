@@ -1,6 +1,6 @@
 # HANDOFF - Punto di ripresa del lavoro
 
-Data: 2026-07-13 (aggiornato in serata dalla sessione casa)
+Data: 2026-07-14 (aggiornato dalla sincronizzazione ufficio dopo la sessione casa)
 Scopo: consentire a un altro assistente di riprendere il progetto senza
 ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 `breakdown_status.md`, `prompt_log.md`, `incidents.md`, `SPEC_ERRATA.md`.
@@ -8,9 +8,11 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 > Nota multi-macchina: il progetto viene sviluppato da due postazioni.
 > Ufficio: workspace storico, autenticato come MrChuck118 (collaboratore).
 > Casa: clone in `C:\none\Acquatic-intelligence-system`, venv ricreato e
-> baseline rivalidata il 2026-07-13; credenziali push da verificare al primo
-> push. Il video provvisorio untracked va ricopiato a mano su ogni macchina
-> (SHA256 di riferimento in incidents.md, INC-009).
+> baseline rivalidata il 2026-07-13; primo push da casa RIUSCITO. L'ufficio ha
+> poi sincronizzato con `git pull --ff-only` (2026-07-14): entrambe le
+> postazioni sono allineate a `origin/main` (0/0). Il video UFFICIALE
+> `profilo_test.mp4` E' versionato e viaggia con Git; il vecchio provvisorio
+> `profilo_provvisorio.mp4` e' ora escluso via `.gitignore` (obsoleto, INC-009).
 
 ---
 
@@ -125,16 +127,17 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 
 ## 5. Blocchi / cose in sospeso (serve l'utente)
 
-- Il campione provvisorio e' presente su entrambe le macchine come
-  `test_videos/profilo_provvisorio.mp4` (SHA256 identico, vedi INC-009), ma
-  resta fuori da Git per possibile licenza di terzi. Non pubblicarlo finche'
-  provenienza e diritti non sono chiariti. Il video ufficiale sara' quello
-  proprio del sandbox T35.
-- Webcam: assente sulla macchina ufficio, presente e funzionante sulla
-  macchina casa (INC-010). Non blocca il percorso MP4 primario.
-- I commit della sessione casa (governance, T14, T16) sono locali: push solo
-  dopo OK esplicito dell'utente.
-- `data/sessions.csv` non ancora creato: lo generera' il modulo di export (M4).
+- Nessun blocco tecnico: il breakdown T01-T41 e' completo e sincronizzato su
+  entrambe le postazioni (casa ha pushato, ufficio ha pullato il 2026-07-14).
+- Video ufficiale: `test_videos/profilo_test.mp4` (licenza Pexels) e'
+  VERSIONATO ed e' il riferimento di demo/validazione. Il vecchio provvisorio
+  `profilo_provvisorio.mp4` resta solo locale, gitignored e non piu' necessario
+  (INC-009).
+- Webcam: assente in ufficio, presente e funzionante a casa (INC-010). Non
+  blocca il percorso MP4 primario; prova UI = modalita' sperimentale T28.
+- `data/sessions.csv`: generato a runtime dal modulo di export (M4), gitignored.
+- Azioni utente residue: revisione pitch deck T39 (nome fornito: Massimo Davide
+  Fedrigo; importo fondi da decidere) e rehearsal umana con proiettore.
 
 ## 6. Trappole da NON ripetere
 
@@ -153,7 +156,8 @@ ricostruire il contesto. Leggere questo file per PRIMO, poi `spec.txt`,
 - `metrics_engine.py` - motore metriche (angolo, stroke, fluidity, selezione
   arto, smoother e `analyze_frame`; simmetria airbag fuori pipeline).
 - `vision_tracker.py` - ingestione video + MediaPipe Pose + overlay (FASE 1).
-- `app.py` - scaffold Streamlit T15; qui proseguono T16-T22.
+- `app.py` - dashboard Streamlit completa (T15-T22): input, rendering
+  annotato, angolo gomito live, KPI reali, grafico onda polso, export CSV.
 - `scripts/test_metrics.py` - runner di validazione del motore (auto-discovery,
   23 test).
 - `breakdown_status.md` - avanzamento per modulo/task (T01-T41).

@@ -1173,3 +1173,62 @@
 - Il lavoro svolto da casa e' presente anche sulla postazione ufficio.
 - Breakdown software T01-T41 completato; restano le azioni utente indicate in
   HANDOFF (revisione pitch deck e rehearsal umana).
+
+## 2026-07-14 (ripresa ufficio) - Rifiniture: refresh governance, riproducibilita' e pitch
+
+### Messaggio utente
+- "A casa abbiamo finito il progetto praticamente ora va solo pullato da github
+  e vanno messe le ultime rifiniture qui." Metodo abituale: leggere
+  integralmente allegati, prompt_log e breakdown_status; analizzare discordanze
+  tra progetto e documenti; individuare prossima task e arretrati; verificare
+  allineamento Git locale vs origin; valutare il README; validare il piano ed
+  esporlo in attesa di approvazione. Vincoli: non inventare, non costruire prima
+  dell'OK.
+- Approvazione: "ok A procedi. B: Massimo Davide Fedrigo. Importo fondi: essendo
+  un progetto scolastico incerto se inserirlo e quanto. C: ok procedi."
+
+### Messaggi/azioni assistente (analisi, sola lettura)
+- Letti integralmente: i due allegati (spec v1.1, breakdown_tasks_v1),
+  `prompt_log.md` (1176 righe), `breakdown_status.md`, `incidents.md`,
+  `HANDOFF.md`, `SPEC_ERRATA.md`, `README.md`, `requirements.txt`, `.gitignore`;
+  verificati `metrics_engine.py` (analyze_frame/FrameAnalysisState presenti,
+  simmetria airbag con 0 chiamate attive), `scripts/analyze_video.py`,
+  `pitch_deck.md`.
+- Git: `git fetch` -> locale = `origin/main` = `50db4f6`, 0 ahead / 0 behind,
+  worktree pulita. Riscontro: il pull da GitHub era GIA' avvenuto stamattina
+  (entry 09:17): fast-forward `9d33510 -> 19d9732`, sync ufficio registrato in
+  `50db4f6`. Lo snapshot Git di apertura sessione (HEAD 9d33510) era obsoleto.
+- Salute su questa macchina: suite `scripts/test_metrics.py` 23/23, venv Python
+  3.12.10, requirements pinnati.
+- Discordanze rilevate: (1) governance non aggiornata dopo il sync ufficio -
+  `50db4f6` toccava solo prompt_log, mentre `HANDOFF.md` e `breakdown_status.md`
+  portavano ancora testo "commit locali / push pending" ormai superato; (2)
+  `pitch_deck.md` con placeholder `[Nome studente]` e `[importo da definire]`
+  (T39 in revisione utente); (3) README (T37) verificato accurato, nessuna
+  modifica necessaria.
+
+### Blocco C - Riproducibilita' su macchina ufficio
+- `analyze_video.py --source test_videos/profilo_test.mp4`: 175/175 frame con
+  posa, 10 bracciate, Fluidity 93,1, angoli [58,49; 179,92]. IDENTICI ai numeri
+  di riferimento documentati: portabilita' confermata anche in ufficio. Warning
+  MediaPipe `landmark_projection_calculator` non fatale (cosmetico upstream),
+  non e' un incidente.
+
+### Blocco A - Refresh governance
+- Aggiornati `HANDOFF.md` e `breakdown_status.md`: date al 2026-07-14, nota di
+  sincronizzazione ufficio (pull ff `9d33510 -> 19d9732`, 0/0), rimosso il testo
+  stantio su push pending / commit locali, video provvisorio ora gitignored,
+  riproducibilita' ufficio annotata. Aggiunta questa entry di prompt_log.
+- Commit di governance in chiusura iterazione. Push subordinato all'OK esplicito.
+
+### Blocco B - Pitch deck (T39): in corso
+- Nome fornito: "Massimo Davide Fedrigo" (slide 1). Importo fondi: l'utente e'
+  incerto se inserirlo per un progetto scolastico. Fornita raccomandazione
+  (importo illustrativo con voci hardware oppure formulazione qualitativa senza
+  cifra); si attende la scelta prima di finalizzare la slide fondi e rigenerare
+  il PDF (chiude il DoD T39).
+
+### Stato iterazione
+- Breakdown T01-T41 completo e sincronizzato su entrambe le postazioni. Restano
+  azioni utente: chiusura T39 (decisione importo), rehearsal umana + screenshot
+  dashboard, decisione webcam live.

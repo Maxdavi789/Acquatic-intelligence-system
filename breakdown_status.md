@@ -1,6 +1,6 @@
 # Breakdown Status
 
-Data aggiornamento: 2026-07-13
+Data aggiornamento: 2026-07-14
 
 ## Stato Generale
 
@@ -18,6 +18,16 @@ AppTest Streamlit 0 eccezioni / 2 colonne. Su questa macchina la webcam
 all'indice 0 ESISTE e legge frame (INC-010 risolto per la macchina di casa).
 Il video provvisorio e' stato riscaricato dall'utente, hash SHA256 identico a
 quello approvato, e ricopiato untracked in `test_videos/`.
+
+Sincronizzazione ufficio (2026-07-14): la postazione ufficio
+(`c:\AcquaticIntelligenceSystem`) ha eseguito `git pull --ff-only` con
+fast-forward `9d33510 -> 19d9732`, recuperando tutto il lavoro di casa
+(T14-T41, asset pitch, video ufficiale versionato). Locale e `origin/main`
+allineati (0/0); l'intero breakdown software e' pushato. Rivalidato qui: suite
+`scripts/test_metrics.py` 23/23 e pipeline sul video UFFICIALE
+`profilo_test.mp4` -> 175/175 frame con posa, 10 bracciate, Fluidity 93,1,
+angoli [58,49; 179,92] (riproducibilita' confermata anche su questa macchina).
+Webcam assente in ufficio (INC-010, non bloccante).
 
 Allineato a `breakdown_tasks_v1` (task T01-T41) e alla spec congelata v1.1.
 
@@ -153,17 +163,24 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
   il DoD di T39.
 - Rehearsal umana della demo con proiettore + cattura screenshot dashboard.
 - Decidere il momento webcam live nella scaletta (best-effort, T28 pronta).
-- Eventuale replica dei test su altra macchina per la portabilita' (clone
-  -> venv -> requirements -> demo).
+- Portabilita': verificata anche sulla postazione ufficio il 2026-07-14
+  (suite 23/23 + pipeline sul video ufficiale con numeri identici). Replica su
+  ulteriori macchine: clone -> venv -> requirements -> demo.
 
 ## Task Arretrate o Bloccate
 
-- Webcam: sulla macchina di casa il dispositivo indice 0 esiste e legge frame
-  (INC-010 risolto qui); la prova UI completa resta in T28 come da breakdown.
-- Video provvisorio: riscaricato sulla macchina di casa con SHA256 identico;
-  resta deliberatamente non tracciato da Git per possibile licenza di terzi.
-  Va sostituito dal video proprio T35.
-- Push su `origin`: i commit della sessione casa (governance + T14 + T16)
-  sono locali; push subordinato all'OK esplicito dell'utente. Da verificare
-  al primo push le credenziali GitHub di questa macchina.
-- `data/sessions.csv` non creato: generato dal modulo di export (M4).
+Nessuna task del breakdown e' arretrata o bloccata: T01-T41 completate e
+sincronizzate su entrambe le postazioni. Restano solo azioni utente (vedi
+"Azioni rimanenti").
+
+- Push/sync: RISOLTO. Casa ha pushato tutto (fino a 8fba712) e l'ufficio ha
+  sincronizzato con `git pull --ff-only` (2026-07-14); locale e `origin/main`
+  allineati (0/0). I commit di governance restano subordinati all'OK esplicito
+  per il push, come da politica.
+- Video provvisorio: `profilo_provvisorio.mp4` resta solo locale, ora ESCLUSO
+  da Git via `.gitignore`; superato dal video ufficiale `profilo_test.mp4`
+  (versionato). Non piu' necessario.
+- Webcam: assente in ufficio, presente e funzionante a casa (INC-010, non
+  bloccante); la prova UI resta la modalita' sperimentale T28.
+- `data/sessions.csv`: non versionato, generato a runtime dal modulo di export
+  (M4), gitignored.
