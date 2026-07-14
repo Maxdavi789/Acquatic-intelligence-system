@@ -1148,3 +1148,28 @@
   bit-identica dimostrata (T33) la demo da' sempre gli stessi numeri:
   e' il motivo per cui DA-02 ha reso l'MP4 percorso primario. La webcam
   live resta un momento bonus opzionale gia' implementato (T28).
+
+## 2026-07-14 09:17 +02:00 - Sincronizzazione ufficio dopo lavoro da casa
+
+### Messaggio utente
+- L'utente ha ripetuto la richiesta di eseguire commit e push appena terminato,
+  per poter continuare il lavoro da casa.
+
+### Messaggi/azioni assistente
+- Eseguito `git fetch origin`: il locale risultava 32 commit indietro e 0
+  avanti rispetto a `origin/main`; nessuna modifica tracciata locale.
+- Verificato che il vecchio `test_videos/profilo_provvisorio.mp4` non fosse
+  tracciato sul remoto e non interferisse con l'aggiornamento.
+- Eseguito `git pull --ff-only origin main`: fast-forward da `9d33510` a
+  `19d9732`, senza merge commit e senza conflitti.
+- Recuperati il completamento T14-T41, gli asset pitch e il video ufficiale
+  versionato `test_videos/profilo_test.mp4`.
+- Verifica dopo il pull: locale e `origin/main` allineati 0/0; worktree pulita
+  (il vecchio video provvisorio e' ora escluso tramite `.gitignore`).
+- Preparato questo solo commit di governance per catalogare il messaggio e la
+  sincronizzazione; nessun codice applicativo modificato.
+
+### Stato iterazione
+- Il lavoro svolto da casa e' presente anche sulla postazione ufficio.
+- Breakdown software T01-T41 completato; restano le azioni utente indicate in
+  HANDOFF (revisione pitch deck e rehearsal umana).
