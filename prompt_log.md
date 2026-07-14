@@ -1790,3 +1790,231 @@
   definitivo. Nessuna modifica estranea rilevata.
 - Validazioni, commit e push su `origin/main` eseguiti in chiusura di questa
   iterazione; nessuna PR richiesta o creata.
+
+## 2026-07-14 - Audit post-pull finale e piano in attesa di approvazione
+
+### Messaggio utente
+- Richiesto di catalogare ogni messaggio in `prompt_log.md` prima dell'output
+  finale e di registrare tutti gli incidenti in `incidents.md`.
+- Obiettivo: leggere integralmente i due allegati, l'intero prompt log e il
+  breakdown status; confrontare documenti, progetto e repository; individuare
+  prossima task e arretrati; verificare Git locale/remoto e README; presentare
+  un piano validato senza iniziare a costruire.
+- Subtask: il progetto e' stato finito sull'altra postazione; eseguire il pull
+  e concludere.
+
+### Letture e analisi eseguite
+- Usata la skill GitHub per orientare il controllo del repository corretto
+  `Maxdavi789/Acquatic-intelligence-system`; nessuna PR o issue coinvolta.
+- Individuata la working tree in `C:\none\Acquatic-intelligence-system`.
+- Letti integralmente gli allegati Technical Spec v1.1 e breakdown task v1,
+  `prompt_log.md`, `breakdown_status.md`, `incidents.md`, `HANDOFF.md`, README,
+  `SPEC_ERRATA.md`, requirements, gitignore, launcher, codice applicativo,
+  script di test/validazione/generazione asset e sorgente pitch.
+- Il breakdown versionato in `docs/governance/` e quello allegato risultano
+  identici dopo normalizzazione newline (20.620 caratteri ciascuno).
+- Confermato dal codice che T01-T41 sono implementate: simmetria fuori
+  pipeline, MP4 ufficiale come default, dashboard/export, gestione errori,
+  test e deliverable PPTX finale presenti.
+
+### Git e pull richiesto
+- Stato iniziale: working tree pulita, `main` al commit `19d9732`, uguale al
+  riferimento `origin/main` locale ma non ancora aggiornato dal server.
+- `git fetch origin` ha rilevato `origin/main` avanti fino a `8c32125`.
+- Eseguito `git pull --ff-only`: fast-forward pulito `19d9732 -> 8c32125`,
+  senza merge o conflitti. Recuperati hardening, smoke test, breakdown
+  canonico, launcher Windows, presentazione finale e governance aggiornata.
+- Verifica post-pull: `HEAD == origin/main == 8c3212510ba2f9f4a03be3ab26407acd6a0c56cc`,
+  divergenza 0 ahead / 0 behind.
+
+### Findings
+- Breakdown: nessuna task T01-T41 arretrata o bloccata; il prossimo lavoro e'
+  fuori breakdown (rehearsal umana e decisione webcam best-effort).
+- README: sostanzialmente accurato e completo; nessuna correzione contenutistica
+  necessaria prima della verifica runtime locale.
+- Governance: `HANDOFF.md` e l'introduzione di `breakdown_status.md` conservano
+  alcune frasi storiche pre-push (`a959c6c` / correzioni ancora locali), mentre
+  Git dimostra che il commit finale `8c32125` e' gia' pubblicato.
+- Ambiente corrente: il `venv` locale non parte perche' punta a un interprete
+  Python 3.12.10 non piu' presente; `python` e `py` non sono nel PATH. Per
+  questo suite, smoke e `pip check` non hanno potuto avviarsi. Registrato
+  INC-2026-07-14-016; nessuna dipendenza installata o ambiente ricreato senza
+  approvazione.
+
+### Stato iterazione
+- Nessun codice, README, breakdown status o dipendenza modificati.
+- Modificati soltanto `prompt_log.md` e `incidents.md`, come richiesto dalla
+  governance; queste due modifiche locali non sono committate ne' pushate.
+- Piano di conclusione preparato e in attesa di approvazione dell'utente.
+
+## 2026-07-14 - Chiarimento sull'ordine pull / prompt log
+
+### Messaggio utente
+- Domanda: il pull e' stato eseguito prima di aggiornare `prompt_log.md`?
+
+### Risposta e stato
+- Si'. L'ordine e' stato: verifica working tree pulita; `git fetch origin`;
+  `git pull --ff-only` da `19d9732` a `8c32125`; verifica 0 ahead / 0 behind;
+  lettura e audit del contenuto aggiornato; infine aggiunta dell'entry locale
+  al prompt log prima dell'output finale.
+- Questo ordine non ha perso o sovrascritto messaggi: il pull era un
+  fast-forward su working tree pulita e ha recuperato integralmente il prompt
+  log remoto; la nuova entry e' stata poi aggiunta sopra quella baseline ed e'
+  attualmente una modifica locale non committata.
+
+## 2026-07-14 - Feedback sulla modalita' webcam sperimentale
+
+### Messaggio utente
+- La preview webcam si ferma dopo 300 frame; richiesta indicativa di aumentarla
+  a 3.000 frame.
+- Osservazione: il tracking sembra concentrarsi su un solo braccio e rilevare
+  il secondo soltanto a tratti.
+
+### Analisi eseguita (nessuna modifica applicativa)
+- Confermato in `app.py` il limite `WEBCAM_PREVIEW_FRAMES = 300`, passato al
+  loop tramite `max_frames`: e' una scelta configurativa introdotta da T28 per
+  assicurare la conclusione automatica e il rilascio della webcam.
+- Confermato in `metrics_engine.py` che `select_camera_side_arm` confronta i
+  landmark sinistri 11/13/15 e destri 12/14/16 e sceglie a ogni frame il lato
+  con visibility media maggiore. Il motore calcola quindi metriche su un solo
+  arto, come richiesto da RF-004 e dalla decisione DA-01 della spec laterale.
+- L'overlay MediaPipe prova comunque a disegnare entrambi gli arti. Un braccio
+  intermittente e' compatibile con bassa visibility/occlusione, soprattutto
+  se la webcam non e' perfettamente laterale; la selezione frame-per-frame puo'
+  inoltre alternare il lato quando le visibility sono vicine.
+- Registrato INC-2026-07-14-017. Nessun cambio a durata, tracking, spec o UI e'
+  stato applicato prima dell'approvazione.
+
+### Piano proposto
+- Aumentare la preview webcam a 3.000 frame e aggiornare test/documentazione.
+- Mostrare chiaramente nella UI quale arto viene analizzato.
+- Stabilizzare il lato scelto per la sessione (lock dopo una breve fase
+  affidabile, fallback solo dopo perdita prolungata) e aggiungere indicazioni
+  per la ripresa laterale; mantenere fuori scope la simmetria e le metriche
+  bilaterali, salvo nuova decisione esplicita dell'utente.
+
+## 2026-07-14 - Decisione webcam 900 frame e prodotto bilaterale futuro
+
+### Messaggio utente
+- Precisato che la capacita' di considerare entrambe le braccia fara' parte
+  del prodotto finito; chiesto se una metrica bilaterale con telecamera
+  frontale sia tecnicamente possibile.
+- Corretto il requisito di durata: 300 frame restano insufficienti, ma il
+  valore richiesto e' 900 frame (non 3.000).
+
+### Decisione tecnica
+- Confermato che una modalita' bilaterale frontale e' tecnicamente possibile:
+  deve mantenere due stati separati (destro/sinistro) e definire metriche di
+  confronto coerenti col nuovo piano di ripresa. Non va confusa con il vecchio
+  Symmetry Score del PoC laterale, escluso per ragioni geometriche.
+- Per non ampliare implicitamente lo scope dell'MVP corrente, in questa
+  iterazione viene applicato soltanto il requisito esplicito dei 900 frame; la
+  modalita' bilaterale viene registrata nella roadmap/errata come lavoro futuro
+  da specificare e validare separatamente.
+
+### Modifiche applicate
+- `app.py`: `WEBCAM_PREVIEW_FRAMES` da 300 a 900.
+- `scripts/test_project_smoke.py`: nuovo controllo del budget webcam; smoke
+  atteso da 3/3 a 4/4.
+- README, SPEC_ERRATA, breakdown status e INC-017 aggiornati.
+- Verifica statica: `git diff --check` verde; ricerca globale conferma 900 nei
+  riferimenti operativi. Le occorrenze 300 residue descrivono soltanto lo stato
+  storico di T28 e la segnalazione iniziale.
+- Validazione runtime pendente per INC-016: il venv locale punta a un
+  interprete Python non piu' presente. Nessun risultato di test inventato.
+
+## 2026-07-14 - Ripristino Python/venv e validazione runtime completa
+
+### Messaggio utente
+- Richiesto esplicitamente di risolvere il problema del `venv` non avviabile,
+  invece di lasciare i test runtime pendenti.
+
+### Diagnosi e ripristino
+- Confermata l'assenza di `python`, `py`, `winget`, Chocolatey e Scoop nella
+  sessione; il percorso base registrato in `venv\pyvenv.cfg` non era presente.
+- Verificata sul sito ufficiale python.org la disponibilita' dell'installer
+  Windows 64-bit CPython 3.12.10, versione esatta della baseline.
+- Scaricato in `C:\tmp\python-3.12.10-amd64.exe`; SHA256
+  `67B5635E80EA51072B87941312D00EC8927C4DB9BA18938F7AD2D27B328B95FB`;
+  firma Authenticode valida della Python Software Foundation.
+- Installazione silenziosa per l'utente corrente completata con exit code 0.
+  Python base, launcher del venv e pip hanno risposto come Python 3.12.10;
+  non e' stato necessario cancellare o ricreare il venv.
+- Controllo versioni dirette: MediaPipe 0.10.21, OpenCV 4.11.0, NumPy 1.26.4,
+  Pandas 3.0.3 e protobuf 4.25.9 gia' allineati. Streamlit era 1.59.2 ed e'
+  stato riportato al pin 1.59.1 tramite pip.
+
+### Validazione finale
+- `pip check`: nessuna dipendenza rotta.
+- `compileall`: riuscito per app, motore, tracker e script.
+- `scripts/test_metrics.py`: 23/23 passati.
+- `scripts/test_project_smoke.py`: 4/4 passati, incluso il nuovo controllo
+  `WEBCAM_PREVIEW_FRAMES == 900`.
+- Pipeline CLI sul video ufficiale: 175/175 frame con posa, 10 bracciate,
+  Fluidity 93,1, angoli [58,49; 179,92].
+- `AVVIA_APP.bat --check`: exit 0, Streamlit 1.59.1.
+- Un primo comando wrapper `cmd /c AVVIA_APP.bat --check` e' fallito per la
+  sintassi di invocazione del comando, non per il launcher; il test diretto
+  PowerShell `& .\AVVIA_APP.bat --check` e' passato.
+
+### Stato iterazione
+- INC-016 chiuso come RISOLTO; breakdown status aggiornato.
+- La modifica webcam a 900 frame e' ora validata a runtime tramite smoke 4/4.
+- Nessun commit o push eseguito.
+
+## 2026-07-14 - Consultazione: telefono come camera per la demo live in VM
+
+### Messaggio utente
+- Chiesto se, qualora la webcam della virtual machine non funzionasse sul posto
+  di lavoro, sia possibile presentare la modalita' live usando il telefono.
+
+### Verifica tecnica
+- La webcam corrente usa OpenCV server-side (`VideoCapture(0)`): il telefono
+  deve quindi apparire come dispositivo video dentro la VM oppure il progetto
+  deve acquisire lo stream dal browser/rete.
+- Documentazione Microsoft verificata: Windows 11 puo' usare un telefono
+  Android 10+ collegato come webcam; RDP supporta la redirezione di camera e
+  dispositivi di acquisizione video verso la sessione remota, se consentita
+  da client e policy.
+- `st.camera_input` nativo di Streamlit restituisce singole fotografie, non un
+  flusso video continuo: non sostituisce la modalita' live.
+- `streamlit-webrtc` permette invece al browser del telefono di inviare video
+  real-time, ma richiede nuova dipendenza e integrazione asincrona/thread-safe;
+  da host remoto richiede HTTPS e puo' richiedere STUN/TURN.
+
+### Raccomandazione
+- Percorso piu' semplice senza modifiche: Android come camera collegata al PC
+  Windows 11, poi redirezione video RDP nella VM; se compare come device 0, il
+  codice attuale funziona.
+- Percorso piu' robusto rispetto alla VM ma con sviluppo: nuova sorgente
+  `Telefono (WebRTC)` nella dashboard, da implementare e provare prima della
+  presentazione.
+- Fallback garantito: elaborazione live del video MP4 ufficiale. E' comunque
+  una demo live della pipeline; la webcam/telefono resta un bonus.
+- Nessuna modifica applicativa eseguita in questa iterazione.
+
+## 2026-07-14 - Pubblicazione modifiche e richiesta speech della presentazione
+
+### Messaggio utente
+- Richiesto, come prima azione, commit e push delle modifiche locali.
+- Fornita/indicata la presentazione gia' prodotta e chiesto di verificare se
+  sia aggiornata rispetto allo stato corrente del progetto.
+- Richiesto di creare un file Markdown con lo speech e di collocarlo sul
+  Desktop in una cartella insieme alla presentazione, spostando quest'ultima
+  dalla cartella Download.
+
+### Piano operativo avviato
+- Verificato lo scope Git: sette file modificati, tutti appartenenti alle
+  iterazioni approvate (webcam 900 frame, smoke 4/4, roadmap bilaterale,
+  ripristino ambiente e governance). `git diff --check` verde; `main` e
+  `origin/main` partivano entrambi da `8c32125`.
+- La skill GitHub `yeet` richiede `gh`, non installato in questa postazione.
+  Poiche' l'utente ha chiesto push diretto su `main` e Git HTTPS e' gia'
+  configurato, viene usato il fallback Git nativo senza PR e senza installare
+  GitHub CLI.
+- Corretta prima del commit la frase stantia di INC-017: il runtime dei 900
+  frame e' stato validato dallo smoke 4/4 dopo la risoluzione di INC-016.
+- Fasi successive: individuare il PPTX piu' recente nei Download, confrontarlo
+  con la copia finale versionata e con le modifiche post-pubblicazione,
+  ispezionarlo/renderizzarlo, generare lo speech slide-per-slide e creare la
+  cartella Desktop richiesta.

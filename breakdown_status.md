@@ -176,6 +176,12 @@ Validatore dopo T22: `python scripts/test_metrics.py` -> 23/23 test, exit 0
   e copia versionata in `docs/pitch/AI_Swimming_Motion_Analyzer_Final.pptx`.
 - INC-015: rilevato e mitigato lo snapshot Desktop precedente all'hardening;
   il PPTX usa `docs/pitch/` come baseline autorevole.
+- Feedback webcam post-pubblicazione: preview T28 estesa da 300 a 900 frame;
+  la futura metrica bilaterale frontale e' registrata come direzione di
+  prodotto, non come task MVP riaperta.
+- INC-016 risolto: Python 3.12.10 ripristinato sulla postazione corrente; venv
+  riallineato ai pin (incluso Streamlit 1.59.1). `pip check`, suite 23/23,
+  smoke 4/4, pipeline ufficiale 10/93,1 e launcher tutti verdi.
 
 ## Azioni rimanenti (fuori breakdown)
 

@@ -490,3 +490,56 @@
   stato sovrascritto.
 - Stato: mitigato per il PPTX finale; la cartella Desktop resta uno snapshot
   storico e non va riutilizzata come baseline senza riallinearla alla repo.
+
+### INC-2026-07-14-016 - Virtual environment locale non avviabile dopo la sincronizzazione finale
+- Tipo: ambiente Python / portabilita' della postazione corrente.
+- Evidenza: dopo il pull fast-forward a `8c32125`, ogni comando tramite
+  `venv\Scripts\python.exe` termina con `No Python at
+  C:\Users\ezioc\AppData\Local\Programs\Python\Python312\python.exe`.
+  `venv\pyvenv.cfg` punta a Python 3.12.10 in quel percorso, ma l'interprete
+  base non esiste piu'; inoltre ne' `python` ne' `py` sono disponibili nel
+  PATH della sessione corrente.
+- Impatto: su questa postazione `AVVIA_APP.bat`, suite metriche, smoke test e
+  pipeline CLI non sono eseguibili finche' l'ambiente non viene ricreato. Non
+  e' evidenza di una regressione del codice: il commit remoto contiene le
+  validazioni verdi eseguite prima della pubblicazione finale.
+- Risoluzione 2026-07-14: scaricato l'installer ufficiale CPython 3.12.10
+  64-bit da python.org; firma Authenticode valida, firmatario Python Software
+  Foundation, SHA256
+  `67B5635E80EA51072B87941312D00EC8927C4DB9BA18938F7AD2D27B328B95FB`.
+  Installazione per l'utente corrente riuscita (exit 0) nello stesso percorso
+  atteso da `venv\pyvenv.cfg`: il venv esistente e' tornato avviabile senza
+  essere cancellato o ricreato.
+- Rilevata e corretta una sola deriva: Streamlit 1.59.2 nel venv, riallineato
+  al pin `streamlit==1.59.1`. Le altre dipendenze dirette coincidevano gia'
+  con requirements.
+- Validazione finale: `pip check` pulito; compilazione Python riuscita; suite
+  metriche 23/23; smoke progetto 4/4 (incluso budget webcam 900); pipeline
+  ufficiale 175/175 frame, 10 bracciate, Fluidity 93,1; launcher
+  `AVVIA_APP.bat --check` -> Streamlit 1.59.1.
+- Stato: RISOLTO. Ambiente locale nuovamente pronto per avvio e rehearsal.
+
+### INC-2026-07-14-017 - Preview webcam breve e percezione instabile del secondo braccio
+- Tipo: usabilita' webcam / protocollo di ripresa / comportamento MediaPipe.
+- Segnalazione utente: la modalita' webcam sperimentale termina dopo 300 frame;
+  3.000 frame sono ritenuti piu' utili. Durante la prova il sistema sembra
+  concentrarsi su un solo braccio e mostrare l'altro solo a tratti.
+- Evidenza nel codice: `app.py` imposta `WEBCAM_PREVIEW_FRAMES = 300`. Il
+  motore, coerentemente con RF-004 e DA-01, usa deliberatamente un solo arto:
+  `select_camera_side_arm` sceglie a ogni frame quello con visibility media
+  maggiore. MediaPipe disegna invece l'intero scheletro che riesce a stimare.
+- Analisi: il limite di durata e' configurativo. La selezione mono-arto non e'
+  un bug ne' Symmetry Score; e' il comportamento previsto per una ripresa
+  laterale. Con una webcam frontale/obliqua o con auto-occlusioni, la visibility
+  del braccio lontano puo' calare e il lato scelto puo' cambiare tra frame.
+- Decisione utente: durata finale richiesta = 900 frame, non 3.000. Una
+  metrica bilaterale con telecamera frontale fara' parte della direzione del
+  prodotto futuro.
+- Azione eseguita: `WEBCAM_PREVIEW_FRAMES` portato a 900; aggiunto uno smoke
+  check dedicato e aggiornate documentazione/errata. La metrica bilaterale non
+  viene inserita implicitamente nell'MVP: richiede protocollo frontale,
+  definizione formale e validazione dedicate.
+- Stato: RISOLTO per la durata; verifica runtime completata dopo la risoluzione
+  di INC-016 (`smoke 4/4`, incluso il controllo dei 900 frame). L'osservazione
+  sulla stabilita' visiva dei due arti resta input per il design della
+  modalita' bilaterale futura.

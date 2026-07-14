@@ -115,7 +115,8 @@ espressamente prevista dalla spec (sez. 14.2).
   questo non autorizza un'affermazione assoluta su ogni video futuro.
 - La misura e' 2D monoculare su vista laterale: l'arto lontano non e'
   affidabile, per questo il Symmetry Score e' fuori scope MVP (DA-01).
-- Webcam in Streamlit: percorso sperimentale a durata limitata (RF-014).
+- Webcam in Streamlit: percorso sperimentale limitato a 900 frame per singola
+  anteprima (RF-014), circa 30 secondi a 30 fps.
 - Un rerun di Streamlit durante l'inferenza nativa resta un limite noto. La
   causa concreta osservata in INC-012 (riscrittura della cache sotto il
   decoder) e' stata rimossa; durante la demo e' comunque prudente non toccare
@@ -125,7 +126,10 @@ espressamente prevista dalla spec (sez. 14.2).
 
 Sandbox di ripresa proprietario, telecamere subacquee, mini-PC edge, sensor
 fusion/LiDAR, analisi multi-atleta, validazione biomeccanica in acqua con
-protocollo scientifico.
+protocollo scientifico. Il prodotto futuro prevede inoltre una modalita'
+frontale bilaterale: tracking separato di braccio destro e sinistro e metriche
+di confronto da calibrare su quel protocollo; non coincide con la metrica
+mono-arto del PoC laterale.
 
 ## Struttura
 

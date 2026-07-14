@@ -38,7 +38,7 @@ INPUT_WEBCAM = "Webcam (sperimentale)"
 WEBCAM_DEVICE_INDEX = 0
 # L'anteprima webcam e' best-effort (RF-014): durata limitata, cosi' il loop
 # termina sempre da solo e rilascia le risorse anche senza uno stop manuale.
-WEBCAM_PREVIEW_FRAMES = 300
+WEBCAM_PREVIEW_FRAMES = 900
 
 
 st.set_page_config(

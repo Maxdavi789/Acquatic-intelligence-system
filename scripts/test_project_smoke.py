@@ -9,6 +9,7 @@ Streamlit completi un primo render senza eccezioni.
 """
 from __future__ import annotations
 
+import ast
 import sys
 from pathlib import Path
 from typing import Callable
@@ -40,11 +41,24 @@ def check_streamlit_initial_render() -> None:
     assert [title.value for title in app.title] == ["AI Swimming Motion Analyzer"]
 
 
+def check_webcam_preview_budget() -> None:
+    app_tree = ast.parse((PROJECT_ROOT / "app.py").read_text(encoding="utf-8"))
+    assignments = {
+        target.id: ast.literal_eval(node.value)
+        for node in app_tree.body
+        if isinstance(node, ast.Assign)
+        for target in node.targets
+        if isinstance(target, ast.Name) and target.id == "WEBCAM_PREVIEW_FRAMES"
+    }
+    assert assignments.get("WEBCAM_PREVIEW_FRAMES") == 900, assignments
+
+
 def main() -> int:
     checks: list[tuple[str, Callable[[], None]]] = [
         ("default video ufficiale", check_default_video_is_official),
         ("MediaPipe legacy Pose", check_mediapipe_legacy_pose_available),
         ("render iniziale Streamlit", check_streamlit_initial_render),
+        ("preview webcam 900 frame", check_webcam_preview_budget),
     ]
     failures = 0
     for label, check in checks:

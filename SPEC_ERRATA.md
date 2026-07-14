@@ -45,6 +45,19 @@ Qui si annotano baseline, delta e correzioni successive, con data e task ID.
 
 ## Errata successivi
 
+### 2026-07-14 - Estensione preview webcam e direzione prodotto bilaterale
+
+- Su feedback della prova utente, la durata massima della preview webcam T28
+  passa da 300 a 900 frame (circa 30 secondi a 30 fps). La webcam resta una
+  modalita' sperimentale/best-effort e il percorso MP4 resta quello garantito.
+- Chiarita la direzione del prodotto successivo all'MVP: una ripresa frontale
+  potra' alimentare metriche distinte per braccio destro e sinistro e un
+  confronto bilaterale. Questa modalita' richiedera' un protocollo e una
+  calibrazione propri; non riattiva automaticamente il vecchio Symmetry Score
+  escluso dal PoC laterale (DA-01).
+- Nessuna metrica bilaterale viene aggiunta in questa errata: il delta runtime
+  corrente riguarda soltanto il budget della preview webcam.
+
 ### 2026-07-14 - Hardening riproducibilita' ambiente UI (audit pre-presentazione)
 
 - La spec richiede esplicitamente il pin di MediaPipe (DA-06); l'audit finale
