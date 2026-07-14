@@ -2018,3 +2018,36 @@
   con la copia finale versionata e con le modifiche post-pubblicazione,
   ispezionarlo/renderizzarlo, generare lo speech slide-per-slide e creare la
   cartella Desktop richiesta.
+
+### Esito commit e push
+- Commit applicativo creato e pubblicato su `origin/main`:
+  `5c78f2a Extend webcam preview and restore runtime baseline`.
+- Verificata l'identita' tra `HEAD` e `origin/main` dopo il push:
+  `5c78f2a5dd8e619b30408f90f88c4a1067490599`.
+
+### Verifica presentazione
+- L'allegato nei Download era una versione precedente da 10 slide, SHA256
+  `7DCEDA0C7EC9237580882A60038C70DBFD6554D956E61E723E45A2D0567EBA17`.
+- La versione finale gia' approvata e versionata in `docs/pitch` contiene 11
+  slide, inclusa la chiusura "Grazie", SHA256
+  `26420EC1E218161A805C5EF0356489B991F88C8644A51C02390F322B445EB3FD`.
+- Il contenuto delle prime 10 slide coincide; l'allegato era quindi integro ma
+  non aggiornato alla revisione conclusiva. Le modifiche recenti non alterano
+  i KPI centrali della presentazione e sono state integrate nel materiale del
+  relatore: webcam sperimentale a 900 frame e roadmap bilaterale frontale.
+- Un nuovo rendering in questa VM non e' stato possibile: il runtime di
+  presentazione non dispone di `pdf2image` e PowerPoint COM/LibreOffice non
+  sono installati. Non e' stato modificato il PPTX; e' stata riutilizzata la
+  finale da 11 slide gia' renderizzata e validata in precedenza nella repo.
+
+### Consegna sul Desktop
+- Creata la cartella
+  `C:\Users\ezioc\Desktop\AI_Swimming_Motion_Analyzer_Presentazione`.
+- Spostato l'allegato dai Download e conservato come
+  `AI_Swimming_Motion_Analyzer_10_slide_backup.pptx`.
+- Copiata nella stessa cartella la revisione ufficiale da 11 slide come
+  `AI_Swimming_Motion_Analyzer_Final.pptx`; hash verificato uguale alla copia
+  versionata.
+- Creato `Speech_AI_Swimming_Motion_Analyzer.md`: speech slide-per-slide,
+  traccia della demo, transizioni, risposte alle domande probabili, fallback
+  webcam/telefono e chiusura breve.
