@@ -2051,3 +2051,22 @@
 - Creato `Speech_AI_Swimming_Motion_Analyzer.md`: speech slide-per-slide,
   traccia della demo, transizioni, risposte alle domande probabili, fallback
   webcam/telefono e chiusura breve.
+
+## 2026-07-14 - Risposta da presentazione: quale AI e' stata usata
+
+### Messaggio utente
+- Chiesto cosa rispondere se durante la presentazione viene domandato quale
+  intelligenza artificiale sia stata usata nel progetto.
+
+### Verifica e risposta preparata
+- Verificato nel codice che il componente AI e' **MediaPipe Pose / BlazePose**:
+  rete neurale profonda pre-addestrata per la pose estimation, eseguita
+  localmente sulla CPU e capace di restituire 33 landmark corporei.
+- Configurazione effettiva: `static_image_mode=False`, `model_complexity=1`,
+  smoothing attivo, segmentazione disattiva e soglie detection/tracking 0,5.
+- Chiarita la separazione architetturale: BlazePose riconosce i punti del
+  corpo; angolo del gomito, conteggio delle bracciate e Fluidity Score sono
+  calcolati successivamente con formule e regole deterministiche in Python.
+- Nessun LLM o modello generativo, nessuna API cloud, nessuna API key e nessun
+  addestramento proprietario del modello. Preparata una risposta orale breve e
+  una versione tecnica per eventuali domande di approfondimento.
