@@ -1232,3 +1232,40 @@
 - Breakdown T01-T41 completo e sincronizzato su entrambe le postazioni. Restano
   azioni utente: chiusura T39 (decisione importo), rehearsal umana + screenshot
   dashboard, decisione webcam live.
+
+## 2026-07-14 (ripresa ufficio, seguito) - Chiusura T39, push e diagnosi webcam
+
+### Messaggi utente
+- Scelta importo fondi: opzione qualitativa SENZA cifra (slide 10 elenca
+  l'hardware e rimanda il budget di dettaglio).
+- "si pusha i commit, ma INVECE GUARDA CHE QUESTO PC HA LA WEBCAM, non le
+  rilevi?"
+
+### Blocco B - T39 chiusa (commit b9cf487)
+- `pitch_deck.md`: nome inserito (Massimo Davide Fedrigo, slide 1), slide 10
+  con richiesta fondi qualitativa senza cifra, intestazione aggiornata a
+  REVISIONATA (DoD T39 soddisfatto).
+- `pitch_deck_bozza.pdf` rigenerato dal markdown revisionato (matplotlib
+  PdfPages, 10 slide, immagini reali della pipeline incorporate); slide 1, 4 e
+  10 ispezionate visivamente prima del commit.
+
+### Push autorizzato
+- `git push origin main`: riuscito, `50db4f6..b9cf487` (governance 5a65698 +
+  T39 b9cf487). Verifica post-push: locale e `origin/main` allineati 0/0.
+
+### Diagnosi webcam macchina ufficio (INC-010 aggiornato)
+- Sonda OpenCV: indici 0-2 con backend MSMF e DirectShow -> nessuna apertura.
+- Inventario PnP Windows: la sessione e' un ambiente remoto/virtualizzato
+  (scheda video Hyper-V, zero dispositivi USB) con "Bus fotocamera Desktop
+  remoto" (RDCAMERA_BUS) presente ma VUOTO: nessuna camera reindirizzata.
+  La webcam fisica sta sul PC client dell'utente, non nella sessione remota.
+  Privacy webcam Windows su Allow (non e' il blocco).
+- Rimedio documentato in INC-010: abilitare la redirezione dei dispositivi di
+  acquisizione video nel client Desktop remoto e riconnettersi; poi ripetere
+  la sonda (T28 gia' pronta a consumare l'indice 0).
+
+### Stato iterazione
+- T39 CHIUSA; tutto il breakdown T01-T41 completato e pushato. Webcam ufficio:
+  spiegata (redirezione RDP assente), rimedio in mano all'utente; a casa resta
+  funzionante. Restano: rehearsal umana + screenshot dashboard, decisione
+  momento webcam live.

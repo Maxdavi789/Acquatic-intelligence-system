@@ -373,3 +373,19 @@
   La modalita' webcam best-effort (RF-014) torna quindi verificabile
   visivamente; la prova UI completa resta in T28. Stato: risolto sulla
   macchina di casa, non bloccante.
+- Aggiornamento 2026-07-14 (macchina ufficio, causa individuata): l'utente
+  segnala che il PC ha una webcam; nuova diagnosi eseguita. OpenCV non apre
+  nessun indice 0-2 ne' col backend MSMF ne' con DirectShow. L'inventario PnP
+  di Windows rivela la causa: la sessione in cui gira il codice e' un ambiente
+  remoto/virtualizzato (scheda video Hyper-V, NESSUN dispositivo USB) in cui
+  e' presente il "Bus fotocamera Desktop remoto" (RDCAMERA_BUS) ma senza
+  alcuna camera reindirizzata al suo interno. La webcam fisica appartiene al
+  PC client davanti all'utente, non alla sessione remota. Le impostazioni
+  privacy webcam di Windows sono su Allow: non sono loro il blocco.
+- Rimedio documentato (azione utente): abilitare la redirezione della
+  videocamera nel client Desktop remoto prima di connettersi (mstsc:
+  Opzioni > Risorse locali > Altro... > spuntare "Dispositivi di acquisizione
+  video"; nelle app Remote Desktop/Windows App: impostazioni della connessione
+  > reindirizza fotocamera), poi riconnettersi. La camera comparira' sotto il
+  bus RDCAMERA e OpenCV potra' aprirla all'indice 0 (modalita' T28 gia'
+  pronta). Stato: aperto non bloccante in ufficio; risolto a casa.
