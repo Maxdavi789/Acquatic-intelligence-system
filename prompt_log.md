@@ -2070,3 +2070,35 @@
 - Nessun LLM o modello generativo, nessuna API cloud, nessuna API key e nessun
   addestramento proprietario del modello. Preparata una risposta orale breve e
   una versione tecnica per eventuali domande di approfondimento.
+
+## 2026-07-14 - Sincronizzazione ufficio dopo la sessione finale di casa
+
+### Messaggio utente
+- "ok ho finito un gran lavoro a casa, pulla tutto quello che va pullato
+  dalla repo per pareggiare questo ambiente di lavoro."
+
+### Azioni e verifiche (postazione ufficio)
+- Il primo `git fetch` e' fallito per un ref locale Codex corrotto
+  (refs/codex/turn-diffs/..., SHA nullo, badRefContent): rimosso il solo
+  ref rotto (residuo di tooling, non dati di progetto), fetch riuscito.
+  L'altro ref codex, integro, e' stato lasciato invariato.
+- `git pull --ff-only origin main`: fast-forward `8c32125 -> c60bc9c`,
+  3 commit dalla sessione casa (preview webcam 900 frame + hardening,
+  handoff speech presentazione, risposta "quale AI"). Dopo il pull:
+  locale e `origin/main` allineati 0/0, worktree pulito.
+- Verificato che i fix INC-012 (guard file_id + width="stretch") sono
+  intatti dopo il merge del delta webcam.
+- Rivalidata la baseline su questa macchina: `pip check` pulito, suite
+  motore 23/23, smoke test progetto 4/4 (video default ufficiale,
+  MediaPipe legacy, primo render Streamlit, budget preview 900).
+  L'INC-016 (venv rotto) riguardava solo la macchina di casa.
+- INC-015 applicato alla postazione ufficio: la cartella Desktop
+  `pitch_claude_design` (snapshot pre-audit) e' stata RIALLINEATA alla
+  fonte autorevole: ricopiati deck, 6 immagini e README da docs/pitch/ e
+  root repo; hash verificati IDENTICI alla baseline auditata (8/8 OK);
+  LEGGIMI aggiornato con nota di riallineamento e rimando alla
+  presentazione finale versionata AI_Swimming_Motion_Analyzer_Final.pptx.
+
+### Stato iterazione
+- Ambiente ufficio pareggiato alla repo e validato; presentazione finale,
+  launcher AVVIA_APP.bat e speech disponibili anche qui.
